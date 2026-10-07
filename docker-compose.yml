@@ -1,0 +1,20 @@
+services:
+  arcade-hub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: arcadex_game_hub
+    restart: unless-stopped
+    ports:
+      - "3080:80"
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 128M
