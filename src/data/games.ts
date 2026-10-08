@@ -2,6 +2,57 @@ import { GameItem } from '../types/game';
 
 export const GAMES_CATALOG: GameItem[] = [
   {
+    id: 'mecha-blaster-2',
+    slug: 'mecha-blaster-2',
+    title: 'Mecha Blaster 2: Cyber Assault',
+    category: 'action',
+    description: 'Retro Symbian-inspired top-down mech combat. Pilot an armored titan with 360° aim, homing missiles, and boss battles.',
+    longDescription: 'Mecha Blaster 2: Cyber Assault delivers adrenaline-pumping retro mech combat inspired by classic mobile mech shooters. Command an armored walking titan across hazardous futuristic battlefields. Blast through swarms of robotic scout drones, crawling spider mechs, and heavy tanks. Upgrade your arsenal from dual vulcan gatling guns to triple plasma cannons and quad hyper lasers, launch homing swarm missiles, trigger tactical EMP nukes, and defeat colossal multi-phase mech titans with zero lag in your browser.',
+    howToPlay: [
+      'Use WASD or Arrow Keys to maneuver your combat mech in 8 directions.',
+      'Aim with your mouse or right joystick; click/hold to fire your primary vulcan cannons.',
+      'Press Spacebar to launch homing swarm missiles against enemy clusters.',
+      'Press Shift to activate your directional thruster dash and dodge bullet storms.',
+      'Collect glowing power-ups: ⚡ Weapon Overdrive, 🛡️ Shield Battery, 🚀 Missile Packs, and 💣 Tactical Nuke EMPs.',
+      'Survive relentless enemy waves and eliminate mega titan bosses every 3 waves.'
+    ],
+    controls: {
+      desktop: 'WASD/Arrows to Move, Mouse to Aim & Fire, Space for Missiles, Shift for Dash',
+      mobile: 'Dual touch controls, on-screen Missile and Dash buttons'
+    },
+    tips: [
+      'Keep moving constantly to prevent swarm drones and heavy tank shells from surrounding you.',
+      'Save your homing swarm missiles for large enemy clusters or mega titan boss shields.',
+      'Use your thruster dash (Shift) when trapped in dense bullet storms to gain invulnerability frames.',
+      'Your energy shields will auto-regenerate over time if you avoid taking damage.'
+    ],
+    faqs: [
+      {
+        question: 'What inspired Mecha Blaster 2?',
+        answer: 'Mecha Blaster 2 is an original retro tribute to classic Symbian and early mobile top-down mech combat games, built with modern 60 FPS HTML5 Canvas and Web Audio.'
+      },
+      {
+        question: 'Does Mecha Blaster 2 require installation or login?',
+        answer: 'No! It runs 100% locally in your web browser with zero downloads, zero account setup, and zero server lag.'
+      },
+      {
+        question: 'How do I unlock higher weapon tiers?',
+        answer: 'Defeat enemy units and grab the glowing cyan ⚡ Weapon Overdrive power-up to upgrade to Tri-Plasma and Quad Hyper Cannons.'
+      }
+    ],
+    badge: 'New',
+    coverImage: '/assets/covers/mecha-blaster-2.jpg',
+    proBadge: 'PRO ACTION HIT',
+    heroImage: '/assets/heroes/hero-spotlight-galaxy.jpg',
+    difficulty: 'Hard',
+    tags: ['Action', 'Mech', 'Retro', 'Shooter', 'Top-Down', 'Boss Fight'],
+    gradient: 'from-blue-600 to-indigo-900',
+    rating: 4.95,
+    reviewCount: 890,
+    plays: 12400,
+    releaseDate: '2026-10-08'
+  },
+  {
     id: 'snake',
     slug: 'snake',
     title: 'Retro Snake 2.0',

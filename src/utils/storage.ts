@@ -10,6 +10,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
   { id: 'word_detective', title: 'Lexicon Master', description: 'Decode a 5-letter word in Word Quest', icon: '🔤', unlocked: false },
   { id: 'sudoku_genius', title: 'Logic Guru', description: 'Complete a Sudoku puzzle', icon: '🔢', unlocked: false },
   { id: 'asteroid_blaster', title: 'Rock Crusher', description: 'Score 1,500+ in Asteroid Blaster', icon: '☄️', unlocked: false },
+  { id: 'mecha_titan', title: 'Titan Slayer', description: 'Score 2,500+ in Mecha Blaster 2', icon: '🤖', unlocked: false },
   { id: 'five_games', title: 'Arcade Explorer', description: 'Play at least 5 different games', icon: '🌟', unlocked: false },
   { id: 'century_club', title: 'Century Veteran', description: 'Play 100 total game rounds', icon: '👑', unlocked: false },
 ];
@@ -75,6 +76,7 @@ export const checkAndUnlockAchievements = (profile: PlayerProfile): PlayerProfil
     if (ach.id === 'snake_master' && (profile.gameStats['snake']?.highScore || 0) >= 100) unlock = true;
     if (ach.id === 'galaxy_hero' && (profile.gameStats['galaxy-defender']?.highScore || 0) >= 1000) unlock = true;
     if (ach.id === 'asteroid_blaster' && (profile.gameStats['asteroid-blaster']?.highScore || 0) >= 1500) unlock = true;
+    if (ach.id === 'mecha_titan' && (profile.gameStats['mecha-blaster-2']?.highScore || 0) >= 2500) unlock = true;
     if (ach.id === 'word_detective' && (profile.gameStats['word-quest']?.highScore || 0) > 0) unlock = true;
     if (ach.id === 'sudoku_genius' && (profile.gameStats['sudoku']?.highScore || 0) > 0) unlock = true;
 

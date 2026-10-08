@@ -36,6 +36,7 @@ import { ConnectFourGame } from './games/ConnectFourGame';
 import { SimonEchoGame } from './games/SimonEchoGame';
 import { BubbleShooterGame } from './games/BubbleShooterGame';
 import { UltimateTicTacToeGame } from './games/UltimateTicTacToeGame';
+import { MechaBlaster2Game } from './games/MechaBlaster2Game';
 
 interface GamePlayerModalProps {
   game: GameItem | null;
@@ -126,6 +127,8 @@ export const GamePlayerModal: React.FC<GamePlayerModalProps> = ({
         return <BubbleShooterGame {...props} />;
       case 'ultimate-tictactoe':
         return <UltimateTicTacToeGame {...props} />;
+      case 'mecha-blaster-2':
+        return <MechaBlaster2Game {...props} />;
       default:
         return (
           <div className="flex flex-col items-center justify-center p-12 text-center text-slate-600">
