@@ -111,7 +111,7 @@ export const updateSEO = (config: SEOConfig): void => {
 };
 
 export const updateGameSEO = (game: GameItem): void => {
-  const directUrl = `http://localhost:3080/?game=${game.slug}`;
+  const directUrl = `${window.location.origin}/?game=${game.slug}`;
   updateSEO({
     title: `Play ${game.title} Online Free - No Download, Instant Arcade`,
     description: `Play ${game.title} (${game.category.toUpperCase()}) free in your browser. Zero login, 0% server lag, pure client-side HTML5 & Web Audio!`,
@@ -119,5 +119,16 @@ export const updateGameSEO = (game: GameItem): void => {
     ogType: 'game',
     keywords: [game.title, game.category, ...game.tags, 'free online games', 'no download games', 'html5 arcade'],
     game,
+  });
+};
+
+export const resetToHomeSEO = (): void => {
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3080';
+  updateSEO({
+    title: 'Arcadex - 100% Free Web Arcade Games (Zero Download & No Login)',
+    description: 'Instant client-side web gaming hub with 17+ retro classics, puzzles, action & word games. Zero latency, 100% browser-rendered physics & procedural Web Audio.',
+    canonicalUrl: `${origin}/`,
+    ogType: 'website',
+    keywords: ['free web games', 'retro arcade', 'browser games', 'no download games', 'html5 games', 'wordle free', 'sudoku online', '2048 online', 'asteroids arcade'],
   });
 };

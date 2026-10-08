@@ -1,7 +1,10 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { GameItem, GameCategory, PlayerProfile } from './types/game';
 import { GAMES_CATALOG } from './data/games';
 import { Header } from './components/Header';
+import { Arcade3DHero } from './components/Arcade3DHero';
+import { InfiniteMarquee } from './components/InfiniteMarquee';
+import { BentoGridSection } from './components/BentoGridSection';
 import { CategoryFilter } from './components/CategoryFilter';
 import { GameCard } from './components/GameCard';
 import { GamePlayerModal } from './components/GamePlayerModal';
@@ -9,95 +12,77 @@ import { StatsDrawer } from './components/StatsDrawer';
 import { AchievementsModal } from './components/AchievementsModal';
 import {
   getStoredProfile,
-  recordGamePlay,
   toggleFavoriteGame,
+  recordGamePlay,
   updateSoundPreference,
-  checkAndUnlockAchievements,
+  defaultProfile,
 } from './utils/storage';
-import { updateSEO, updateGameSEO } from './utils/seo';
+import { updateGameSEO, resetToHomeSEO } from './utils/seo';
 import { sounds } from './utils/soundEngine';
 import {
-  Search,
-  Sparkles,
-  Flame,
   Gamepad2,
   Trophy,
+  Flame,
+  Search,
+  SlidersHorizontal,
+  Sparkles,
   Zap,
-  ShieldCheck,
-  ChevronRight,
   HelpCircle,
-  Clock,
-  Layers,
+  ShieldCheck,
+  Globe,
   Award,
 } from 'lucide-react';
 
 export const App: React.FC = () => {
-  // State
-  const [profile, setProfile] = useState<PlayerProfile>(getStoredProfile());
+  const [profile, setProfile] = useState<PlayerProfile>(defaultProfile);
   const [activeCategory, setActiveCategory] = useState<GameCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeGame, setActiveGame] = useState<GameItem | null>(null);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [selectedGame, setSelectedGame] = useState<GameItem | null>(null);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [sortBy, setSortBy] = useState<'popular' | 'rating' | 'title'>('popular');
+  const catalogRef = useRef<HTMLDivElement>(null);
 
-  // Sync sound engine enabled state
+  // Initialize Profile & Sound on Mount
   useEffect(() => {
-    sounds.setEnabled(profile.soundEnabled);
-  }, [profile.soundEnabled]);
+    const saved = getStoredProfile();
+    setProfile(saved);
+    sounds.setEnabled(saved.soundEnabled);
+  }, []);
 
-  // Handle URL Query Params for deep-linking & SEO indexing
+  // Sync with URL Query Parameters (?game=slug, ?category=cat)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const gameSlug = params.get('game');
-    const categoryParam = params.get('category') as GameCategory | null;
-    const searchParam = params.get('search');
-
-    if (gameSlug) {
-      const matched = GAMES_CATALOG.find((g) => g.slug === gameSlug || g.id === gameSlug);
-      if (matched) {
-        setActiveGame(matched);
-        updateGameSEO(matched);
-      }
-    } else {
-      updateSEO({
-        title: 'Arcadex - Play 15+ Free Online Web Games (No Download, No Signup)',
-        description:
-          'Play 15+ free HTML5 web games with zero login, zero downloads, and instant client-side execution. Retro Snake, 2048, Word Quest, Sudoku, Galaxy Defender, and more.',
-        canonicalUrl: window.location.origin + '/',
-      });
-    }
+    const categoryParam = params.get('category') as GameCategory;
 
     if (categoryParam && ['all', 'arcade', 'puzzle', 'retro', 'action', 'strategy', 'word'].includes(categoryParam)) {
       setActiveCategory(categoryParam);
     }
 
-    if (searchParam) {
-      setSearchQuery(searchParam);
+    if (gameSlug) {
+      const match = GAMES_CATALOG.find((g) => g.slug === gameSlug || g.id === gameSlug);
+      if (match) {
+        setSelectedGame(match);
+        updateGameSEO(match);
+      }
+    } else {
+      resetToHomeSEO();
     }
 
-    // Handle Browser Popstate (Back/Forward)
     const handlePopState = () => {
-      const updatedParams = new URLSearchParams(window.location.search);
-      const curGameSlug = updatedParams.get('game');
-      const curCat = updatedParams.get('category') as GameCategory | null;
-
-      if (curGameSlug) {
-        const matched = GAMES_CATALOG.find((g) => g.slug === curGameSlug || g.id === curGameSlug);
-        setActiveGame(matched || null);
-        if (matched) updateGameSEO(matched);
+      const p = new URLSearchParams(window.location.search);
+      const slug = p.get('game');
+      const cat = p.get('category') as GameCategory;
+      if (cat) setActiveCategory(cat);
+      if (slug) {
+        const found = GAMES_CATALOG.find((g) => g.slug === slug || g.id === slug);
+        setSelectedGame(found || null);
+        if (found) updateGameSEO(found);
       } else {
-        setActiveGame(null);
-        updateSEO({
-          title: 'Arcadex - Play 15+ Free Online Web Games (No Download, No Signup)',
-          description:
-            'Play 15+ free HTML5 web games with zero login, zero downloads, and instant client-side execution. Retro Snake, 2048, Word Quest, Sudoku, Galaxy Defender, and more.',
-          canonicalUrl: window.location.origin + '/',
-        });
-      }
-
-      if (curCat) {
-        setActiveCategory(curCat);
+        setSelectedGame(null);
+        resetToHomeSEO();
       }
     };
 
@@ -105,264 +90,224 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Update URL Query params cleanly
-  const updateUrlParams = useCallback((game: GameItem | null, cat?: GameCategory) => {
+  // Update URL and SEO when Game opens/closes
+  const handleOpenGame = useCallback((game: GameItem) => {
+    setSelectedGame(game);
+    updateGameSEO(game);
     const url = new URL(window.location.href);
-    if (game) {
-      url.searchParams.set('game', game.slug);
-    } else {
-      url.searchParams.delete('game');
-    }
-
-    if (cat && cat !== 'all') {
-      url.searchParams.set('category', cat);
-    } else if (cat === 'all') {
-      url.searchParams.delete('category');
-    }
-
+    url.searchParams.set('game', game.slug);
     window.history.pushState({}, '', url.toString());
   }, []);
 
-  // Handlers
-  const handleOpenGame = (game: GameItem) => {
-    setActiveGame(game);
-    updateGameSEO(game);
-    updateUrlParams(game, activeCategory);
-  };
+  const handleCloseGame = useCallback(() => {
+    setSelectedGame(null);
+    resetToHomeSEO();
+    const url = new URL(window.location.href);
+    url.searchParams.delete('game');
+    window.history.pushState({}, '', url.toString());
+  }, []);
 
-  const handleCloseGame = () => {
-    setActiveGame(null);
-    updateUrlParams(null, activeCategory);
-    updateSEO({
-      title: 'Arcadex - Play 15+ Free Online Web Games (No Download, No Signup)',
-      description:
-        'Play 15+ free HTML5 web games with zero login, zero downloads, and instant client-side execution. Retro Snake, 2048, Word Quest, Sudoku, Galaxy Defender, and more.',
-      canonicalUrl: window.location.origin + '/',
-    });
-  };
-
-  const handleSelectCategory = (cat: GameCategory) => {
+  // Select Category with URL update
+  const handleSelectCategory = useCallback((category: GameCategory) => {
     sounds.playClick();
-    setActiveCategory(cat);
-    updateUrlParams(activeGame, cat);
-  };
+    setActiveCategory(category);
+    const url = new URL(window.location.href);
+    if (category === 'all') {
+      url.searchParams.delete('category');
+    } else {
+      url.searchParams.set('category', category);
+    }
+    window.history.pushState({}, '', url.toString());
+  }, []);
 
-  const handleToggleFavorite = (gameId: string) => {
+  // Sound Engine Mute Toggle
+  const handleToggleSound = useCallback(() => {
+    const next = !profile.soundEnabled;
+    const updated = updateSoundPreference(next);
+    sounds.setEnabled(next);
+    setProfile(updated);
+    if (next) sounds.playLaser();
+  }, [profile.soundEnabled]);
+
+  // Toggle Favorite
+  const handleToggleFavorite = useCallback((gameId: string) => {
+    sounds.playLaser();
     const updated = toggleFavoriteGame(gameId);
     setProfile(updated);
-  };
+  }, []);
 
-  const handleToggleSound = () => {
-    const newSoundState = !profile.soundEnabled;
-    const updated = updateSoundPreference(newSoundState);
-    setProfile(updated);
-  };
+  // Game Over Handler
+  const handleRecordGameOver = useCallback((gameId: string, finalScore: number) => {
+    const { profile: updatedProfile, isNewHighScore } = recordGamePlay(gameId, finalScore, 60);
+    setProfile(updatedProfile);
+    if (isNewHighScore) {
+      sounds.playVictory();
+    }
+  }, []);
 
-  const handleRecordGameOver = (gameId: string, finalScore: number) => {
-    const updated = recordGamePlay(gameId, finalScore);
-    const withAchievements = checkAndUnlockAchievements(updated);
-    setProfile(withAchievements);
-  };
+  // Scroll to Game Catalog
+  const handleScrollToCatalog = useCallback(() => {
+    if (catalogRef.current) {
+      catalogRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
 
-  // Filtered Games Calculation
+  // Pick and Play Random Game
+  const handlePlayRandomGame = useCallback(() => {
+    const randomIndex = Math.floor(Math.random() * GAMES_CATALOG.length);
+    const randomGame = GAMES_CATALOG[randomIndex];
+    if (randomGame) {
+      handleOpenGame(randomGame);
+    }
+  }, [handleOpenGame]);
+
+  // Filtered & Sorted Games List
   const filteredGames = useMemo(() => {
-    return GAMES_CATALOG.filter((game) => {
-      // Category Filter
-      if (activeCategory !== 'all' && game.category !== activeCategory) {
-        return false;
-      }
-      // Favorites Filter
-      if (showFavoritesOnly && !profile.favoriteGames.includes(game.id)) {
-        return false;
-      }
-      // Search Query
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchTitle = game.title.toLowerCase().includes(q);
-        const matchDesc = game.description.toLowerCase().includes(q);
-        const matchTags = game.tags.some((t) => t.toLowerCase().includes(q));
-        const matchCat = game.category.toLowerCase().includes(q);
-        return matchTitle || matchDesc || matchTags || matchCat;
-      }
-      return true;
+    let list = GAMES_CATALOG.filter((game) => {
+      const matchCat = activeCategory === 'all' || game.category === activeCategory;
+      const matchFav = !showFavoritesOnly || profile.favoriteGames.includes(game.id);
+      const matchQuery =
+        game.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        game.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        game.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
+      return matchCat && matchFav && matchQuery;
     });
-  }, [activeCategory, showFavoritesOnly, profile.favoriteGames, searchQuery]);
 
-  // Category counts
-  const categoryCounts = useMemo(() => {
-    const counts: Record<GameCategory, number> = {
-      all: GAMES_CATALOG.length,
-      arcade: 0,
-      puzzle: 0,
-      retro: 0,
-      action: 0,
-      strategy: 0,
-      word: 0,
-    };
-    GAMES_CATALOG.forEach((g) => {
-      if (counts[g.category] !== undefined) {
-        counts[g.category]++;
-      }
-    });
-    return counts;
-  }, []);
+    if (sortBy === 'rating') {
+      list.sort((a, b) => b.rating - a.rating);
+    } else if (sortBy === 'title') {
+      list.sort((a, b) => a.title.localeCompare(b.title));
+    } else {
+      // Default: Popularity / Plays
+      list.sort((a, b) => (b.plays || 0) - (a.plays || 0));
+    }
 
-  const featuredGames = useMemo(() => {
-    return GAMES_CATALOG.filter((g) => g.isFeatured || g.badge);
-  }, []);
+    return list;
+  }, [activeCategory, searchQuery, showFavoritesOnly, profile.favoriteGames, sortBy]);
 
-  const unlockedAchievementsCount = useMemo(() => {
-    return profile.achievements.filter((a) => a.unlocked).length;
-  }, [profile.achievements]);
+  const categoryCounts: Record<GameCategory, number> = useMemo(() => ({
+    all: GAMES_CATALOG.length,
+    arcade: GAMES_CATALOG.filter((g) => g.category === 'arcade').length,
+    puzzle: GAMES_CATALOG.filter((g) => g.category === 'puzzle').length,
+    retro: GAMES_CATALOG.filter((g) => g.category === 'retro').length,
+    action: GAMES_CATALOG.filter((g) => g.category === 'action').length,
+    strategy: GAMES_CATALOG.filter((g) => g.category === 'strategy').length,
+    word: GAMES_CATALOG.filter((g) => g.category === 'word').length,
+  }), []);
+
+  const unlockedCount = profile.achievements.filter((a) => a.unlocked).length;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col light-dot-grid">
-      {/* Top Navigation */}
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+      {/* Top Header */}
       <Header
         soundEnabled={profile.soundEnabled}
         onToggleSound={handleToggleSound}
-        onOpenStats={() => setIsStatsOpen(true)}
-        onOpenAchievements={() => setIsAchievementsOpen(true)}
+        onOpenStats={() => {
+          sounds.playLaser();
+          setIsStatsOpen(true);
+        }}
+        onOpenAchievements={() => {
+          sounds.playLaser();
+          setIsAchievementsOpen(true);
+        }}
         favoritesCount={profile.favoriteGames.length}
-        unlockedAchievementsCount={unlockedAchievementsCount}
+        unlockedAchievementsCount={unlockedCount}
         totalAchievementsCount={profile.achievements.length}
         showFavoritesOnly={showFavoritesOnly}
-        onToggleFavoritesOnly={() => setShowFavoritesOnly(!showFavoritesOnly)}
+        onToggleFavoritesOnly={() => {
+          sounds.playClick();
+          setShowFavoritesOnly((prev) => !prev);
+        }}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
-        {/* Hero Banner (Spacious, High-Contrast Light Mode) */}
-        <section className="relative rounded-3xl bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-950 p-6 sm:p-10 text-white shadow-xl overflow-hidden border border-slate-800">
-          <div className="absolute -right-16 -bottom-16 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute right-1/3 -top-16 w-60 h-60 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
+      <main className="flex-1 pb-16">
+        {/* Interactive 3D WebGL Hero Showcase */}
+        <Arcade3DHero
+          onExploreGames={handleScrollToCatalog}
+          onPlayRandom={handlePlayRandomGame}
+          totalGames={GAMES_CATALOG.length}
+        />
 
-          <div className="relative z-10 max-w-2xl space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-indigo-300 text-xs font-semibold backdrop-blur-md border border-white/10 font-mono">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-300" />
-              <span>100% Client-Side Physics • 0% Server Compute</span>
+        {/* Bidirectional Infinite Games Marquee Ticker */}
+        <InfiniteMarquee
+          games={GAMES_CATALOG}
+          onSelectGame={handleOpenGame}
+        />
+
+        {/* Modern Bento Grid: Daily Quest, XP Level, Roulette & Quick Launch */}
+        <BentoGridSection
+          games={GAMES_CATALOG}
+          profile={profile}
+          onSelectGame={handleOpenGame}
+          onOpenAchievements={() => {
+            sounds.playLaser();
+            setIsAchievementsOpen(true);
+          }}
+          onOpenStats={() => {
+            sounds.playLaser();
+            setIsStatsOpen(true);
+          }}
+        />
+
+        {/* Main Game Catalog Grid Anchor */}
+        <div ref={catalogRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+          {/* Catalog Title & Search Toolbar */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+                <Gamepad2 className="w-7 h-7 text-indigo-600" />
+                <span>All Games Collection</span>
+                <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-slate-200/80 text-slate-700 font-bold">
+                  {filteredGames.length}
+                </span>
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                Filter by genre or search instantly. All games run directly in your browser.
+              </p>
             </div>
 
-            <h2 className="text-2xl sm:text-4xl font-black tracking-tight leading-tight">
-              Instant Casual Gaming. <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-300 to-emerald-400">
-                Zero Downloads. Zero Sign-Ups.
-              </span>
-            </h2>
-
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              Enjoy 15+ curated retro classics, brain puzzles, and high-speed action games running directly on your browser's hardware with procedural 8-bit sound synthesis.
-            </p>
-
-            {/* Quick stats pills */}
-            <div className="flex flex-wrap items-center gap-3 pt-2 text-xs font-mono">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/10">
-                <Gamepad2 className="w-4 h-4 text-cyan-400" />
-                <span>15+ Active Games</span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/10">
-                <Trophy className="w-4 h-4 text-amber-400" />
-                <span>Local Highscore Vault</span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/10">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>Privacy First (Guest Mode)</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Search & Category Filter Section */}
-        <section className="space-y-4">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-            {/* Category Pills */}
-            <div className="flex-1 overflow-hidden">
-              <CategoryFilter
-                activeCategory={activeCategory}
-                onSelectCategory={handleSelectCategory}
-                counts={categoryCounts}
-              />
-            </div>
-
-            {/* Search Input Bar */}
-            <div className="relative min-w-[260px] sm:w-72">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search games, tags, rules..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white text-slate-900 border border-slate-300 placeholder-slate-400 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* Featured Showcase (if showing All games without active search) */}
-        {activeCategory === 'all' && !searchQuery && !showFavoritesOnly && (
-          <section className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Flame className="w-5 h-5 text-amber-500 fill-amber-500" />
-                <h3 className="text-lg font-bold text-slate-900 tracking-tight">
-                  Featured & Trending Hits
-                </h3>
-              </div>
-              <span className="text-xs text-slate-500 font-medium">Handpicked Favorites</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {featuredGames.slice(0, 4).map((game) => (
-                <GameCard
-                  key={game.id}
-                  game={game}
-                  stats={profile.gameStats[game.id]}
-                  isFavorite={profile.favoriteGames.includes(game.id)}
-                  onPlay={handleOpenGame}
-                  onToggleFavorite={handleToggleFavorite}
+            {/* Search Input and Sort Dropdown */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search games or tags..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 pr-4 py-1.5 bg-white rounded-xl border border-slate-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-xs w-48 sm:w-60"
                 />
-              ))}
-            </div>
-          </section>
-        )}
+              </div>
 
-        {/* Main Games Grid */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Layers className="w-5 h-5 text-indigo-600" />
-              <h3 className="text-lg font-bold text-slate-900 tracking-tight">
-                {showFavoritesOnly
-                  ? 'Your Favorite Games'
-                  : activeCategory === 'all'
-                  ? 'All Games Library'
-                  : `${activeCategory.toUpperCase()} Games`}
-              </h3>
-              <span className="px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 text-xs font-bold font-mono">
-                {filteredGames.length}
-              </span>
+              <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-xs">
+                <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
+                <span className="text-xs font-semibold text-slate-600">Sort:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="text-xs font-bold text-slate-800 bg-transparent border-none focus:outline-hidden cursor-pointer"
+                >
+                  <option value="popular">Most Popular</option>
+                  <option value="rating">Top Rated</option>
+                  <option value="title">Alphabetical</option>
+                </select>
+              </div>
             </div>
-
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="text-xs font-semibold text-indigo-600 hover:text-indigo-800"
-              >
-                Clear Search
-              </button>
-            )}
           </div>
 
+          {/* Category Filter Pills */}
+          <div className="mb-8">
+            <CategoryFilter
+              activeCategory={activeCategory}
+              onSelectCategory={handleSelectCategory}
+              counts={categoryCounts}
+            />
+          </div>
+
+          {/* Games Card Grid */}
           {filteredGames.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredGames.map((game) => (
                 <GameCard
                   key={game.id}
@@ -375,101 +320,148 @@ export const App: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3 shadow-sm">
-              <Gamepad2 className="w-12 h-12 text-slate-300 mx-auto" />
-              <h4 className="text-base font-bold text-slate-800">No games matched your criteria</h4>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Try searching for another keyword or switch category filter to see all available games.
+            <div className="text-center py-16 bg-white rounded-3xl border border-slate-200/90 p-8 shadow-xs">
+              <Gamepad2 className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-slate-800 mb-1">No games found</h3>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto mb-4">
+                No titles match your current filter or search criteria "{searchQuery}".
               </p>
               <button
                 onClick={() => {
                   setSearchQuery('');
-                  setActiveCategory('all');
                   setShowFavoritesOnly(false);
+                  setActiveCategory('all');
                 }}
-                className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition"
+                className="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-xs hover:bg-indigo-700 transition-all cursor-pointer"
               >
-                Reset Filters
+                Reset All Filters
               </button>
             </div>
           )}
-        </section>
+        </div>
 
-        {/* SEO & Knowledge Section (Answer-First for Google & AI Engines) */}
-        <section className="mt-12 bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 space-y-6 shadow-sm">
-          <div className="border-b border-slate-100 pb-4">
-            <h3 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-              <HelpCircle className="w-5 h-5 text-indigo-600" />
-              Frequently Asked Questions & Platform Overview
-            </h3>
-            <p className="text-xs text-slate-500 mt-1">
-              Everything you need to know about playing free HTML5 web games on Arcadex.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs leading-relaxed text-slate-600">
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5">
-              <h4 className="font-bold text-slate-900 text-sm">How does Arcadex achieve 0% server compute load?</h4>
-              <p>
-                Every game in the Arcadex library runs 100% on the client side using HTML5 Canvas, WebGL, and JavaScript event loops. All physics, collision detection, and procedural sound generation occur inside your browser's CPU/GPU. The hosting server only serves static files via high-speed Nginx Alpine caching.
-              </p>
+        {/* Rich SEO & FAQ Section for Search Engine / AI Crawlers */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
+          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-slate-200/90 shadow-sm">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-mono font-bold mb-4">
+              <HelpCircle className="w-3.5 h-3.5 text-indigo-600" />
+              <span>Platform FAQ & Architecture</span>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5">
-              <h4 className="font-bold text-slate-900 text-sm">Do I need to sign up or create an account to save high scores?</h4>
-              <p>
-                No account or sign-up is required. All your high scores, gameplay statistics, unlocked achievements, and favorite games are automatically saved locally on your device via HTML5 LocalStorage. You can also export or import your save data at any time from the "My Stats" drawer.
-              </p>
-            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-4">
+              Frequently Asked Questions About Arcadex
+            </h2>
 
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5">
-              <h4 className="font-bold text-slate-900 text-sm">Are these games mobile-friendly with touch controls?</h4>
-              <p>
-                Yes! Every game comes with dedicated touch controls, on-screen responsive D-pads, swipe gestures, and virtual action buttons designed for smooth play on smartphones, tablets, and touch-screen laptops.
-              </p>
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/70">
+                <h3 className="text-sm font-bold text-slate-900 mb-1.5 flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-amber-500" />
+                  <span>How do games run with 0% server lag?</span>
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Arcadex utilizes HTML5 Canvas, WebGL, and the Web Audio API. 100% of game physics, rendering loops, and audio synthesis are computed locally by your device's browser, providing zero-latency 60 FPS gameplay with zero backend computing load.
+                </p>
+              </div>
 
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5">
-              <h4 className="font-bold text-slate-900 text-sm">Can I play these games offline as a Web App (PWA)?</h4>
-              <p>
-                Yes. Arcadex includes a valid Web App Manifest (`manifest.json`) and service worker caching headers. You can install it on your Android or iOS home screen and launch games with instant sub-millisecond startup times.
-              </p>
+              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/70">
+                <h3 className="text-sm font-bold text-slate-900 mb-1.5 flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  <span>Do I need to create an account to save progress?</span>
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  No sign-up or login is ever required. Your high scores, unlockable achievements, and favorite games are automatically saved locally inside your browser's private localStorage.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/70">
+                <h3 className="text-sm font-bold text-slate-900 mb-1.5 flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-indigo-500" />
+                  <span>Can I play Arcadex games on mobile and tablets?</span>
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Yes. Every game includes custom responsive touch controls and virtual on-screen d-pads/buttons for smooth gameplay on smartphones, iPads, and touch-screen laptops.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/70">
+                <h3 className="text-sm font-bold text-slate-900 mb-1.5 flex items-center gap-2">
+                  <Award className="w-4 h-4 text-purple-500" />
+                  <span>Are there new games and challenges added regularly?</span>
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Arcadex features deterministic Daily Quests that refresh automatically every 24 hours, alongside a continuous rollout of client-side retro, word, and strategy games.
+                </p>
+              </div>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 mt-12 py-8 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">
+      {/* Modern High-Contrast Footer */}
+      <footer className="bg-white border-t border-slate-200 py-10 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white font-black text-sm shadow-xs">
               A
             </div>
-            <span className="font-semibold text-slate-800">Arcadex Web Games Hub</span>
-            <span>• 100% Free & Open-Source</span>
+            <div>
+              <span className="font-black text-slate-900 text-sm tracking-tight">Arcadex</span>
+              <p className="text-[11px] text-slate-500">Instant Free Web Gaming Portal</p>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 text-[11px] font-medium text-slate-600">
-            <a href="/robots.txt" className="hover:text-indigo-600 transition">Robots.txt</a>
-            <a href="/sitemap.xml" className="hover:text-indigo-600 transition">Sitemap.xml</a>
-            <a href="/llms.txt" className="hover:text-indigo-600 transition">llms.txt (AI Index)</a>
-            <span className="text-slate-400">|</span>
-            <span>Created for Imon Khan</span>
+          <div className="flex flex-wrap items-center gap-6 text-xs font-semibold text-slate-600">
+            <button
+              onClick={() => handleSelectCategory('retro')}
+              className="hover:text-indigo-600 transition-colors cursor-pointer"
+            >
+              Retro Classics
+            </button>
+            <button
+              onClick={() => handleSelectCategory('puzzle')}
+              className="hover:text-indigo-600 transition-colors cursor-pointer"
+            >
+              Puzzle & Logic
+            </button>
+            <button
+              onClick={() => handleSelectCategory('word')}
+              className="hover:text-indigo-600 transition-colors cursor-pointer"
+            >
+              Word Games
+            </button>
+            <button
+              onClick={() => handleSelectCategory('strategy')}
+              className="hover:text-indigo-600 transition-colors cursor-pointer"
+            >
+              Strategy
+            </button>
+            <button
+              onClick={() => {
+                sounds.playLaser();
+                setIsAchievementsOpen(true);
+              }}
+              className="hover:text-indigo-600 transition-colors cursor-pointer text-indigo-600"
+            >
+              Trophy Hall
+            </button>
+          </div>
+
+          <div className="text-xs text-slate-400 font-mono">
+            © 2026 Arcadex Studio. 0% Server Load.
           </div>
         </div>
       </footer>
 
-      {/* Game Player Modal */}
+      {/* Game Player Fullscreen Modal */}
       <GamePlayerModal
-        game={activeGame}
+        game={selectedGame}
         onClose={handleCloseGame}
         onRecordGameOver={handleRecordGameOver}
-        isFavorite={activeGame ? profile.favoriteGames.includes(activeGame.id) : false}
+        isFavorite={Boolean(selectedGame && profile.favoriteGames.includes(selectedGame.id))}
         onToggleFavorite={handleToggleFavorite}
       />
 
-      {/* Player Stats & Save Data Drawer */}
+      {/* Stats & Highscores Drawer */}
       <StatsDrawer
         isOpen={isStatsOpen}
         onClose={() => setIsStatsOpen(false)}
@@ -477,7 +469,7 @@ export const App: React.FC = () => {
         onUpdateProfile={(newProf) => setProfile(newProf)}
       />
 
-      {/* Achievements Modal */}
+      {/* Achievements & Trophies Modal */}
       <AchievementsModal
         isOpen={isAchievementsOpen}
         onClose={() => setIsAchievementsOpen(false)}
@@ -486,5 +478,4 @@ export const App: React.FC = () => {
     </div>
   );
 };
-
 export default App;
