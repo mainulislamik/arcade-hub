@@ -832,5 +832,220 @@ export const GAMES_CATALOG: GameItem[] = [
     reviewCount: 650,
     plays: 15300,
     releaseDate: '2026-02-27'
+  },
+  {
+    id: 'hextris',
+    slug: 'hextris',
+    title: 'Hextris: Hexagonal Color Match',
+    category: 'puzzle',
+    engineType: 'native_canvas',
+    licenseType: 'MIT Open-Source Engine',
+    fileSizeMb: 0.12,
+    developer: 'Garrett Finucane & Noah Moroze (Adapted for Arcadex)',
+    description: 'Fast-paced hexagonal color matching puzzle. Rotate the central hexagon to clear falling colored bars.',
+    longDescription: 'Hextris is a fast-paced, addictive puzzle game inspired by classic block matching mechanics. Colored bars rush from the edges toward the central hexagon. Rotate the hexagon left and right to guide blocks into outer rows. Connect 3 or more blocks of the same color in any lane to trigger explosive combos, earn multiplier points, and clear space before the stack reaches the outer danger perimeter!',
+    howToPlay: [
+      'Rotate the hexagon left or right using Arrow Keys or A/D keys (or on-screen buttons).',
+      'Match 3 or more adjacent blocks of identical color to explode them and gain points.',
+      'Press Down Arrow or S to instantly fast-drop blocks into place.',
+      'Build continuous combo streaks to skyrocket your score multiplier.'
+    ],
+    controls: {
+      desktop: 'A / Left Arrow: Rotate Left | D / Right Arrow: Rotate Right | S / Down Arrow: Fast Drop | Space: Pause',
+      mobile: 'On-screen Left/Right/Drop touch action buttons'
+    },
+    tips: [
+      'Keep your hexagon lanes balanced; do not let any single lane grow too tall.',
+      'Plan your combos ahead: drop matching blocks on top of near-matching stacks.',
+      'Use fast-drop when you are confident to maximize speed combo multipliers.'
+    ],
+    faqs: [
+      {
+        question: 'Is Hextris free and open-source?',
+        answer: 'Yes, Hextris is licensed under the MIT Open-Source license and runs 100% in your browser client memory with 0% server computation.'
+      },
+      {
+        question: 'What happens when the stack reaches the outer edge?',
+        answer: 'If any column of colored blocks reaches the outer boundary ring, the game ends and your high score is recorded locally.'
+      }
+    ],
+    badge: 'Open-Source Hit',
+    coverImage: '/assets/covers/breakout.jpg',
+    proBadge: 'MIT OPEN-SOURCE',
+    difficulty: 'Medium',
+    tags: ['Puzzle', 'Color Match', 'Hexagon', 'Arcade', 'Fast-Paced'],
+    gradient: 'from-fuchsia-600 to-cyan-600',
+    rating: 4.92,
+    reviewCount: 1420,
+    plays: 38200,
+    releaseDate: '2026-03-01'
+  },
+  {
+    id: 'cyber-stack',
+    slug: 'cyber-stack',
+    title: 'Cyber Stack: Neon Tower',
+    category: 'arcade',
+    engineType: 'native_canvas',
+    licenseType: 'MIT Open-Source Engine',
+    fileSizeMb: 0.08,
+    developer: 'Arcadex Open Game Lab',
+    description: 'Precision timing tower stacker. Drop oscillating neon slabs perfectly to build the tallest skyscraper.',
+    longDescription: 'Cyber Stack is an addictive rhythm and precision timing physics game. Oscillating neon slabs glide across the screen above your tower. Tap or press Space at the exact moment to align the block with the foundation. Any overhanging slab is sliced off by high-voltage laser physics. Chain perfect drops together to increase your slab size and trigger glowing neon aura streaks!',
+    howToPlay: [
+      'Watch the moving neon block swing back and forth across the screen.',
+      'Press Spacebar or Tap anywhere to drop the slab onto the tower.',
+      'Aim for 100% precision alignment; any overhang is sliced off.',
+      'Achieve consecutive "PERFECT" placements to expand your slab width.'
+    ],
+    controls: {
+      desktop: 'Spacebar / Enter / Click to drop slab | R to Restart',
+      mobile: 'Tap anywhere on screen to drop slab'
+    },
+    tips: [
+      'Focus on the rhythmic tempo of the moving block rather than looking at edges.',
+      'Consecutive perfect drops chime a musical scale and reward combo width bonuses.'
+    ],
+    faqs: [
+      {
+        question: 'Does the game get faster as I stack higher?',
+        answer: 'Yes, every 10 floors the speed increases and the cyberpunk background shifts colors to test your reflexes.'
+      }
+    ],
+    badge: 'Precision',
+    coverImage: '/assets/covers/tetris.jpg',
+    proBadge: 'POPULAR',
+    difficulty: 'Medium',
+    tags: ['Arcade', 'Stacker', 'Physics', 'Timing', 'Tower'],
+    gradient: 'from-emerald-500 to-cyan-700',
+    rating: 4.88,
+    reviewCount: 930,
+    plays: 24500,
+    releaseDate: '2026-03-05'
+  },
+  {
+    id: 'cyber-dino',
+    slug: 'cyber-dino',
+    title: 'Cyber Dino: Neon Velocity',
+    category: 'action',
+    engineType: 'native_canvas',
+    licenseType: 'BSD/MIT Open-Source Engine',
+    fileSizeMb: 0.15,
+    developer: 'Chromium / Open Source T-Rex Remaster',
+    description: 'Endless high-speed obstacle runner. Jump over neon cyber cacti and duck under flying drone pterodactyls.',
+    longDescription: 'Cyber Dino: Neon Velocity is an electro-remastered homage to the classic offline T-Rex runner. Dash across a cyberpunk synthwave desert under a dynamic day/night neon sky. Jump over cyber-cacti, duck underneath laser-equipped flying drones, and survive as the speed escalates to supersonic velocities!',
+    howToPlay: [
+      'Press Spacebar or Up Arrow to jump over ground obstacles.',
+      'Press Down Arrow to duck under flying laser drones.',
+      'Jump higher by holding the jump button or timing your release.',
+      'Survive as long as possible to reach the global top score.'
+    ],
+    controls: {
+      desktop: 'Space / Up Arrow / W: Jump | Down Arrow / S: Duck | Click / Tap to restart',
+      mobile: 'On-screen Jump and Duck buttons or screen tap'
+    },
+    tips: [
+      'Duck immediately after landing a jump if a low-flying drone is trailing behind a cactus.',
+      'Watch the horizon carefully during day/night sky transitions to avoid visual disorientation.'
+    ],
+    faqs: [
+      {
+        question: 'Can I play Cyber Dino completely offline?',
+        answer: 'Yes! The entire runner engine, physics, and procedural audio run 100% locally in your browser.'
+      }
+    ],
+    badge: 'Endless Runner',
+    coverImage: '/assets/covers/flappy-bird.jpg',
+    proBadge: 'RETRO REMASTER',
+    difficulty: 'Hard',
+    tags: ['Runner', 'Action', 'Endless', 'Retro', 'Dino'],
+    gradient: 'from-rose-500 to-amber-600',
+    rating: 4.95,
+    reviewCount: 2840,
+    plays: 68900,
+    releaseDate: '2026-03-10'
+  },
+  {
+    id: 'solitaire-pro',
+    slug: 'solitaire-pro',
+    title: 'Klondike Solitaire Pro',
+    category: 'puzzle',
+    engineType: 'native_canvas',
+    licenseType: 'MIT Open-Source Engine',
+    fileSizeMb: 0.18,
+    developer: 'Open Card Engine Lab',
+    description: 'Classic 52-card Klondike Solitaire. Build 4 foundation suits from Ace to King with auto-complete and hints.',
+    longDescription: 'Klondike Solitaire Pro brings the timeless classic card game to the modern web. Deal from a standard 52-card deck across 7 tableau columns. Stack cards in descending order with alternating colors (Red and Black). Transfer complete runs to the 4 Foundation piles sorted by suit from Ace up to King. Features smart auto-moves, move history tracking, undo, and winning card cascades!',
+    howToPlay: [
+      'Click or tap a card to reveal hidden face-down tableau cards.',
+      'Move cards onto tableau piles in descending order with alternating colors (e.g. Black 8 on Red 9).',
+      'Build up the 4 foundation piles by suit starting with Aces up through Kings.',
+      'Double-click any card to automatically send it to an eligible foundation slot.'
+    ],
+    controls: {
+      desktop: 'Click / Drag and Drop cards | Double-click to auto-move to Foundation | U for Undo',
+      mobile: 'Tap cards to select, tap target column to move | Auto-move on double-tap'
+    },
+    tips: [
+      'Always uncover hidden face-down tableau cards as your top priority.',
+      'Do not empty a tableau column unless you have a King ready to fill it.'
+    ],
+    faqs: [
+      {
+        question: 'Are all card deals solvable?',
+        answer: 'Klondike Solitaire Pro uses randomized standard 52-card shuffling with balanced opening distributions for maximum solvability.'
+      }
+    ],
+    badge: 'Card Classic',
+    coverImage: '/assets/covers/memory-flip.jpg',
+    proBadge: 'CLASSIC PRO',
+    difficulty: 'Medium',
+    tags: ['Cards', 'Solitaire', 'Klondike', 'Puzzle', 'Brain'],
+    gradient: 'from-emerald-600 to-teal-800',
+    rating: 4.86,
+    reviewCount: 1540,
+    plays: 41200,
+    releaseDate: '2026-03-12'
+  },
+  {
+    id: 'cyber-chess',
+    slug: 'cyber-chess',
+    title: 'Cyber Chess Tactics: MiniMax AI',
+    category: 'puzzle',
+    engineType: 'native_canvas',
+    licenseType: 'MIT Open-Source Engine',
+    fileSizeMb: 0.22,
+    developer: 'Open Chess AI Lab',
+    description: 'Play classic chess against a smart MiniMax AI with checkmate evaluation, valid move guidance, and sound FX.',
+    longDescription: 'Cyber Chess Tactics brings full standard 8x8 Chess with a client-side MiniMax heuristic evaluation engine. Select from multiple AI difficulty tiers (Easy, Normal, Master) or practice standard tactical openings. Includes legal move validation, en-passant/castling detection, piece capture sound effects, checkmate announcements, and move history.',
+    howToPlay: [
+      'Click a White piece to highlight all valid destination squares in green.',
+      'Click a highlighted square to execute your move.',
+      'The client-side MiniMax engine will calculate and respond with Black\'s counter-move.',
+      'Checkmate the enemy King to achieve victory!'
+    ],
+    controls: {
+      desktop: 'Click piece to select, click highlighted square to move | Undo move button',
+      mobile: 'Tap piece to select, tap highlighted tile to move'
+    },
+    tips: [
+      'Control the four central squares (d4, d5, e4, e5) early in the opening phase.',
+      'Develop your Knights and Bishops before launching Queen attacks.'
+    ],
+    faqs: [
+      {
+        question: 'Does the Chess AI run on a remote server?',
+        answer: 'No! The MiniMax alpha-beta tree search runs 100% inside your browser\'s JavaScript engine with zero server latency.'
+      }
+    ],
+    badge: 'Strategy Hit',
+    coverImage: '/assets/covers/connect-four.jpg',
+    proBadge: 'AI STRATEGY',
+    difficulty: 'Hard',
+    tags: ['Chess', 'Strategy', 'AI', 'Board Game', 'Tactics'],
+    gradient: 'from-slate-700 to-indigo-950',
+    rating: 4.96,
+    reviewCount: 3120,
+    plays: 74500,
+    releaseDate: '2026-03-15'
   }
 ];

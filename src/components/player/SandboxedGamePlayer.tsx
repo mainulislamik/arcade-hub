@@ -39,6 +39,11 @@ import { SimonEchoGame } from '../games/SimonEchoGame';
 import { BubbleShooterGame } from '../games/BubbleShooterGame';
 import { UltimateTicTacToeGame } from '../games/UltimateTicTacToeGame';
 import { MechaBlaster2Game } from '../games/MechaBlaster2Game';
+import { HextrisGame } from '../games/HextrisGame';
+import { CyberStackGame } from '../games/CyberStackGame';
+import { CyberDinoGame } from '../games/CyberDinoGame';
+import { SolitaireGame } from '../games/SolitaireGame';
+import { CyberChessGame } from '../games/CyberChessGame';
 
 interface SandboxedGamePlayerProps {
   game: GameItem;
@@ -151,6 +156,16 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
         return <BubbleShooterGame />;
       case 'ultimate-tictactoe':
         return <UltimateTicTacToeGame />;
+      case 'hextris':
+        return <HextrisGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} />;
+      case 'cyber-stack':
+        return <CyberStackGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} />;
+      case 'cyber-dino':
+        return <CyberDinoGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} />;
+      case 'solitaire-pro':
+        return <SolitaireGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} />;
+      case 'cyber-chess':
+        return <CyberChessGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} />;
       default:
         return <MechaBlaster2Game />;
     }

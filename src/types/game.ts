@@ -62,7 +62,7 @@ export interface GameItem {
   binaryUrl?: string;
   fileSizeMb?: number;
   emulatorConfig?: EmulatorConfig;
-  licenseType?: 'Freeware' | 'Homebrew' | 'MIT' | 'Public Domain' | 'Arcadex Original' | 'Indie Authorized';
+  licenseType?: 'Freeware' | 'Homebrew' | 'MIT' | 'BSD' | 'Apache-2.0' | 'GPL' | 'Public Domain' | 'Arcadex Original' | 'Indie Authorized' | 'MIT Open-Source Engine' | 'BSD/MIT Open-Source Engine' | string;
   developer?: string;
   developerWebsite?: string;
   downloadCount?: number;
