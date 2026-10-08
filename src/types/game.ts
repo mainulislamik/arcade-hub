@@ -36,6 +36,9 @@ export interface GameItem {
   tags: string[];
   badge?: string;
   isFeatured?: boolean;
+  coverImage?: string;
+  heroImage?: string;
+  playStationBadge?: string;
 }
 
 export interface GameStats {

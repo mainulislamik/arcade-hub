@@ -38,6 +38,9 @@ export const GAMES_CATALOG: GameItem[] = [
       }
     ],
     badge: 'Popular',
+    coverImage: '/assets/covers/snake-retro.jpg',
+    playStationBadge: 'PS CLASSIC',
+    heroImage: '/assets/heroes/hero-spotlight-retro.jpg',
     difficulty: 'Easy',
     tags: ['Retro', 'Arcade', 'Classic', 'Casual'],
     gradient: 'from-emerald-500 to-teal-700',
@@ -79,6 +82,8 @@ export const GAMES_CATALOG: GameItem[] = [
       }
     ],
     badge: 'Trending',
+    coverImage: '/assets/covers/2048-master.jpg',
+    playStationBadge: 'PS MUST PLAY',
     difficulty: 'Medium',
     tags: ['Puzzle', 'Numbers', 'Math', 'Brain'],
     gradient: 'from-amber-500 to-orange-700',
@@ -116,6 +121,9 @@ export const GAMES_CATALOG: GameItem[] = [
       }
     ],
     badge: 'Action Hit',
+    coverImage: '/assets/covers/galaxy-defender.jpg',
+    playStationBadge: 'PS EXCLUSIVE',
+    heroImage: '/assets/heroes/hero-spotlight-galaxy.jpg',
     difficulty: 'Medium',
     tags: ['Action', 'Space', 'Shooter', 'Arcade'],
     gradient: 'from-cyan-500 to-indigo-800',
@@ -154,6 +162,9 @@ export const GAMES_CATALOG: GameItem[] = [
       }
     ],
     badge: 'Brain Booster',
+    coverImage: '/assets/covers/word-quest.jpg',
+    playStationBadge: 'PS DAILY',
+    heroImage: '/assets/heroes/hero-spotlight-word.jpg',
     difficulty: 'Medium',
     tags: ['Word', 'Puzzle', 'Vocabulary', 'Logic'],
     gradient: 'from-emerald-600 to-cyan-700',
@@ -191,6 +202,9 @@ export const GAMES_CATALOG: GameItem[] = [
       }
     ],
     badge: 'Retro Classic',
+    coverImage: '/assets/covers/asteroid-blaster.jpg',
+    playStationBadge: 'PS ACTION',
+    heroImage: '/assets/heroes/hero-spotlight-asteroid.jpg',
     difficulty: 'Hard',
     tags: ['Retro', 'Space', 'Vector', 'Physics'],
     gradient: 'from-sky-500 to-blue-900',
@@ -228,6 +242,8 @@ export const GAMES_CATALOG: GameItem[] = [
       }
     ],
     badge: 'Mind Fitness',
+    coverImage: '/assets/covers/sudoku-master.jpg',
+    playStationBadge: 'PS LOGIC',
     difficulty: 'Medium',
     tags: ['Sudoku', 'Logic', 'Numbers', 'Puzzle'],
     gradient: 'from-indigo-600 to-purple-800',
@@ -265,6 +281,8 @@ export const GAMES_CATALOG: GameItem[] = [
       }
     ],
     badge: 'Addictive',
+    coverImage: '/assets/covers/flappy-bird.jpg',
+    playStationBadge: 'PS ARCADE',
     difficulty: 'Hard',
     tags: ['Arcade', 'Flappy', 'Reflex', 'Highscore'],
     gradient: 'from-amber-400 to-yellow-600',
@@ -301,6 +319,8 @@ export const GAMES_CATALOG: GameItem[] = [
       }
     ],
     badge: 'Retro Arcade',
+    coverImage: '/assets/covers/neon-breakout.jpg',
+    playStationBadge: 'PS RETRO',
     difficulty: 'Medium',
     tags: ['Breakout', 'Bricks', 'Arcade', 'Retro'],
     gradient: 'from-rose-500 to-purple-700',
@@ -337,6 +357,8 @@ export const GAMES_CATALOG: GameItem[] = [
       }
     ],
     badge: 'Legendary',
+    coverImage: '/assets/covers/tetra-block.jpg',
+    playStationBadge: 'PS LEGEND',
     difficulty: 'Medium',
     tags: ['Tetris', 'Blocks', 'Puzzle', 'Arcade'],
     gradient: 'from-purple-600 to-indigo-900',
@@ -373,6 +395,8 @@ export const GAMES_CATALOG: GameItem[] = [
       }
     ],
     badge: 'Strategy Hit',
+    coverImage: '/assets/covers/connect-four.jpg',
+    playStationBadge: 'PS STRATEGY',
     difficulty: 'Medium',
     tags: ['Strategy', 'Board', 'Multiplayer', 'Logic'],
     gradient: 'from-blue-600 to-cyan-800',
@@ -409,6 +433,8 @@ export const GAMES_CATALOG: GameItem[] = [
       }
     ],
     badge: 'Relaxing',
+    coverImage: '/assets/covers/bubble-shooter.jpg',
+    playStationBadge: 'PS HIT',
     difficulty: 'Easy',
     tags: ['Bubble', 'Shooter', 'Match 3', 'Casual'],
     gradient: 'from-cyan-500 to-pink-600',
@@ -445,6 +471,8 @@ export const GAMES_CATALOG: GameItem[] = [
       }
     ],
     badge: 'Deep Tactics',
+    coverImage: '/assets/covers/ultimate-tictactoe.jpg',
+    playStationBadge: 'PS STRATEGY',
     difficulty: 'Hard',
     tags: ['TicTacToe', 'Strategy', 'Mind Game', 'Board'],
     gradient: 'from-emerald-500 to-cyan-800',
@@ -481,6 +509,8 @@ export const GAMES_CATALOG: GameItem[] = [
       }
     ],
     badge: 'Retro Icon',
+    coverImage: '/assets/covers/pac-runner.jpg',
+    playStationBadge: 'PS MASTER',
     difficulty: 'Hard',
     tags: ['Pacman', 'Maze', 'Retro', 'Action'],
     gradient: 'from-yellow-400 to-amber-700',
@@ -553,6 +583,8 @@ export const GAMES_CATALOG: GameItem[] = [
       }
     ],
     badge: 'Classic',
+    coverImage: '/assets/covers/minesweeper.jpg',
+    playStationBadge: 'PS TACTICAL',
     difficulty: 'Medium',
     tags: ['Minesweeper', 'Logic', 'Puzzle', 'Classic'],
     gradient: 'from-emerald-500 to-cyan-900',
@@ -588,6 +620,8 @@ export const GAMES_CATALOG: GameItem[] = [
       }
     ],
     badge: 'PvP Ready',
+    coverImage: '/assets/covers/cyber-pong.jpg',
+    playStationBadge: 'PS 2-PLAYER',
     difficulty: 'Medium',
     tags: ['Pong', 'Retro', 'Multiplayer', 'Arcade'],
     gradient: 'from-blue-500 to-indigo-800',
@@ -624,6 +658,8 @@ export const GAMES_CATALOG: GameItem[] = [
       }
     ],
     badge: 'Rhythm',
+    coverImage: '/assets/covers/simon-echo.jpg',
+    playStationBadge: 'PS AUDIO',
     difficulty: 'Medium',
     tags: ['Memory', 'Simon', 'Audio', 'Sequence'],
     gradient: 'from-amber-500 to-rose-700',
