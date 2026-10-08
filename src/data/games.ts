@@ -2,153 +2,168 @@ import { GameItem } from '../types/game';
 
 export const games: GameItem[] = [
   {
-    "id": "subway-surfer",
-    "title": "Subway Runner 3D",
-    "slug": "subway-surfer",
+    "id": "slope-3d",
+    "title": "Cyber Slope 3D",
+    "slug": "slope-3d",
     "category": "action",
     "tags": [
-      "runner",
       "3d",
+      "webgl",
+      "speed",
+      "slope",
+      "cyberpunk",
+      "runner",
+      "popular"
+    ],
+    "rating": 4.96,
+    "plays": 284000,
+    "description": "High-speed 3D WebGL neon ball rolling down endless twisting ramps. Dodge red cubes and collect glowing gems!",
+    "coverImage": "/assets/covers/slope-3d.jpg",
+    "featured": true,
+    "aspectRatio": "16:9",
+    "howToPlay": [
+      "Press A / D or Left / Right Arrows to steer the ball across 3D platforms.",
+      "Avoid red block obstacles and don't fall off the neon edges.",
+      "Collect golden octahedron gems for bonus points."
+    ],
+    "controls": {
+      "keyboard": "A/D or Left/Right Arrow Keys",
+      "touch": "Swipe Left / Right",
+      "mouse": "Drag horizontally"
+    },
+    "difficulty": "Medium",
+    "icon": "Gamepad2"
+  },
+  {
+    "id": "drift-3d",
+    "title": "Hyper Drift 3D",
+    "slug": "drift-3d",
+    "category": "driving",
+    "tags": [
+      "3d",
+      "webgl",
+      "racing",
+      "drift",
+      "cars",
+      "nitro",
+      "popular"
+    ],
+    "rating": 4.94,
+    "plays": 215000,
+    "description": "Burn rubber with realistic 3D car physics, tire smoke FX, nitro boost and extreme angle drift combos!",
+    "coverImage": "/assets/covers/drift-3d.jpg",
+    "featured": true,
+    "aspectRatio": "16:9",
+    "howToPlay": [
+      "Use W / Up to accelerate and S / Down to brake/reverse.",
+      "Steer with A / D and hold Spacebar for handbrake drift combos.",
+      "Hold Shift for instant high-speed Nitro Boost."
+    ],
+    "controls": {
+      "keyboard": "WASD / Arrows, Space: Handbrake, Shift: Nitro",
+      "touch": "On-screen Gas, Steer & Drift buttons",
+      "mouse": "Touch controls"
+    },
+    "difficulty": "Medium",
+    "icon": "Gamepad2"
+  },
+  {
+    "id": "subway-3d",
+    "title": "Subway Runner 3D",
+    "slug": "subway-3d",
+    "category": "action",
+    "tags": [
+      "3d",
+      "webgl",
+      "runner",
+      "subway",
       "action",
       "mobile-hit",
-      "subway",
-      "trains",
-      "coins",
-      "dodging"
+      "popular"
     ],
-    "description": "The world famous 3D subway runner experience! Dash across endless train tracks, dodge oncoming subway trains, jump over barricades, roll under warning signs, and collect gold coins and jetpack powerups.",
-    "instructions": "Use Left/Right Arrow or A/D keys to switch lanes. Up Arrow / W / Space to Jump over obstacles. Down Arrow / S to Roll under barriers.",
-    "aspectRatio": "16:9",
-    "controls": {
-      "keyboard": "Arrow Keys / WASD / Space",
-      "touch": "Swipe Left / Right / Up / Down",
-      "mouse": "On-screen Touch Controls"
-    },
-    "faqs": [
-      {
-        "question": "How do I play Subway Runner 3D?",
-        "answer": "Switch across 3 tracks to avoid crashing into trains and barriers while picking up coins and shields."
-      },
-      {
-        "question": "Does it require download?",
-        "answer": "No, it plays 100% instantly in your browser on PC and mobile."
-      }
-    ],
-    "cover": "/assets/covers/subway-surfer.jpg",
-    "likes": 9840,
-    "plays": 48200,
-    "rating": 4.9,
+    "rating": 4.98,
+    "plays": 395000,
+    "description": "Sprint down 3D subway rails, jump over low barriers, slide under signs, and dodge incoming high-speed red trains!",
+    "coverImage": "/assets/covers/subway-3d.jpg",
     "featured": true,
+    "aspectRatio": "16:9",
+    "howToPlay": [
+      "Press A / D or Left / Right to switch between the 3 railway tracks.",
+      "Press W / Up / Space to jump over hurdles and oncoming barriers.",
+      "Press S / Down to roll-slide under high signboards.",
+      "Collect gold coins to boost your high score."
+    ],
+    "controls": {
+      "keyboard": "A/D: Switch Lanes, W/Space: Jump, S: Slide",
+      "touch": "Swipe Left / Right / Up / Down",
+      "mouse": "Swipe gestures"
+    },
     "difficulty": "Medium",
     "icon": "Gamepad2"
   },
   {
-    "id": "temple-dash",
-    "title": "Temple Relic Escape 3D",
-    "slug": "temple-dash",
-    "category": "action",
+    "id": "knife-3d",
+    "title": "Cyber Knife 3D",
+    "slug": "knife-3d",
+    "category": "arcade",
     "tags": [
-      "temple",
-      "runner",
       "3d",
-      "adventure",
-      "jungle",
-      "relic",
-      "escape"
-    ],
-    "description": "The ultimate ancient jungle temple escape! Sprint through cursed ruins, jump over blazing fire pits and broken bridges, slide under spinning saw blades, and outrun the giant demon monkey.",
-    "instructions": "Use Left/Right or A/D to switch stone lanes. Up / W to Jump over fire and broken bridges. Down / S to Slide under spinning saws.",
-    "aspectRatio": "16:9",
-    "controls": {
-      "keyboard": "Arrow Keys / WASD",
-      "touch": "Swipe Left / Right / Up / Down",
-      "mouse": "Clickable Controls"
-    },
-    "faqs": [
-      {
-        "question": "How to escape the temple demon?",
-        "answer": "Maintain your sprint speed by timing jumps and slides over hazards without stumbling."
-      }
-    ],
-    "cover": "/assets/covers/temple-dash.jpg",
-    "likes": 8920,
-    "plays": 39400,
-    "rating": 4.8,
-    "featured": true,
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "hill-climb",
-    "title": "Hill Racer 2D Physics",
-    "slug": "hill-climb",
-    "category": "racing",
-    "tags": [
-      "racing",
-      "physics",
-      "hill",
-      "climb",
-      "jeep",
-      "4x4",
-      "upgrade",
-      "offroad"
-    ],
-    "description": "Conquer extreme rugged terrains in your 4x4 off-road Jeep! Master real 2D suspension physics, balance gas and brake to perform stunts without flipping over, and collect fuel canisters.",
-    "instructions": "Hold Right Arrow / D or GAS pedal to accelerate forward. Hold Left Arrow / A or BRAKE pedal to brake and reverse.",
-    "aspectRatio": "16:9",
-    "controls": {
-      "keyboard": "Arrow Keys / A & D",
-      "touch": "On-Screen Gas & Brake Pedals",
-      "mouse": "Pedal Click"
-    },
-    "faqs": [
-      {
-        "question": "Why did my car crash?",
-        "answer": "If you land upside down and the driver helmet hits the ground, the vehicle crashes. Balance your throttle in mid-air!"
-      }
-    ],
-    "cover": "/assets/covers/hill-climb.jpg",
-    "likes": 7450,
-    "plays": 32100,
-    "rating": 4.9,
-    "featured": true,
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "fruit-slash",
-    "title": "Fruit Blade Ninja",
-    "slug": "fruit-slash",
-    "category": "action",
-    "tags": [
-      "ninja",
-      "fruit",
-      "slash",
-      "blade",
-      "katana",
+      "webgl",
+      "target",
+      "knife",
       "arcade",
-      "slicing",
-      "combos"
+      "precision",
+      "popular"
     ],
-    "description": "Slice and dice juicy flying fruits with your razor-sharp katana blade! Chain multi-fruit combos for mega bonus scores, but beware of explosive black bombs.",
-    "instructions": "Click and drag your mouse or swipe your finger across the screen to slice flying watermelons, oranges, and bananas. Never slice bombs!",
-    "aspectRatio": "16:9",
-    "controls": {
-      "mouse": "Click & Drag Blade Trail",
-      "touch": "Finger Swipe",
-      "keyboard": "Mouse/Touch Slicing"
-    },
-    "faqs": [
-      {
-        "question": "How do combos work?",
-        "answer": "Slice 2 or more fruits in a single swift swipe to trigger high multiplier combo bonuses."
-      }
-    ],
-    "cover": "/assets/covers/fruit-slash.jpg",
-    "likes": 9120,
-    "plays": 44500,
-    "rating": 4.9,
+    "rating": 4.91,
+    "plays": 165000,
+    "description": "Throw sharp cyber blades into the rotating 3D core. Hit open spots, avoid existing blades, and clear boss stages!",
+    "coverImage": "/assets/covers/knife-3d.jpg",
     "featured": true,
+    "aspectRatio": "16:9",
+    "howToPlay": [
+      "Click or tap screen / press Space to throw a knife at the rotating core.",
+      "Never strike an already embedded knife or the stage will reset.",
+      "Clear all knives to advance to the next stage."
+    ],
+    "controls": {
+      "keyboard": "Spacebar or Up Arrow",
+      "touch": "Tap screen",
+      "mouse": "Left Click"
+    },
+    "difficulty": "Medium",
+    "icon": "Gamepad2"
+  },
+  {
+    "id": "voxel-3d",
+    "title": "Voxel Strike 3D",
+    "slug": "voxel-3d",
+    "category": "shooting",
+    "tags": [
+      "3d",
+      "webgl",
+      "fps",
+      "shooting",
+      "voxel",
+      "action",
+      "popular"
+    ],
+    "rating": 4.93,
+    "plays": 190000,
+    "description": "Eliminate attacking 3D voxel combat drones in a hardware-accelerated cyber arena with raycast targeting!",
+    "coverImage": "/assets/covers/voxel-3d.jpg",
+    "featured": true,
+    "aspectRatio": "16:9",
+    "howToPlay": [
+      "Move mouse to aim crosshair around the 3D arena.",
+      "Left click to shoot raycast lasers at approaching drones.",
+      "Press R to reload your 20-round ammo clip."
+    ],
+    "controls": {
+      "keyboard": "R: Reload, Space: Start",
+      "touch": "Tap targets",
+      "mouse": "Look and Left Click to shoot"
+    },
     "difficulty": "Medium",
     "icon": "Gamepad2"
   },
@@ -159,101 +174,92 @@ export const games: GameItem[] = [
     "category": "action",
     "tags": [
       "stickman",
-      "fighter",
+      "fighting",
       "action",
-      "combat",
-      "shadow",
-      "brawler"
+      "karate",
+      "combo",
+      "popular"
     ],
-    "description": "Engage in brutal martial arts combat as the Stickman Shadow Fighter! Execute light punches, heavy flying kicks, energy blasts, and shield blocks against ruthless ninja opponents with real ragdoll physics.",
-    "instructions": "Move with A/D or Arrow keys. Jump with W or Up. Light Punch: J or Z. Heavy Kick: K or X. Dragon Special Slash: L or C. Block: S or Down.",
-    "aspectRatio": "16:9",
-    "controls": {
-      "keyboard": "A/D to move, W jump, S block, J punch, K kick, L special blast",
-      "touch": "On-screen virtual touch buttons",
-      "mouse": "Clickable action buttons"
-    },
-    "faqs": [
-      {
-        "question": "How do I perform special attacks?",
-        "answer": "Build up your blue Energy meter by landing normal attacks, then press L or C to unleash the Dragon Slash."
-      }
-    ],
-    "cover": "/assets/covers/stickman-fighter.jpg",
-    "likes": 8420,
-    "plays": 41200,
-    "rating": 4.9,
+    "rating": 4.92,
+    "plays": 142000,
+    "description": "Authentic martial arts combat with combos, flying kicks, dragon slashes, and blocking.",
+    "coverImage": "/assets/covers/stickman-fighter.jpg",
     "featured": true,
+    "aspectRatio": "16:9",
+    "howToPlay": [
+      "Press A / D or Left / Right Arrows to move your stickman warrior.",
+      "Press J or Z to execute rapid punches.",
+      "Press K or X for sweeping high kicks.",
+      "Press L or C to unleash the fiery Dragon Slash when combo gauge is charged!"
+    ],
+    "controls": {
+      "keyboard": "A/D: Move, J/Z: Punch, K/X: Kick, L/C: Dragon Slash",
+      "touch": "On-screen virtual arcade buttons",
+      "mouse": "Click action buttons"
+    },
     "difficulty": "Medium",
     "icon": "Gamepad2"
   },
   {
     "id": "stickman-archer",
-    "title": "Stickman Bowmaster Pro",
+    "title": "Stickman Bowmaster Arena",
     "slug": "stickman-archer",
-    "category": "sports",
+    "category": "action",
     "tags": [
       "stickman",
       "archer",
-      "bow",
       "physics",
-      "shooting",
-      "headshot"
+      "bow",
+      "headshot",
+      "popular"
     ],
-    "description": "Master precision archery with realistic ballistic trajectory physics! Adjust your draw power and angle to take down enemy archers, account for wind resistance, and aim for critical 2.5x headshot kills.",
-    "instructions": "Click and drag backward from your Stickman archer to adjust angle and tension power. Release to loose the arrow.",
-    "aspectRatio": "16:9",
-    "controls": {
-      "mouse": "Click & Drag to Aim and Shoot",
-      "touch": "Touch & Pull back bowstring",
-      "keyboard": "Mouse driven"
-    },
-    "faqs": [
-      {
-        "question": "How do headshots work?",
-        "answer": "Hitting an enemy in the head deals 2.5x critical damage and can result in an instant one-shot knockout."
-      }
-    ],
-    "cover": "/assets/covers/stickman-archer.jpg",
-    "likes": 7650,
-    "plays": 35400,
-    "rating": 4.8,
+    "rating": 4.88,
+    "plays": 118000,
+    "description": "Ballistic physics archery with wind resistance, parabolic trajectory arcs, and 2.5x headshot criticals.",
+    "coverImage": "/assets/covers/stickman-archer.jpg",
     "featured": true,
+    "aspectRatio": "16:9",
+    "howToPlay": [
+      "Click/touch and drag back from your archer to set shooting angle and pull tension.",
+      "Observe the wind indicator at the top of the arena.",
+      "Release to loose the arrow. Aim for the enemy's head for instant 2.5x critical damage!"
+    ],
+    "controls": {
+      "keyboard": "Mouse drag to aim & shoot",
+      "touch": "Touch drag and release",
+      "mouse": "Left click drag and release"
+    },
     "difficulty": "Medium",
     "icon": "Gamepad2"
   },
   {
     "id": "stickman-runner",
-    "title": "Stickman Parkour Dash",
+    "title": "Stickman Parkour Escape",
     "slug": "stickman-runner",
     "category": "action",
     "tags": [
       "stickman",
       "runner",
       "parkour",
-      "dash",
-      "speed",
-      "reflex"
+      "cyberpunk",
+      "speed"
     ],
-    "description": "Sprint, vault, slide, and double jump across neon rooftops! Dodge dangerous laser grids and spinning buzz saws while collecting cyber gems to achieve maximum speed.",
-    "instructions": "Press Space, W, or Up Arrow to jump. Press again in mid-air to Double Jump. Press S or Down Arrow to slide under barriers.",
+    "rating": 4.85,
+    "plays": 95000,
+    "description": "Fast-paced rooftop parkour with acrobatic double jumps, laser slide dodges, and speed boosts.",
+    "coverImage": "/assets/covers/stickman-runner.jpg",
+    "featured": false,
     "aspectRatio": "16:9",
-    "controls": {
-      "keyboard": "W/Up/Space: Jump, S/Down: Slide",
-      "touch": "On-screen Jump and Slide touch buttons",
-      "mouse": "Click Jump / Slide controls"
-    },
-    "faqs": [
-      {
-        "question": "Can I double jump?",
-        "answer": "Yes! Tap the jump button again while in the air to perform an acrobatic double flip."
-      }
+    "howToPlay": [
+      "Press W / Space / Up Arrow to jump across building gaps.",
+      "Press Jump again while mid-air to execute an acrobatic Double Jump.",
+      "Press S / Down Arrow to slide under overhead laser barriers and drones."
     ],
-    "cover": "/assets/covers/stickman-runner.jpg",
-    "likes": 6980,
-    "plays": 29800,
-    "rating": 4.8,
-    "featured": true,
+    "controls": {
+      "keyboard": "W/Up/Space: Jump (Double Jump), S/Down: Slide",
+      "touch": "Tap Jump / Slide on-screen buttons",
+      "mouse": "Touch buttons"
+    },
     "difficulty": "Medium",
     "icon": "Gamepad2"
   },
@@ -261,70 +267,154 @@ export const games: GameItem[] = [
     "id": "stickman-sniper",
     "title": "Stickman Tactical Sniper",
     "slug": "stickman-sniper",
-    "category": "action",
+    "category": "shooting",
     "tags": [
       "stickman",
       "sniper",
       "shooting",
-      "stealth",
-      "fps",
-      "tactical"
+      "scope",
+      "headshot"
     ],
-    "description": "Take position as an elite tactical stickman sniper! Look through your precision optical scope, calculate target lead and bullet velocity, and eliminate hostile terrorist targets while saving innocent hostages.",
-    "instructions": "Move your mouse to aim the optical crosshair scope. Left Click to fire your high-caliber rifle.",
+    "rating": 4.89,
+    "plays": 134000,
+    "description": "Telescopic sniper scope missions with breath holding, hostage rescues, and precision long-range combat.",
+    "coverImage": "/assets/covers/stickman-sniper.jpg",
+    "featured": false,
     "aspectRatio": "16:9",
-    "controls": {
-      "mouse": "Move to Aim, Left Click to Shoot",
-      "touch": "Drag to aim scope, tap Fire button",
-      "keyboard": "Space to shoot"
-    },
-    "faqs": [
-      {
-        "question": "What happens if I shoot a hostage?",
-        "answer": "Shooting a civilian VIP fails the mission immediately. Always confirm your target before pulling the trigger."
-      }
+    "howToPlay": [
+      "Move mouse or drag finger to aim the high-magnification telescopic scope.",
+      "Hold Spacebar or Shift to steady your breath and lock the reticle.",
+      "Click to shoot enemy syndicate targets. Do not hit civilian hostages!"
     ],
-    "cover": "/assets/covers/stickman-sniper.jpg",
-    "likes": 8100,
-    "plays": 37200,
-    "rating": 4.9,
-    "featured": true,
+    "controls": {
+      "keyboard": "Mouse Aim, Left Click Shoot, Space Hold Breath",
+      "touch": "Drag scope and tap Fire",
+      "mouse": "Move to aim, Click to shoot"
+    },
     "difficulty": "Medium",
     "icon": "Gamepad2"
   },
   {
     "id": "stickman-warriors",
-    "title": "Stickman Castle Army: War",
+    "title": "Stickman Castle War",
     "slug": "stickman-warriors",
     "category": "strategy",
     "tags": [
       "stickman",
       "war",
-      "army",
-      "strategy",
       "castle",
-      "defense",
-      "battle"
+      "strategy",
+      "defense"
     ],
-    "description": "Command your Stickman legion in epic castle battles! Mine gold, summon Swordsmen, Archers, Mages, and Giant Golems, and unleash catastrophic meteor spells to conquer the enemy stronghold.",
-    "instructions": "Click on unit icons at the top to train and summon troops. Manage your gold economy and protect your castle gate.",
-    "aspectRatio": "16:9",
-    "controls": {
-      "mouse": "Click unit buttons (Swordsman, Archer, Mage, Giant)",
-      "keyboard": "Number keys 1-4 to spawn units",
-      "touch": "Tap unit recruit buttons"
-    },
-    "faqs": [
-      {
-        "question": "How do I earn gold faster?",
-        "answer": "Your gold miners automatically generate 12 gold per second. Defeating enemy troops also yields bonus bounty gold."
-      }
-    ],
-    "cover": "/assets/covers/stickman-warriors.jpg",
-    "likes": 9230,
-    "plays": 46100,
     "rating": 4.9,
+    "plays": 160000,
+    "description": "Real-time castle defense strategy with swordsmen, archers, iron golems, and enemy siege waves.",
+    "coverImage": "/assets/covers/stickman-warriors.jpg",
     "featured": true,
+    "aspectRatio": "16:9",
+    "howToPlay": [
+      "Gold generates automatically each second from your castle treasury.",
+      "Deploy Swordsmen (25G), Bow Archers (40G), and Iron Golems (100G) to hold the line.",
+      "Destroy the enemy castle while defending your own gates!"
+    ],
+    "controls": {
+      "keyboard": "1/2/3 keys to spawn units",
+      "touch": "Tap unit recruit buttons",
+      "mouse": "Click spawn buttons"
+    },
+    "difficulty": "Medium",
+    "icon": "Gamepad2"
+  },
+  {
+    "id": "hill-climb",
+    "title": "Hill Racer 2D Physics",
+    "slug": "hill-climb",
+    "category": "driving",
+    "tags": [
+      "racing",
+      "physics",
+      "car",
+      "hill",
+      "offroad"
+    ],
+    "rating": 4.9,
+    "plays": 220000,
+    "description": "4x4 Off-road hill racer with realistic spring suspension physics, gas/brake tilt control, and fuel management.",
+    "coverImage": "/assets/covers/hill-climb.jpg",
+    "featured": true,
+    "aspectRatio": "16:9",
+    "howToPlay": [
+      "Hold D / Right Arrow to accelerate uphill.",
+      "Hold A / Left Arrow to brake or reverse.",
+      "Balance your vehicle in mid-air and collect fuel canisters before running dry."
+    ],
+    "controls": {
+      "keyboard": "D/Right: Gas, A/Left: Brake & Tilt",
+      "touch": "Gas / Brake pedals",
+      "mouse": "Touch pedals"
+    },
+    "difficulty": "Medium",
+    "icon": "Gamepad2"
+  },
+  {
+    "id": "fruit-slash",
+    "title": "Fruit Blade Ninja",
+    "slug": "fruit-slash",
+    "category": "arcade",
+    "tags": [
+      "arcade",
+      "ninja",
+      "fruit",
+      "slash",
+      "blade"
+    ],
+    "rating": 4.92,
+    "plays": 185000,
+    "description": "Slice flying watermelons, oranges, and pineapples with blade trails. Chain massive combos and avoid explosives!",
+    "coverImage": "/assets/covers/fruit-slash.jpg",
+    "featured": true,
+    "aspectRatio": "16:9",
+    "howToPlay": [
+      "Drag mouse or finger across flying fruits to slice them with your neon katana.",
+      "Slice multiple fruits in one continuous stroke for Combo Multipliers.",
+      "Avoid clicking or slicing dangerous black dynamite bombs!"
+    ],
+    "controls": {
+      "keyboard": "Mouse drag slash",
+      "touch": "Finger drag swipe",
+      "mouse": "Drag to slice"
+    },
+    "difficulty": "Medium",
+    "icon": "Gamepad2"
+  },
+  {
+    "id": "temple-dash",
+    "title": "Temple Relic Escape 3D",
+    "slug": "temple-dash",
+    "category": "action",
+    "tags": [
+      "runner",
+      "3d",
+      "temple",
+      "relic",
+      "action"
+    ],
+    "rating": 4.93,
+    "plays": 260000,
+    "description": "Ancient temple escape runner. Turn sharp stone corners, jump across fire pits, and slide under spinning blades!",
+    "coverImage": "/assets/covers/temple-dash.jpg",
+    "featured": true,
+    "aspectRatio": "16:9",
+    "howToPlay": [
+      "Press A / D to steer across the ancient stone pathway.",
+      "Press W / Up / Space to jump across blazing fire pits and gaps.",
+      "Press S / Down to slide under razor-sharp spinning blades."
+    ],
+    "controls": {
+      "keyboard": "A/D: Move, W/Space: Jump, S: Slide",
+      "touch": "Swipe controls",
+      "mouse": "On-screen buttons"
+    },
     "difficulty": "Medium",
     "icon": "Gamepad2"
   },
@@ -332,480 +422,296 @@ export const games: GameItem[] = [
     "id": "mecha-blaster-2",
     "title": "Mecha Blaster 2",
     "slug": "mecha-blaster-2",
-    "category": "action",
+    "category": "shooting",
     "tags": [
-      "symbian",
       "retro",
+      "symbian",
       "shmup",
-      "arcade",
-      "mecha",
       "space",
-      "shooting"
+      "pixel-art"
     ],
-    "description": "Authentic Symbian OS Mobile hit recreated in 60 FPS Canvas! Command the legendary cyber mecha fighter, annihilate alien fleets, and defeat massive mechanical bosses.",
-    "instructions": "Use WASD or Arrow Keys to maneuver your mecha craft. Press Spacebar or Z to fire laser cannons. Hold Shift or X for Nova Bomb.",
+    "rating": 4.95,
+    "plays": 88000,
+    "description": "Authentic 60 FPS Symbian vertical space shoot-em-up with weapon upgrades, bosses, and bullet patterns.",
+    "coverImage": "/assets/covers/mecha-blaster-2.jpg",
+    "featured": false,
     "aspectRatio": "4:3",
-    "controls": {
-      "keyboard": "WASD / Arrow Keys to move, Space/Z to shoot, Shift/X for Bomb",
-      "touch": "On-screen virtual arcade D-Pad and Fire buttons",
-      "mouse": "Click and drag to direct ship"
-    },
-    "faqs": [
-      {
-        "question": "Is this the authentic Symbian OS version?",
-        "answer": "Yes! Reverse-engineered from Nokia .SIS byte structure into pure zero-latency Canvas runtime."
-      }
+    "howToPlay": [
+      "Arrow Keys / WASD to fly your gunship.",
+      "Spacebar to fire primary lasers.",
+      "B or Shift to detonate EMP Bomb."
     ],
-    "cover": "/assets/covers/mecha-blaster-2.jpg",
-    "likes": 12450,
-    "plays": 58300,
-    "rating": 4.9,
-    "featured": true,
+    "controls": {
+      "keyboard": "WASD/Arrows: Move, Space: Shoot, B: Bomb",
+      "touch": "Virtual joystick and fire buttons",
+      "mouse": "Mouse follow"
+    },
     "difficulty": "Medium",
     "icon": "Gamepad2"
   },
   {
-    "id": "hextris",
-    "title": "Hextris Quantum",
-    "slug": "hextris",
+    "id": "hextris-deluxe",
+    "title": "Hextris Deluxe",
+    "slug": "hextris-deluxe",
     "category": "puzzle",
     "tags": [
       "puzzle",
       "hexagon",
-      "match-3",
-      "arcade",
-      "fast-paced"
+      "match3",
+      "arcade"
     ],
-    "description": "Fast-paced hexagonal puzzle game inspired by Tetris! Rotate the outer hexagon to stack falling colored blocks and clear 3+ matching colors.",
-    "instructions": "Use Left and Right Arrow keys (or A/D) to rotate the hexagon. On mobile, tap left or right side of screen.",
+    "rating": 4.87,
+    "plays": 62000,
+    "description": "Fast-paced hexagonal puzzle game. Rotate the hexagon to match 3 or more blocks of the same color.",
+    "coverImage": "/assets/covers/hextris-deluxe.jpg",
+    "featured": false,
     "aspectRatio": "1:1",
-    "controls": {
-      "keyboard": "Left/Right Arrow Keys or A/D",
-      "touch": "Tap Left/Right half of screen",
-      "mouse": "Click rotation arrows"
-    },
-    "faqs": [
-      {
-        "question": "How do combos work?",
-        "answer": "Clearing blocks consecutively builds up your multiplier up to 8x."
-      }
+    "howToPlay": [
+      "Left/Right Arrow keys or A/D to rotate the hexagon.",
+      "Match 3 of the same color on any side to clear lines."
     ],
-    "cover": "/assets/covers/hextris.jpg",
-    "likes": 6780,
-    "plays": 28900,
-    "rating": 4.8,
-    "featured": true,
+    "controls": {
+      "keyboard": "Left/Right Arrows or A/D",
+      "touch": "Tap Left/Right side of screen",
+      "mouse": "Click buttons"
+    },
     "difficulty": "Medium",
     "icon": "Gamepad2"
   },
   {
-    "id": "cyber-stack",
+    "id": "cyber-stack-3d",
     "title": "Cyber Stack 3D",
-    "slug": "cyber-stack",
+    "slug": "cyber-stack-3d",
     "category": "arcade",
     "tags": [
+      "arcade",
       "stack",
-      "isometric",
+      "3d",
       "timing",
-      "arcade",
-      "minimalist"
+      "relaxing"
     ],
-    "description": "Test your reflexes in this vibrant isometric block stacking challenge! Time your taps perfectly to build the tallest cyber skyscraper.",
-    "instructions": "Click or press Spacebar to place the moving block. Overhanging parts will be sliced off!",
+    "rating": 4.82,
+    "plays": 74000,
+    "description": "Precision 3D block stacking with relaxing synth soundscapes and dynamic color gradients.",
+    "coverImage": "/assets/covers/cyber-stack-3d.jpg",
+    "featured": false,
     "aspectRatio": "9:16",
+    "howToPlay": [
+      "Click or press Spacebar at the exact moment to place the moving slab.",
+      "Overhanging edges will be sliced off. Build as high as possible!"
+    ],
     "controls": {
-      "keyboard": "Spacebar or Enter to drop",
-      "touch": "Tap anywhere on screen",
-      "mouse": "Left Click"
-    },
-    "faqs": [
-      {
-        "question": "How to get a Perfect bonus?",
-        "answer": "Align the block exactly with the block below to hear the rising musical chord and expand your block size."
-      }
-    ],
-    "cover": "/assets/covers/cyber-stack.jpg",
-    "likes": 5340,
-    "plays": 24100,
-    "rating": 4.7,
-    "featured": false,
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "cyber-dino",
-    "title": "Chrome Dino Runner",
-    "slug": "cyber-dino",
-    "category": "arcade",
-    "tags": [
-      "runner",
-      "dino",
-      "pixel",
-      "endless",
-      "offline"
-    ],
-    "description": "The classic Chrome T-Rex runner reimagined with cyber neon aesthetics and day/night mode transitions! Jump over cacti and duck under pterodactyls.",
-    "instructions": "Press Space or Up Arrow to jump. Down Arrow to duck.",
-    "aspectRatio": "16:9",
-    "controls": {
-      "keyboard": "Space/Up to jump, Down to duck",
-      "touch": "Tap screen to jump",
-      "mouse": "Click screen"
-    },
-    "faqs": [
-      {
-        "question": "Does it work completely offline?",
-        "answer": "Yes! Arcadex caches the entire engine in ServiceWorker for 100% offline gameplay."
-      }
-    ],
-    "cover": "/assets/covers/cyber-dino.jpg",
-    "likes": 8920,
-    "plays": 45600,
-    "rating": 4.9,
-    "featured": true,
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "solitaire-pro",
-    "title": "Classic Solitaire Klondike",
-    "slug": "solitaire-pro",
-    "category": "cards",
-    "tags": [
-      "cards",
-      "solitaire",
-      "klondike",
-      "classic",
-      "casual"
-    ],
-    "description": "The world's favorite card game with smooth animations, auto-complete, draw-1 and draw-3 modes, and authentic winning cascade animations.",
-    "instructions": "Drag and drop cards or click to auto-move. Build four foundation piles from Ace to King by suit.",
-    "aspectRatio": "16:9",
-    "controls": {
-      "mouse": "Click or Drag cards",
-      "touch": "Tap or Drag cards",
-      "keyboard": "Z for Undo, N for New Game"
-    },
-    "faqs": [
-      {
-        "question": "Are all deals winnable?",
-        "answer": "The game uses standard Klondike rules with smart hints and unlimited undo."
-      }
-    ],
-    "cover": "/assets/covers/solitaire-pro.jpg",
-    "likes": 4210,
-    "plays": 19800,
-    "rating": 4.8,
-    "featured": false,
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "cyber-chess",
-    "title": "Cyber Chess AI",
-    "slug": "cyber-chess",
-    "category": "strategy",
-    "tags": [
-      "chess",
-      "ai",
-      "strategy",
-      "board",
-      "2player"
-    ],
-    "description": "Play classical Chess against a sophisticated client-side Minimax Alpha-Beta AI engine or in local 2-player pass-and-play mode with legal move validation.",
-    "instructions": "Click a piece to highlight valid moves, then click the destination square.",
-    "aspectRatio": "1:1",
-    "controls": {
-      "mouse": "Click piece then square",
-      "touch": "Tap piece then square",
-      "keyboard": "Mouse driven"
-    },
-    "faqs": [
-      {
-        "question": "Can I play against a friend?",
-        "answer": "Yes! Choose 2-Player mode to play on the same device or use our P2P WebRTC multiplayer lobby."
-      }
-    ],
-    "cover": "/assets/covers/cyber-chess.jpg",
-    "likes": 6120,
-    "plays": 27400,
-    "rating": 4.9,
-    "featured": false,
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "galaxy-defender",
-    "title": "Galaxy Defender Space Shooter",
-    "slug": "galaxy-defender",
-    "category": "action",
-    "tags": [
-      "space",
-      "shooter",
-      "arcade",
-      "retro",
-      "aliens",
-      "laser"
-    ],
-    "description": "Classic top-down arcade shoot-em-up. Dodge incoming bullet hell waves, pick up triple-lasers and shields, and destroy motherships.",
-    "instructions": "Arrow keys or WASD to move ship. Spacebar to shoot lasers.",
-    "aspectRatio": "4:3",
-    "controls": {
-      "keyboard": "Arrow keys / WASD to move, Space to shoot",
-      "touch": "Touch controls overlay",
-      "mouse": "Drag to guide ship"
-    },
-    "faqs": [
-      {
-        "question": "How to get high scores?",
-        "answer": "Maintain a high kill streak without taking damage to earn 4x score multipliers."
-      }
-    ],
-    "cover": "/assets/covers/galaxy-defender.jpg",
-    "likes": 5120,
-    "plays": 22400,
-    "rating": 4.8,
-    "featured": false,
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "neon-blocks",
-    "title": "Neon Block Matrix (Tetris)",
-    "slug": "neon-blocks",
-    "category": "puzzle",
-    "tags": [
-      "tetris",
-      "blocks",
-      "puzzle",
-      "neon",
-      "arcade",
-      "classic"
-    ],
-    "description": "Authentic falling tetromino blocks puzzle with hard drop, hold piece, ghost piece projector, and line clear combo scoring.",
-    "instructions": "Left/Right arrow to move, Up arrow to rotate, Down arrow for soft drop, Spacebar for instant hard drop.",
-    "aspectRatio": "9:16",
-    "controls": {
-      "keyboard": "Arrow keys, Space for Hard Drop, C to Hold",
-      "touch": "D-Pad and rotation touch buttons",
-      "mouse": "On-screen buttons"
-    },
-    "faqs": [
-      {
-        "question": "Can I hold a tetromino piece?",
-        "answer": "Yes, press C or Shift to store a piece in your hold queue."
-      }
-    ],
-    "cover": "/assets/covers/neon-blocks.jpg",
-    "likes": 8420,
-    "plays": 41200,
-    "rating": 4.9,
-    "featured": true,
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "cyber-snake",
-    "title": "Cyber Snake Arcade",
-    "slug": "cyber-snake",
-    "category": "arcade",
-    "tags": [
-      "snake",
-      "nokia",
-      "arcade",
-      "retro",
-      "classic"
-    ],
-    "description": "The legendary Nokia 3310 Snake game revamped with cyber glowing apples, particle effects, speed surges, and obstacle walls.",
-    "instructions": "Steer using Arrow Keys or WASD. Eat glowing neon apples without biting your own tail or hitting border walls.",
-    "aspectRatio": "1:1",
-    "controls": {
-      "keyboard": "Arrow Keys / WASD",
-      "touch": "Swipe in 4 directions",
-      "mouse": "Directional buttons"
-    },
-    "faqs": [
-      {
-        "question": "Does speed increase?",
-        "answer": "Every 5 apples eaten accelerates the snake speed."
-      }
-    ],
-    "cover": "/assets/covers/cyber-snake.jpg",
-    "likes": 4790,
-    "plays": 21300,
-    "rating": 4.7,
-    "featured": false,
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "cyber-breakout",
-    "title": "Neon Breakout Arkanoid",
-    "slug": "cyber-breakout",
-    "category": "arcade",
-    "tags": [
-      "breakout",
-      "arkanoid",
-      "brick",
-      "paddle",
-      "retro"
-    ],
-    "description": "Classic brick breaker with laser powerups, multi-balls, sticky paddles, and explosive neon bricks.",
-    "instructions": "Move your paddle with Mouse or Left/Right Arrow keys. Launch ball with Space or Click.",
-    "aspectRatio": "4:3",
-    "controls": {
-      "keyboard": "Left/Right Arrow Keys, Space to launch",
-      "mouse": "Move cursor to position paddle",
-      "touch": "Drag finger horizontally"
-    },
-    "faqs": [
-      {
-        "question": "How to catch powerups?",
-        "answer": "Catch falling glowing capsules with your paddle to activate laser cannons and multi-ball."
-      }
-    ],
-    "cover": "/assets/covers/cyber-breakout.jpg",
-    "likes": 3950,
-    "plays": 17800,
-    "rating": 4.8,
-    "featured": false,
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "flappy-cyber",
-    "title": "Flappy Drone Pilot",
-    "slug": "flappy-cyber",
-    "category": "arcade",
-    "tags": [
-      "flappy",
-      "fly",
-      "tap",
-      "arcade",
-      "reflex"
-    ],
-    "description": "Tap to flap and navigate through cyber pipes in this high-intensity reflex challenge with precision collision boundaries.",
-    "instructions": "Press Spacebar or Click anywhere on screen to give the drone an upward thrust.",
-    "aspectRatio": "9:16",
-    "controls": {
-      "keyboard": "Spacebar or Up Arrow",
+      "keyboard": "Spacebar",
       "touch": "Tap screen",
       "mouse": "Left Click"
     },
-    "faqs": [
-      {
-        "question": "How to beat the high score?",
-        "answer": "Keep a steady rhythm and stay near the center of the gap between pipes."
-      }
-    ],
-    "cover": "/assets/covers/flappy-cyber.jpg",
-    "likes": 7230,
-    "plays": 34100,
-    "rating": 4.7,
-    "featured": false,
     "difficulty": "Medium",
     "icon": "Gamepad2"
   },
   {
-    "id": "2048-quantum",
-    "title": "2048 Quantum Fusion",
-    "slug": "2048-quantum",
+    "id": "dino-runner-chrome",
+    "title": "Chrome Dino Cyber Edition",
+    "slug": "dino-runner-chrome",
+    "category": "action",
+    "tags": [
+      "runner",
+      "retro",
+      "arcade",
+      "endless"
+    ],
+    "rating": 4.84,
+    "plays": 91000,
+    "description": "Cyberpunk reimagining of the classic offline T-Rex runner with day/night cycles and pterodactyls.",
+    "coverImage": "/assets/covers/dino-runner-chrome.jpg",
+    "featured": false,
+    "aspectRatio": "16:9",
+    "howToPlay": [
+      "Press Space or Up Arrow to jump over cacti.",
+      "Press Down Arrow to duck under flying pterodactyls."
+    ],
+    "controls": {
+      "keyboard": "Space/Up: Jump, Down: Duck",
+      "touch": "Tap to jump",
+      "mouse": "Click to jump"
+    },
+    "difficulty": "Medium",
+    "icon": "Gamepad2"
+  },
+  {
+    "id": "master-chess-pro",
+    "title": "Master Chess AI",
+    "slug": "master-chess-pro",
+    "category": "strategy",
+    "tags": [
+      "chess",
+      "strategy",
+      "board",
+      "ai",
+      "brain"
+    ],
+    "rating": 4.96,
+    "plays": 115000,
+    "description": "Full chess engine with Stockfish-grade AI, move validation, undo, and blunder analysis.",
+    "coverImage": "/assets/covers/master-chess-pro.jpg",
+    "featured": false,
+    "aspectRatio": "1:1",
+    "howToPlay": [
+      "Click your chess piece, then click a highlighted destination square.",
+      "Play against AI with 3 difficulty levels."
+    ],
+    "controls": {
+      "keyboard": "Mouse only",
+      "touch": "Tap piece, tap destination",
+      "mouse": "Point and Click"
+    },
+    "difficulty": "Medium",
+    "icon": "Gamepad2"
+  },
+  {
+    "id": "spider-solitaire-hd",
+    "title": "Spider Solitaire Classic",
+    "slug": "spider-solitaire-hd",
+    "category": "puzzle",
+    "tags": [
+      "cards",
+      "solitaire",
+      "puzzle",
+      "classic"
+    ],
+    "rating": 4.81,
+    "plays": 54000,
+    "description": "The definitive card solitaire with 1-suit, 2-suit, and 4-suit modes, smooth card dragging, and hints.",
+    "coverImage": "/assets/covers/spider-solitaire-hd.jpg",
+    "featured": false,
+    "aspectRatio": "16:9",
+    "howToPlay": [
+      "Drag and drop cards in descending order (King to Ace).",
+      "Complete a column of King to Ace to remove the suit."
+    ],
+    "controls": {
+      "keyboard": "Mouse drag",
+      "touch": "Touch drag cards",
+      "mouse": "Drag and Drop"
+    },
+    "difficulty": "Medium",
+    "icon": "Gamepad2"
+  },
+  {
+    "id": "sudoku-master-grid",
+    "title": "Sudoku Master Pro",
+    "slug": "sudoku-master-grid",
+    "category": "puzzle",
+    "tags": [
+      "sudoku",
+      "puzzle",
+      "numbers",
+      "brain"
+    ],
+    "rating": 4.86,
+    "plays": 48000,
+    "description": "Infinite 9x9 Sudoku with pencil notes, auto-error checking, and 4 difficulty tiers.",
+    "coverImage": "/assets/covers/sudoku-master-grid.jpg",
+    "featured": false,
+    "aspectRatio": "1:1",
+    "howToPlay": [
+      "Select a cell and input digits 1-9 without repeating numbers in rows, columns, or 3x3 grids."
+    ],
+    "controls": {
+      "keyboard": "1-9 Number keys",
+      "touch": "Tap cell, tap number",
+      "mouse": "Click keypad"
+    },
+    "difficulty": "Medium",
+    "icon": "Gamepad2"
+  },
+  {
+    "id": "2048-cyber-edition",
+    "title": "2048 Cyber Fusion",
+    "slug": "2048-cyber-edition",
     "category": "puzzle",
     "tags": [
       "2048",
       "puzzle",
       "numbers",
-      "math",
-      "strategy"
+      "fusion",
+      "arcade"
     ],
-    "description": "Slide matching numbered tiles to fuse them together and create the legendary 2048 and 4096 quantum tiles.",
-    "instructions": "Swipe or use Arrow Keys to slide all tiles in that direction. Matching tiles merge into double their value.",
+    "rating": 4.88,
+    "plays": 125000,
+    "description": "Slide and merge matching number tiles to reach the legendary 2048 cyber core.",
+    "coverImage": "/assets/covers/2048-cyber-edition.jpg",
+    "featured": false,
     "aspectRatio": "1:1",
+    "howToPlay": [
+      "Use Arrow Keys or Swipe to slide all tiles in one direction.",
+      "When two identical tiles collide, they merge into one!"
+    ],
     "controls": {
       "keyboard": "Arrow Keys / WASD",
-      "touch": "Swipe Up/Down/Left/Right",
-      "mouse": "Swipe or on-screen arrows"
+      "touch": "Swipe in 4 directions",
+      "mouse": "Drag swipe"
     },
-    "faqs": [
-      {
-        "question": "What is the best strategy?",
-        "answer": "Keep your highest value tile in one corner (e.g. bottom-right) and never move it away."
-      }
-    ],
-    "cover": "/assets/covers/2048-quantum.jpg",
-    "likes": 5670,
-    "plays": 25900,
-    "rating": 4.8,
-    "featured": false,
     "difficulty": "Medium",
     "icon": "Gamepad2"
   },
   {
-    "id": "pac-maze",
-    "title": "Neon Pac-Maze",
-    "slug": "pac-maze",
+    "id": "neon-pong-battle",
+    "title": "Neon Pong Retro Duel",
+    "slug": "neon-pong-battle",
     "category": "arcade",
     "tags": [
-      "pacman",
-      "maze",
-      "retro",
-      "ghosts",
+      "pong",
       "arcade",
-      "classic"
+      "retro",
+      "neon",
+      "2player"
     ],
-    "description": "Navigate glowing labyrinth mazes, munch on cyber pellets, collect power fruits, and turn the tables on hunting ghosts.",
-    "instructions": "Guide Pac-Hero through the maze using Arrow Keys or WASD.",
-    "aspectRatio": "4:3",
+    "rating": 4.8,
+    "plays": 65000,
+    "description": "High-octane neon retro table tennis with curve shots, speed rallies, and single/2-player modes.",
+    "coverImage": "/assets/covers/neon-pong-battle.jpg",
+    "featured": false,
+    "aspectRatio": "16:9",
+    "howToPlay": [
+      "Player 1: W/S keys to slide paddle.",
+      "Player 2: Up/Down arrows.",
+      "Angle your paddle to apply high-speed spin on the ball!"
+    ],
     "controls": {
-      "keyboard": "Arrow Keys / WASD",
-      "touch": "Swipe or D-Pad",
-      "mouse": "Directional Controls"
+      "keyboard": "W/S and Up/Down",
+      "touch": "Drag paddles",
+      "mouse": "Mouse follow"
     },
-    "faqs": [
-      {
-        "question": "How long do power pellets last?",
-        "answer": "Power pellets give you 8 seconds of ghost-chomping invulnerability."
-      }
-    ],
-    "cover": "/assets/covers/pac-maze.jpg",
-    "likes": 8120,
-    "plays": 38900,
-    "rating": 4.9,
-    "featured": true,
     "difficulty": "Medium",
     "icon": "Gamepad2"
   },
   {
-    "id": "bubble-shooter",
-    "title": "Neon Bubble Pop",
-    "slug": "bubble-shooter",
-    "category": "puzzle",
+    "id": "space-invaders-neo",
+    "title": "Space Invaders Neo",
+    "slug": "space-invaders-neo",
+    "category": "shooting",
     "tags": [
-      "bubble",
-      "shooter",
-      "match-3",
-      "puzzle",
-      "casual"
+      "retro",
+      "arcade",
+      "aliens",
+      "shooting",
+      "pixel-art"
     ],
-    "description": "Aim and shoot colorful glowing bubbles to match 3 or more of the same color and pop entire clusters before they reach the bottom.",
-    "instructions": "Move your mouse to aim the bubble cannon. Left Click to shoot the colored bubble.",
-    "aspectRatio": "16:9",
-    "controls": {
-      "mouse": "Aim and Left Click to Fire",
-      "touch": "Tap trajectory line",
-      "keyboard": "Left/Right to aim, Space to shoot"
-    },
-    "faqs": [
-      {
-        "question": "Can bubbles bounce off walls?",
-        "answer": "Yes! Use wall bank-shots to reach tricky angles and pop high bubble clusters."
-      }
-    ],
-    "cover": "/assets/covers/bubble-shooter.jpg",
-    "likes": 4890,
-    "plays": 21800,
-    "rating": 4.8,
+    "rating": 4.87,
+    "plays": 77000,
+    "description": "Classic 1978 arcade defense with destructible bunkers, mystery UFO motherships, and marching alien waves.",
+    "coverImage": "/assets/covers/space-invaders-neo.jpg",
     "featured": false,
+    "aspectRatio": "4:3",
+    "howToPlay": [
+      "A / D or Left / Right Arrows to steer the laser cannon.",
+      "Spacebar to shoot incoming alien invaders."
+    ],
+    "controls": {
+      "keyboard": "A/D: Move, Space: Shoot",
+      "touch": "Left/Right/Fire buttons",
+      "mouse": "Click to move & fire"
+    },
     "difficulty": "Medium",
     "icon": "Gamepad2"
   }
@@ -814,12 +720,12 @@ export const games: GameItem[] = [
 export const GAMES_CATALOG = games;
 
 export const categories = [
-  { id: 'all', name: 'All Games', icon: 'Gamepad2' },
-  { id: 'action', name: 'Action & Combat', icon: 'Swords' },
-  { id: 'arcade', name: 'Retro Arcade', icon: 'Flame' },
-  { id: 'racing', name: 'Racing & 4x4', icon: 'Zap' },
-  { id: 'puzzle', name: 'Puzzle & Match', icon: 'Brain' },
-  { id: 'sports', name: 'Archery & Sports', icon: 'Trophy' },
-  { id: 'strategy', name: 'Strategy & War', icon: 'Shield' },
-  { id: 'cards', name: 'Cards & Solitaire', icon: 'Sparkles' },
+  { id: 'all', name: 'All Games', icon: 'Gamepad2', count: 23 },
+  { id: 'action', name: 'Action', icon: 'Swords', count: 7 },
+  { id: 'driving', name: 'Driving & Cars', icon: 'Car', count: 2 },
+  { id: 'shooting', name: 'Shooting', icon: 'Crosshair', count: 4 },
+  { id: 'arcade', name: 'Arcade & Retro', icon: 'Zap', count: 4 },
+  { id: 'puzzle', name: 'Puzzle & Brain', icon: 'Puzzle', count: 4 },
+  { id: 'strategy', name: 'Strategy', icon: 'Brain', count: 2 },
+  { id: 'favorites', name: 'Favorites', icon: 'Heart', count: 0 }
 ];

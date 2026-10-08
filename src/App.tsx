@@ -176,7 +176,7 @@ export const App: React.FC = () => {
   }, [activeCategory, selectedTag]);
 
   return (
-    <div className="min-h-screen bg-slate-100/70 text-slate-900 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
       {/* CrazyGames Top Header */}
       <Header
         games={GAMES_CATALOG}
@@ -237,16 +237,16 @@ export const App: React.FC = () => {
             /* Homepage Bento & Category Grids */
             <div className="p-3 sm:p-6 max-w-[1600px] mx-auto">
               {selectedTag && (
-                <div className="mb-4 flex items-center justify-between bg-indigo-50 border border-indigo-200/80 p-3 rounded-2xl">
+                <div className="mb-4 flex items-center justify-between bg-cyan-950/40 border border-cyan-500/40 p-3 rounded-2xl backdrop-blur-md">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-indigo-600 uppercase">Filtered by Tag:</span>
-                    <span className="text-sm font-black text-indigo-900 bg-white px-2.5 py-0.5 rounded-lg border border-indigo-200">
+                    <span className="text-xs font-bold text-cyan-400 uppercase">Filtered by Tag:</span>
+                    <span className="text-sm font-black text-cyan-200 bg-slate-900 px-2.5 py-0.5 rounded-lg border border-cyan-500/50">
                       #{selectedTag}
                     </span>
                   </div>
                   <button
                     onClick={() => setSelectedTag(null)}
-                    className="text-xs font-bold text-indigo-600 hover:text-indigo-800"
+                    className="text-xs font-bold text-cyan-400 hover:text-cyan-300 cursor-pointer"
                   >
                     Clear Filter
                   </button>

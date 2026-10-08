@@ -17,7 +17,10 @@ import {
   Puzzle,
   RotateCcw,
   Code2,
-  Gift
+  Gift,
+  Tv,
+  Car,
+  Crosshair
 } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 import { GameItem, GameCategory } from '../types/game';
@@ -50,14 +53,6 @@ const LANGUAGES: { code: LanguageCode; label: string; flag: string }[] = [
   { code: 'de', label: 'DE', flag: '🇩🇪' },
   { code: 'hi', label: 'हिं', flag: '🇮🇳' },
   { code: 'ar', label: 'عر', flag: '🇸🇦' },
-];
-
-const CATEGORY_PILLS: { id: GameCategory; label: string; icon: React.ReactNode }[] = [
-  { id: 'all', label: '🔥 All Games', icon: <Flame className="w-3.5 h-3.5 text-amber-500" /> },
-  { id: 'action', label: '⚔️ Action', icon: <Swords className="w-3.5 h-3.5 text-rose-500" /> },
-  { id: 'puzzle', label: '🧩 Puzzle', icon: <Puzzle className="w-3.5 h-3.5 text-amber-500" /> },
-  { id: 'retro', label: '🕹️ Retro', icon: <RotateCcw className="w-3.5 h-3.5 text-emerald-500" /> },
-  { id: 'arcade', label: '⚡ Arcade', icon: <Sparkles className="w-3.5 h-3.5 text-purple-500" /> },
 ];
 
 export const Header: React.FC<HeaderProps> = ({
@@ -128,7 +123,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
+    <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 shadow-lg">
       <div className="max-w-[1720px] mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
         {/* Left: Mobile Menu Toggle & Brand Logo */}
         <div className="flex items-center gap-2 sm:gap-4">
@@ -137,7 +132,7 @@ export const Header: React.FC<HeaderProps> = ({
               sounds.playClick();
               onOpenMobileSidebar();
             }}
-            className="md:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            className="md:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
             title="Toggle Navigation Menu"
           >
             <Menu className="w-5 h-5" />
@@ -151,15 +146,15 @@ export const Header: React.FC<HeaderProps> = ({
             }}
             className="flex items-center gap-2.5 group cursor-pointer"
           >
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/20 group-hover:scale-105 transition-all">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20 group-hover:scale-105 group-hover:shadow-cyan-500/40 transition-all">
               <Gamepad2 className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div className="flex flex-col">
-              <span className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-none group-hover:text-indigo-600 transition-colors">
+              <span className="text-base sm:text-lg font-black text-white tracking-tight leading-none group-hover:text-cyan-400 transition-colors">
                 ARCADEX
               </span>
-              <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest leading-none mt-0.5">
-                CrazyGames Style
+              <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest leading-none mt-0.5">
+                3D WebGL Arcade
               </span>
             </div>
           </a>
@@ -179,8 +174,8 @@ export const Header: React.FC<HeaderProps> = ({
               }}
               onFocus={() => setIsSearchOpen(true)}
               onKeyDown={handleKeyDown}
-              placeholder="Search Stickman, Mecha Blaster, Hextris, Dino, Solitaire, Chess..."
-              className="w-full pl-10 pr-9 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200/70 focus:bg-white text-slate-900 text-xs sm:text-sm font-medium border border-transparent focus:border-indigo-500 focus:shadow-sm outline-none transition-all"
+              placeholder="Search 3D Slope, Subway Runner, Hyper Drift, Stickman, Voxel Strike..."
+              className="w-full pl-10 pr-9 py-2 rounded-2xl bg-slate-900 hover:bg-slate-800/80 focus:bg-slate-900 text-white text-xs sm:text-sm font-medium border border-slate-800 focus:border-cyan-500/80 focus:shadow-[0_0_15px_rgba(6,182,212,0.25)] outline-none transition-all placeholder:text-slate-500"
             />
             {query && (
               <button
@@ -188,7 +183,7 @@ export const Header: React.FC<HeaderProps> = ({
                   setQuery('');
                   setIsSearchOpen(false);
                 }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -197,11 +192,11 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Autocomplete Dropdown */}
           {isSearchOpen && searchResults.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden z-50 animate-in fade-in-50 zoom-in-95 duration-150">
-              <div className="p-2 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider px-3">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden z-50 animate-in fade-in-50 zoom-in-95 duration-150">
+              <div className="p-2 border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider px-3">
                 Matching Games ({searchResults.length})
               </div>
-              <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+              <div className="max-h-80 overflow-y-auto divide-y divide-slate-800/60">
                 {searchResults.map((game, index) => (
                   <div
                     key={game.id}
@@ -213,25 +208,26 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     onMouseEnter={() => setSelectedIndex(index)}
                     className={`flex items-center gap-3 p-2.5 cursor-pointer transition-colors ${
-                      index === selectedIndex ? 'bg-indigo-50/80 text-indigo-900' : 'hover:bg-slate-50 text-slate-800'
+                      index === selectedIndex ? 'bg-cyan-500/20 text-cyan-300' : 'hover:bg-slate-800/60 text-slate-200'
                     }`}
                   >
-                    <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-900 shrink-0">
+                    <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-950 shrink-0 border border-slate-800">
                       {game.coverImage ? (
                         <img src={game.coverImage} alt={game.title} className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-indigo-400">
-                          <Gamepad2 className="w-5 h-5" />
+                        <div className="w-full h-full flex items-center justify-center bg-cyan-950/60">
+                          <Gamepad2 className="w-5 h-5 text-cyan-400" />
                         </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-bold truncate">{game.title}</div>
-                      <div className="text-[11px] text-slate-500 truncate">{game.description}</div>
-                    </div>
-                    <div className="flex items-center gap-1 text-[11px] font-bold text-amber-500 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200/60 shrink-0">
-                      <Star className="w-3 h-3 fill-current" />
-                      <span>{game.rating ? game.rating.toFixed(1) : '4.9'}</span>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-black text-white truncate">{game.title}</span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 uppercase">
+                          {game.category}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 truncate">{game.description}</p>
                     </div>
                   </div>
                 ))}
@@ -240,142 +236,90 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Right Side Action Buttons */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Developer Portal / Upload Hub */}
-          {onOpenDeveloperPortal && (
-            <button
-              onClick={() => {
-                sounds.playClick();
-                onOpenDeveloperPortal();
-              }}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200/80 text-xs font-bold transition-all active:scale-95"
-              title="Submit Games & 50% Revenue Share"
-            >
-              <Code2 className="w-3.5 h-3.5 text-indigo-500" />
-              <span className="hidden xl:inline">DEV HUB</span>
-              <span className="text-[10px] bg-indigo-600 text-white px-1.5 py-0.2 rounded-md">50% REV</span>
-            </button>
-          )}
-
-          {/* Daily Quests & Lucky Wheel */}
+        {/* Right: Actions, Gamification, Sound & Language */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
+          {/* Daily Quests & Spin Button */}
           {onOpenDailyQuests && (
             <button
               onClick={() => {
                 sounds.playClick();
                 onOpenDailyQuests();
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white text-xs font-black shadow-sm hover:shadow-md transition-all active:scale-95 animate-pulse"
-              title="Daily Quests & Lucky Spin Wheel"
+              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 text-amber-300 border border-amber-500/40 text-xs font-black flex items-center gap-1.5 shadow-sm transition-all hover:scale-105 cursor-pointer animate-pulse"
+              title="Daily Quests & Lucky Spin"
             >
-              <Gift className="w-4 h-4" />
+              <Gift className="w-4 h-4 text-amber-400" />
               <span className="hidden sm:inline">QUESTS</span>
             </button>
           )}
 
-          {/* Surprise Me / Random Game Button */}
+          {/* Random Game Shuffle Button */}
           <button
             onClick={() => {
               sounds.playClick();
               onPlayRandom();
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-black shadow-sm hover:shadow-md transition-all active:scale-95"
-            title="Play a random game"
+            className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-cyan-400 border border-slate-800 transition-colors cursor-pointer"
+            title="Play Random Game"
           >
             <Dices className="w-4 h-4" />
-            <span className="hidden lg:inline">SURPRISE ME</span>
           </button>
 
-          {/* Achievements Trophy */}
+          {/* Leaderboard / Achievements */}
           <button
             onClick={() => {
               sounds.playClick();
               onOpenAchievements();
             }}
-            className="p-2 rounded-xl text-slate-600 hover:text-indigo-600 hover:bg-slate-100 transition-colors"
+            className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-amber-400 border border-slate-800 transition-colors cursor-pointer"
             title="View Achievements"
           >
-            <Trophy className="w-4 h-4 sm:w-5 sm:h-5" />
+            <Trophy className="w-4 h-4" />
           </button>
 
-          {/* Stats Drawer */}
+          {/* Sound Toggle */}
           <button
-            onClick={() => {
-              sounds.playClick();
-              onOpenStats();
-            }}
-            className="p-2 rounded-xl text-slate-600 hover:text-indigo-600 hover:bg-slate-100 transition-colors"
-            title="Player Stats"
+            onClick={onToggleSound}
+            className={`p-2 rounded-xl border transition-colors cursor-pointer ${
+              soundEnabled
+                ? 'bg-slate-900 hover:bg-slate-800 text-cyan-400 border-slate-800'
+                : 'bg-slate-900 text-slate-500 border-slate-800 hover:text-slate-300'
+            }`}
+            title={soundEnabled ? 'Mute Sound' : 'Enable Sound'}
           >
-            <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
+            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
           </button>
 
-          {/* Language Selector Dropdown */}
+          {/* Language Switcher */}
           {onSelectLanguage && (
             <div className="relative group">
-              <button
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition-colors"
+              <button 
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-cyan-500/50 text-slate-300 hover:text-white text-xs font-bold transition-all cursor-pointer"
                 title="Change Language"
               >
-                <Globe className="w-3.5 h-3.5 text-indigo-600" />
-                <span className="uppercase text-[11px]">{currentLanguage || 'en'}</span>
+                <Globe className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="uppercase">{currentLanguage}</span>
               </button>
-              <div className="absolute right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl py-1 px-1 min-w-[120px] hidden group-hover:block z-50 animate-in fade-in zoom-in-95 duration-150">
-                {LANGUAGES.map((lang) => (
+              <div className="absolute right-0 top-full mt-1.5 w-28 bg-slate-900 border border-slate-800 rounded-xl shadow-xl py-1 hidden group-hover:block z-50">
+                {LANGUAGES.map((l) => (
                   <button
-                    key={lang.code}
+                    key={l.code}
                     onClick={() => {
                       sounds.playClick();
-                      onSelectLanguage(lang.code);
+                      onSelectLanguage(l.code);
                     }}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                      currentLanguage === lang.code
-                        ? 'bg-indigo-50 text-indigo-600 font-bold'
-                        : 'text-slate-700 hover:bg-slate-100'
+                    className={`w-full text-left px-3 py-1.5 text-xs font-bold flex items-center justify-between hover:bg-slate-800 cursor-pointer ${
+                      currentLanguage === l.code ? 'text-cyan-400 bg-cyan-950/40' : 'text-slate-300'
                     }`}
                   >
-                    <span className="flex items-center gap-2">
-                      <span>{lang.flag}</span>
-                      <span>{lang.label}</span>
-                    </span>
-                    {currentLanguage === lang.code && <span className="text-indigo-600 text-[10px]">●</span>}
+                    <span>{l.label}</span>
+                    <span>{l.flag}</span>
                   </button>
                 ))}
               </div>
             </div>
           )}
-
-          {/* Sound Synthesizer Toggle */}
-          <button
-            onClick={onToggleSound}
-            className={`p-2 rounded-xl transition-colors ${
-              soundEnabled ? 'text-indigo-600 hover:bg-indigo-50' : 'text-slate-400 hover:bg-slate-100'
-            }`}
-            title={soundEnabled ? 'Mute Web Audio' : 'Unmute Web Audio'}
-          >
-            {soundEnabled ? <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" /> : <VolumeX className="w-4 h-4 sm:w-5 sm:h-5" />}
-          </button>
         </div>
-      </div>
-
-      {/* Quick Category Navigation Pills (CrazyGames Subheader) */}
-      <div className="border-t border-slate-100 bg-slate-50/70 px-3 sm:px-6 py-1.5 overflow-x-auto no-scrollbar flex items-center gap-2">
-        {CATEGORY_PILLS.map((pill) => (
-          <button
-            key={pill.id}
-            onClick={() => {
-              sounds.playClick();
-              onSelectCategory(pill.id);
-            }}
-            className={`px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
-              activeCategory === pill.id
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'bg-white text-slate-600 hover:bg-slate-200/70 border border-slate-200/80'
-            }`}
-          >
-            <span>{pill.label}</span>
-          </button>
-        ))}
       </div>
     </header>
   );

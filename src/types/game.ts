@@ -1,4 +1,4 @@
-export type GameCategory = 'all' | 'arcade' | 'puzzle' | 'retro' | 'action' | 'strategy' | 'word';
+export type GameCategory = 'all' | 'arcade' | 'puzzle' | 'retro' | 'action' | 'strategy' | 'word' | 'driving' | 'shooting' | 'favorites';
 
 export type GameEngineType = 
   | 'native_canvas' 

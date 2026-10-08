@@ -53,6 +53,11 @@ import { SubwaySurferGame } from '../games/SubwaySurferGame';
 import { TempleDashGame } from '../games/TempleDashGame';
 import { HillClimbGame } from '../games/HillClimbGame';
 import { FruitSlashGame } from '../games/FruitSlashGame';
+import { Slope3DGame } from '../games/Slope3DGame';
+import { Drift3DGame } from '../games/Drift3DGame';
+import { Subway3DGame } from '../games/Subway3DGame';
+import { CyberKnife3DGame } from '../games/CyberKnife3DGame';
+import { VoxelShooter3DGame } from '../games/VoxelShooter3DGame';
 import { UniversalProceduralCore } from './UniversalProceduralCore';
 
 interface SandboxedGamePlayerProps {
@@ -194,6 +199,16 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
         return <HillClimbGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'fruit-slash':
         return <FruitSlashGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
+      case 'slope-3d':
+        return <Slope3DGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
+      case 'drift-3d':
+        return <Drift3DGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
+      case 'subway-3d':
+        return <Subway3DGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
+      case 'knife-3d':
+        return <CyberKnife3DGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
+      case 'voxel-3d':
+        return <VoxelShooter3DGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       default:
         return (
           <UniversalProceduralCore

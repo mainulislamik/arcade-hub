@@ -19,7 +19,9 @@ import {
   Mail,
   ChevronLeft,
   ChevronRight,
-  X
+  X,
+  Car,
+  Zap
 } from 'lucide-react';
 import { GameCategory } from '../types/game';
 import { GAMES_CATALOG } from '../data/games';
@@ -45,14 +47,14 @@ const getCategoryCount = (catId: GameCategory) => {
 };
 
 const POPULAR_TAGS = [
+  '#3D-WebGL',
+  '#Subway',
+  '#Slope',
+  '#Drift',
+  '#Stickman',
   '#2-Player',
   '#Endless',
-  '#Space',
-  '#Retro',
-  '#Physics',
-  '#Shooter',
-  '#Memory',
-  '#Puzzle'
+  '#Retro'
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -70,26 +72,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCloseMobile = () => {}
 }) => {
   const categories: { id: GameCategory; label: string; icon: React.ReactNode; count: number }[] = [
-    { id: 'all', label: 'All Games', icon: <Gamepad2 className="w-5 h-5 text-indigo-600" />, count: getCategoryCount('all') },
-    { id: 'action', label: 'Action & Combat', icon: <Swords className="w-5 h-5 text-rose-600" />, count: getCategoryCount('action') },
-    { id: 'puzzle', label: 'Puzzle & Logic', icon: <Puzzle className="w-5 h-5 text-amber-600" />, count: getCategoryCount('puzzle') },
-    { id: 'retro', label: 'Retro & Classic', icon: <RotateCcw className="w-5 h-5 text-emerald-600" />, count: getCategoryCount('retro') },
-    { id: 'arcade', label: 'Arcade & Skill', icon: <Flame className="w-5 h-5 text-purple-600" />, count: getCategoryCount('arcade') },
-    { id: 'strategy', label: 'Strategy & Brain', icon: <Brain className="w-5 h-5 text-cyan-600" />, count: getCategoryCount('strategy') },
-    { id: 'word', label: 'Word & Trivia', icon: <Crosshair className="w-5 h-5 text-pink-600" />, count: getCategoryCount('word') },
+    { id: 'all', label: 'All Games', icon: <Gamepad2 className="w-5 h-5 text-cyan-400" />, count: getCategoryCount('all') },
+    { id: 'action', label: 'Action & 3D', icon: <Swords className="w-5 h-5 text-rose-400" />, count: getCategoryCount('action') },
+    { id: 'driving', label: 'Driving & Cars', icon: <Car className="w-5 h-5 text-amber-400" />, count: getCategoryCount('driving') },
+    { id: 'shooting', label: 'Shooting & FPS', icon: <Crosshair className="w-5 h-5 text-cyan-400" />, count: getCategoryCount('shooting') },
+    { id: 'arcade', label: 'Arcade & Skill', icon: <Zap className="w-5 h-5 text-purple-400" />, count: getCategoryCount('arcade') },
+    { id: 'puzzle', label: 'Puzzle & Logic', icon: <Puzzle className="w-5 h-5 text-emerald-400" />, count: getCategoryCount('puzzle') },
+    { id: 'strategy', label: 'Strategy & Brain', icon: <Brain className="w-5 h-5 text-blue-400" />, count: getCategoryCount('strategy') },
   ];
+
   const content = (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full bg-slate-900 border-r border-slate-800 text-slate-300 select-none">
       {/* Header & Collapse Toggle */}
-      <div className="p-3 border-b border-slate-100 flex items-center justify-between">
+      <div className="p-3 border-b border-slate-800/80 flex items-center justify-between">
         {!isCollapsed && (
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-400 px-2">
-            Navigation
+          <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 px-2 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            ARCADE DISCOVERY
           </span>
         )}
         <button
           onClick={onToggleCollapse}
-          className="hidden md:flex p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors mx-auto"
+          className="hidden md:flex p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors mx-auto cursor-pointer"
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -98,7 +102,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Mobile close button */}
         <button
           onClick={onCloseMobile}
-          className="md:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 ml-auto"
+          className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 ml-auto cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -113,88 +117,88 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onSelectCategory('all');
               onCloseMobile();
             }}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
               currentCategory === 'all' 
-                ? 'bg-indigo-50 text-indigo-600 shadow-sm border border-indigo-100' 
-                : 'text-slate-700 hover:bg-slate-100'
+                ? 'bg-cyan-500/20 text-cyan-300 shadow-sm border border-cyan-500/40' 
+                : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
             }`}
-            title="Home"
           >
-            <Home className="w-5 h-5 shrink-0 text-indigo-600" />
-            {!isCollapsed && <span>Home</span>}
+            <Gamepad2 className="w-5 h-5 text-cyan-400 shrink-0" />
+            {!isCollapsed && <span className="truncate">Featured 3D & Hits</span>}
           </button>
 
-          {onOpenRandom && (
+          <button
+            onClick={() => {
+              onSelectCategory('favorites');
+              onCloseMobile();
+            }}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+              currentCategory === 'favorites' 
+                ? 'bg-rose-500/20 text-rose-300 shadow-sm border border-rose-500/40' 
+                : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
+            }`}
+          >
+            <Heart className="w-5 h-5 text-rose-400 shrink-0" />
+            {!isCollapsed && (
+              <div className="flex items-center justify-between w-full">
+                <span className="truncate">Favorites</span>
+                {favoritesCount > 0 && (
+                  <span className="px-1.5 py-0.2 bg-rose-500 text-white rounded-full text-[10px] font-bold">
+                    {favoritesCount}
+                  </span>
+                )}
+              </div>
+            )}
+          </button>
+        </div>
+
+        {/* Categories Section */}
+        <div className="space-y-1">
+          {!isCollapsed && (
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 px-3 block mb-1">
+              Top Categories
+            </span>
+          )}
+          {categories.map((cat) => (
             <button
+              key={cat.id}
               onClick={() => {
-                onOpenRandom();
+                onSelectCategory(cat.id);
                 onCloseMobile();
               }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-all group"
-              title="Surprise Me (Random Game)"
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                currentCategory === cat.id 
+                  ? 'bg-cyan-500/20 text-cyan-300 shadow-sm border border-cyan-500/40' 
+                  : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
+              }`}
+              title={isCollapsed ? cat.label : undefined}
             >
-              <Dices className="w-5 h-5 shrink-0 text-amber-500 group-hover:rotate-45 transition-transform" />
-              {!isCollapsed && <span>Random Game</span>}
+              <div className="shrink-0">{cat.icon}</div>
+              {!isCollapsed && (
+                <div className="flex items-center justify-between w-full">
+                  <span className="truncate">{cat.label}</span>
+                  <span className="text-[11px] text-slate-500 font-bold">{cat.count}</span>
+                </div>
+              )}
             </button>
-          )}
+          ))}
         </div>
 
-        {/* Categories */}
-        <div>
-          {!isCollapsed && (
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">
-              Categories
-            </h3>
-          )}
-          <div className="space-y-1">
-            {categories.map((cat) => {
-              const isActive = currentCategory === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => {
-                    onSelectCategory(cat.id);
-                    onCloseMobile();
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold transition-all ${
-                    isActive 
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' 
-                      : 'text-slate-700 hover:bg-slate-100'
-                  }`}
-                  title={cat.label}
-                >
-                  <div className="flex items-center gap-3 truncate">
-                    <span className={isActive ? 'text-white' : ''}>{cat.icon}</span>
-                    {!isCollapsed && <span className="truncate">{cat.label}</span>}
-                  </div>
-                  {!isCollapsed && (
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${
-                      isActive ? 'bg-indigo-700 text-indigo-100' : 'bg-slate-100 text-slate-500'
-                    }`}>
-                      {cat.count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Popular Tags */}
-        {!isCollapsed && onSelectTag && (
-          <div>
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">
-              Popular Tags
-            </h3>
+        {/* Trending Tags (Only visible when expanded) */}
+        {!isCollapsed && (
+          <div className="space-y-2 pt-2 border-t border-slate-800/80">
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 px-3 block">
+              Trending Tags
+            </span>
             <div className="flex flex-wrap gap-1.5 px-2">
               {POPULAR_TAGS.map((tag) => (
                 <button
                   key={tag}
                   onClick={() => {
-                    onSelectTag(tag.replace('#', ''));
+                    if (onSelectTag) onSelectTag(tag.replace('#', '').toLowerCase());
                     onCloseMobile();
                   }}
-                  className="px-2.5 py-1 text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 border border-slate-200/60 rounded-lg transition-all"
+                  className="text-[11px] font-medium text-slate-400 hover:text-cyan-300 hover:bg-slate-800 bg-slate-800/50 border border-slate-700/40 px-2 py-1 rounded-lg transition-colors cursor-pointer"
                 >
                   {tag}
                 </button>
@@ -202,98 +206,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
         )}
-
-        {/* Developer Portal Callout (CrazyGames Style) */}
-        {!isCollapsed && onOpenDeveloperPortal && (
-          <div className="pt-2">
-            <div 
-              onClick={() => {
-                onOpenDeveloperPortal();
-                onCloseMobile();
-              }}
-              className="p-3 bg-gradient-to-br from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 border border-indigo-200/80 rounded-2xl cursor-pointer transition-all group shadow-sm hover:shadow"
-            >
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] font-black uppercase tracking-wider text-indigo-600 bg-white px-2 py-0.5 rounded-full border border-indigo-200">
-                  Dev Program
-                </span>
-                <span className="text-[11px] font-extrabold text-emerald-600">50% Rev</span>
-              </div>
-              <h4 className="text-xs font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
-                Publish Your Game
-              </h4>
-              <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">
-                J2ME, DOS, WASM or Canvas. Monetize with zero server cost.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Platform Legal & Trust (For Google AdSense compliance) */}
-        {!isCollapsed && (
-          <div className="pt-4 border-t border-slate-100 space-y-1">
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">
-              Platform & Legal
-            </h3>
-            <button
-              onClick={() => {
-                onOpenLegal('about');
-                onCloseMobile();
-              }}
-              className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 text-left"
-            >
-              <HelpCircle className="w-4 h-4 text-slate-400" />
-              <span>About Arcadex</span>
-            </button>
-            <button
-              onClick={() => {
-                onOpenLegal('privacy');
-                onCloseMobile();
-              }}
-              className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 text-left"
-            >
-              <Shield className="w-4 h-4 text-slate-400" />
-              <span>Privacy Policy</span>
-            </button>
-            <button
-              onClick={() => {
-                onOpenLegal('terms');
-                onCloseMobile();
-              }}
-              className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 text-left"
-            >
-              <FileText className="w-4 h-4 text-slate-400" />
-              <span>Terms of Service</span>
-            </button>
-            <button
-              onClick={() => {
-                onOpenLegal('dmca');
-                onCloseMobile();
-              }}
-              className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 text-left"
-            >
-              <Shield className="w-4 h-4 text-slate-400" />
-              <span>DMCA Policy</span>
-            </button>
-            <button
-              onClick={() => {
-                onOpenLegal('contact');
-                onCloseMobile();
-              }}
-              className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 text-left"
-            >
-              <Mail className="w-4 h-4 text-slate-400" />
-              <span>Contact Us</span>
-            </button>
-          </div>
-        )}
       </div>
 
-      {/* Footer Info */}
+      {/* Footer Legal Links */}
       {!isCollapsed && (
-        <div className="p-3 bg-slate-50 border-t border-slate-100 text-[11px] text-slate-400 text-center">
-          <p>© 2026 Arcadex Studio</p>
-          <p className="font-semibold text-slate-500">100% Client-Side Engine</p>
+        <div className="p-3 border-t border-slate-800/80 bg-slate-950/60 space-y-2">
+          <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-slate-500 font-medium">
+            <button onClick={() => onOpenLegal('privacy')} className="hover:text-slate-300 cursor-pointer">Privacy</button>
+            <button onClick={() => onOpenLegal('terms')} className="hover:text-slate-300 cursor-pointer">Terms</button>
+            <button onClick={() => onOpenLegal('dmca')} className="hover:text-slate-300 cursor-pointer">DMCA</button>
+            <button onClick={() => onOpenLegal('about')} className="hover:text-slate-300 cursor-pointer">About</button>
+            <button onClick={() => onOpenLegal('contact')} className="hover:text-slate-300 cursor-pointer">Contact</button>
+          </div>
+          <div className="text-[10px] text-slate-600">
+            © 2026 Arcadex. 100% Client-Side WebGL.
+          </div>
         </div>
       )}
     </div>
@@ -301,26 +228,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Desktop Sticky Sidebar */}
-      <aside 
-        className={`fixed top-16 left-0 bottom-0 z-30 bg-white border-r border-slate-200 transition-all duration-300 flex flex-col ${
-          isCollapsed ? 'w-16' : 'w-64'
-        } shadow-sm hidden md:flex`}
-        aria-label="Sidebar Navigation"
-      >
+      {/* Desktop Sidebar */}
+      <aside className={`hidden md:block sticky top-16 h-[calc(100vh-4rem)] transition-all duration-300 shrink-0 z-30 ${
+        isCollapsed ? 'w-16' : 'w-64'
+      }`}>
         {content}
       </aside>
 
-      {/* Mobile Drawer Backdrop */}
+      {/* Mobile Drawer */}
       {isMobileOpen && (
-        <div 
-          className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm md:hidden animate-in fade-in"
-          onClick={onCloseMobile}
-        >
+        <div className="fixed inset-0 z-50 md:hidden flex">
           <div 
-            className="w-72 h-full bg-white shadow-2xl animate-in slide-in-from-left duration-200"
-            onClick={(e) => e.stopPropagation()}
-          >
+            className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+            onClick={onCloseMobile}
+          />
+          <div className="relative w-72 max-w-[80vw] h-full bg-slate-900 z-10 shadow-2xl">
             {content}
           </div>
         </div>
