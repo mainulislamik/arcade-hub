@@ -70,7 +70,7 @@ export const App: React.FC = () => {
       } else if (!gameSlug) {
         updatePageSEO({
           title: 'Arcadex - Free Online Games (CrazyGames Style)',
-          description: 'Play 18+ instant browser games online for free. No download, no signup, 0% server load.',
+          description: 'Play 1,115+ instant browser games online for free. No download, no signup, 0% server load.',
           canonical: 'http://localhost:3080/'
         });
       }
@@ -111,7 +111,7 @@ export const App: React.FC = () => {
 
     updatePageSEO({
       title: 'Arcadex - Free Online Games (CrazyGames Style)',
-      description: 'Play 18+ instant browser games online for free. No download, no signup, 0% server load.',
+      description: 'Play 1,115+ instant browser games online for free. No download, no signup, 0% server load.',
       canonical: 'http://localhost:3080/'
     });
   }, []);
@@ -245,7 +245,7 @@ export const App: React.FC = () => {
               )}
 
               <CrazyGamesGrid
-                games={displayedGames}
+                games={GAMES_CATALOG}
                 onSelectGame={handleSelectGame}
                 activeCategory={activeCategory}
                 favorites={favorites}

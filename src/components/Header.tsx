@@ -160,7 +160,7 @@ export const Header: React.FC<HeaderProps> = ({
               }}
               onFocus={() => setIsSearchOpen(true)}
               onKeyDown={handleKeyDown}
-              placeholder="Search 18+ free games (e.g. Mecha Blaster, Snake, 2048)..."
+              placeholder="Search 1,115+ free games (e.g. Mecha Blaster, Hextris, Dino, Solitaire, Chess)..."
               className="w-full pl-10 pr-9 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200/70 focus:bg-white text-slate-900 text-xs sm:text-sm font-medium border border-transparent focus:border-indigo-500 focus:shadow-sm outline-none transition-all"
             />
             {query && (

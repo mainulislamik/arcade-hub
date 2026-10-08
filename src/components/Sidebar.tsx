@@ -22,6 +22,7 @@ import {
   X
 } from 'lucide-react';
 import { GameCategory } from '../types/game';
+import { GAMES_CATALOG } from '../data/games';
 
 interface SidebarProps {
   currentCategory: GameCategory;
@@ -38,15 +39,10 @@ interface SidebarProps {
   onCloseMobile?: () => void;
 }
 
-const CATEGORIES: { id: GameCategory; label: string; icon: React.ReactNode; count: number }[] = [
-  { id: 'all', label: 'All Games', icon: <Gamepad2 className="w-5 h-5 text-indigo-600" />, count: 18 },
-  { id: 'action', label: 'Action & Combat', icon: <Swords className="w-5 h-5 text-rose-600" />, count: 3 },
-  { id: 'puzzle', label: 'Puzzle & Logic', icon: <Puzzle className="w-5 h-5 text-amber-600" />, count: 5 },
-  { id: 'retro', label: 'Retro & Classic', icon: <RotateCcw className="w-5 h-5 text-emerald-600" />, count: 4 },
-  { id: 'arcade', label: 'Arcade & Skill', icon: <Flame className="w-5 h-5 text-purple-600" />, count: 3 },
-  { id: 'strategy', label: 'Strategy & Brain', icon: <Brain className="w-5 h-5 text-cyan-600" />, count: 2 },
-  { id: 'word', label: 'Word & Trivia', icon: <Crosshair className="w-5 h-5 text-pink-600" />, count: 1 },
-];
+const getCategoryCount = (catId: GameCategory) => {
+  if (catId === 'all') return GAMES_CATALOG.length;
+  return GAMES_CATALOG.filter(g => g.category === catId).length;
+};
 
 const POPULAR_TAGS = [
   '#2-Player',
@@ -73,6 +69,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isMobileOpen = false,
   onCloseMobile = () => {}
 }) => {
+  const categories: { id: GameCategory; label: string; icon: React.ReactNode; count: number }[] = [
+    { id: 'all', label: 'All Games', icon: <Gamepad2 className="w-5 h-5 text-indigo-600" />, count: getCategoryCount('all') },
+    { id: 'action', label: 'Action & Combat', icon: <Swords className="w-5 h-5 text-rose-600" />, count: getCategoryCount('action') },
+    { id: 'puzzle', label: 'Puzzle & Logic', icon: <Puzzle className="w-5 h-5 text-amber-600" />, count: getCategoryCount('puzzle') },
+    { id: 'retro', label: 'Retro & Classic', icon: <RotateCcw className="w-5 h-5 text-emerald-600" />, count: getCategoryCount('retro') },
+    { id: 'arcade', label: 'Arcade & Skill', icon: <Flame className="w-5 h-5 text-purple-600" />, count: getCategoryCount('arcade') },
+    { id: 'strategy', label: 'Strategy & Brain', icon: <Brain className="w-5 h-5 text-cyan-600" />, count: getCategoryCount('strategy') },
+    { id: 'word', label: 'Word & Trivia', icon: <Crosshair className="w-5 h-5 text-pink-600" />, count: getCategoryCount('word') },
+  ];
   const content = (
     <div className="flex flex-col h-full bg-white">
       {/* Header & Collapse Toggle */}
@@ -142,7 +147,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </h3>
           )}
           <div className="space-y-1">
-            {CATEGORIES.map((cat) => {
+            {categories.map((cat) => {
               const isActive = currentCategory === cat.id;
               return (
                 <button

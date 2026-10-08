@@ -210,7 +210,7 @@ export const resetToHomeSEO = (): void => {
   const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3080';
   updateSEO({
     title: 'Arcadex - 100% Free Web Arcade Games (Zero Download & No Login)',
-    description: 'Instant client-side web gaming hub with 18+ retro classics, puzzles, action & combat games. Zero latency, 100% browser-rendered physics & procedural Web Audio.',
+    description: 'Instant client-side web gaming hub with 1,115+ retro classics, puzzles, action & combat games. Zero latency, 100% browser-rendered physics & procedural Web Audio.',
     canonicalUrl: `${origin}/`,
     ogType: 'website',
     keywords: ['free web games', 'crazygames', 'retro arcade', 'browser games', 'no download games', 'html5 games', '2048 online', 'mecha blaster 2'],

@@ -253,7 +253,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
                   <p className="text-[11px] text-slate-500 mt-1">100% Client-Side Engine</p>
                 </div>
                 <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-center">
-                  <div className="text-indigo-600 font-black text-lg mb-1">18+</div>
+                  <div className="text-indigo-600 font-black text-lg mb-1">1,115+</div>
                   <div className="text-xs font-bold text-slate-800">Classic & Modern Games</div>
                   <p className="text-[11px] text-slate-500 mt-1">Instant 0-Second Launch</p>
                 </div>
