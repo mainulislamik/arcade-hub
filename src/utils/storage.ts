@@ -42,6 +42,12 @@ export const getStoredProfile = (): PlayerProfile => {
   }
 };
 
+export const getPlayerProfile = getStoredProfile;
+
+export const getFavorites = (): string[] => {
+  return getStoredProfile().favoriteGames || [];
+};
+
 export const saveProfile = (profile: PlayerProfile): void => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
@@ -157,6 +163,11 @@ export const toggleFavoriteGame = (gameId: string): PlayerProfile => {
   };
   saveProfile(updated);
   return updated;
+};
+
+export const toggleFavorite = (gameId: string): string[] => {
+  const updated = toggleFavoriteGame(gameId);
+  return updated.favoriteGames;
 };
 
 export const updateSoundPreference = (enabled: boolean): PlayerProfile => {

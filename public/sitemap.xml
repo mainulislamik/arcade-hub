@@ -45,6 +45,12 @@
   </url>
   <!-- Game Direct Play Links -->
   <url>
+    <loc>http://localhost:3080/?game=mecha-blaster-2</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
     <loc>http://localhost:3080/?game=snake</loc>
     <lastmod>2026-10-08</lastmod>
     <changefreq>weekly</changefreq>

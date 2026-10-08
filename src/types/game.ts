@@ -41,6 +41,8 @@ export interface GameItem {
   proBadge?: string;
 }
 
+export type Game = GameItem;
+
 export interface GameStats {
   plays: number;
   highScore: number;
