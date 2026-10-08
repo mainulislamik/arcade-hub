@@ -51,7 +51,120 @@ export const GAMES_CATALOG: GameItem[] = [
     rating: 4.95,
     reviewCount: 890,
     plays: 12400,
-    releaseDate: '2026-10-08'
+    releaseDate: '2026-10-08',
+    engineType: 'native_canvas',
+    licenseType: 'Arcadex Original',
+    developer: 'Arcadex Studios',
+    fileSizeMb: 1.8,
+    emulatorConfig: {
+      platform: 'native',
+      aspectRatio: '16:9'
+    }
+  },
+  {
+    id: 'cyber-tank-j2me',
+    slug: 'cyber-tank-j2me',
+    title: 'Cyber Tank: Micro J2ME Edition',
+    category: 'retro',
+    description: 'Nostalgic Java J2ME mobile phone arcade tank shooter with authentic tactile Nokia keypad and retro LCD display.',
+    longDescription: 'Play an authentic Java (J2ME) mobile phone classic in your browser! Cyber Tank: Micro Edition features the signature 176x220 pixel retro display, turn-based tank maneuvering, obstacle destruction, power-up collection, and classic polyphonic beep sound effects. Complete with a virtual retro phone keypad for true 2000s mobile nostalgia with 0% server lag.',
+    howToPlay: [
+      'Use the on-screen Retro Mobile Keypad (2/4/6/8 or D-Pad) or Keyboard Arrows to steer your tank.',
+      'Press Key 5, Spacebar, or the Center Action key to fire cannon shells.',
+      'Press Key 1 or 3 to rotate turret independently.',
+      'Destroy enemy tanks, collect fuel cells and repair kits, and survive endless battle waves.'
+    ],
+    controls: {
+      desktop: 'NumPad 2/4/6/8 or Arrows to Move, NumPad 5 or Space to Fire, NumPad 7/9 for Special Weapons',
+      mobile: 'Tactile Retro Mobile Phone Keypad (1-9, *, #, SoftKeys) or on-screen D-Pad'
+    },
+    tips: [
+      'Use brick walls for cover — they absorb 2 enemy shots before disintegrating.',
+      'Keep an eye on your ammo counter; don’t spray shells needlessly.',
+      'Shoot moving power-up crates to immediately gain double damage.'
+    ],
+    faqs: [
+      {
+        question: 'What is J2ME and how does it play in the browser?',
+        answer: 'J2ME (Java 2 Micro Edition) was the engine behind legendary early 2000s mobile games. Arcadex runs these binaries directly on your computer GPU using a client-side WebAssembly engine.'
+      },
+      {
+        question: 'Can I use keyboard numbers to play?',
+        answer: 'Yes! Numpad keys 2, 4, 6, 8 (movement) and 5 (fire) replicate the exact Nokia/Sony phone layout.'
+      }
+    ],
+    badge: 'Retro',
+    coverImage: '/assets/covers/retro-pixel.jpg',
+    proBadge: 'J2ME RETRO MOBILE',
+    heroImage: '/assets/heroes/hero-spotlight-retro.jpg',
+    difficulty: 'Medium',
+    tags: ['Retro', 'Java', 'J2ME', 'Mobile', 'Shooter', 'Tank'],
+    gradient: 'from-amber-600 to-emerald-800',
+    rating: 4.88,
+    reviewCount: 650,
+    plays: 8900,
+    releaseDate: '2026-10-08',
+    engineType: 'java_j2me',
+    licenseType: 'Homebrew',
+    developer: 'RetroWare Community',
+    fileSizeMb: 0.35,
+    emulatorConfig: {
+      platform: 'java',
+      aspectRatio: '3:4',
+      showMobileKeypad: true
+    }
+  },
+  {
+    id: 'retro-racer-dos',
+    slug: 'retro-racer-dos',
+    title: 'Cyber Turbo Racer: 16-Bit PC',
+    category: 'arcade',
+    description: 'High-speed 16-bit retro PC highway racer with pseudo-3D parallax scaling, turbo boosters, and synthwave soundtrack.',
+    longDescription: 'Feel the exhilarating rush of 16-bit retro PC racing! Cyber Turbo Racer puts you behind the wheel of an ultra-fast supercar speeding down multi-lane neon highways. Weave through dynamic traffic, activate nitro afterburners, dodge oil slicks, and race against the clock to reach checkpoints before time runs out.',
+    howToPlay: [
+      'Use Left/Right Arrow Keys or A/D to steer your vehicle across highway lanes.',
+      'Hold Up Arrow or W to accelerate to maximum speed (320 km/h).',
+      'Press Spacebar or Shift to trigger Nitro Turbo Boost.',
+      'Reach each highway checkpoint before the 60-second timer hits zero.'
+    ],
+    controls: {
+      desktop: 'Arrow Keys or WASD to Steer & Accelerate, Spacebar for Nitro Boost, ESC to Pause',
+      mobile: 'Virtual Arcade Gamepad buttons (D-Pad + Turbo Boost)'
+    },
+    tips: [
+      'Draft behind civilian cars for 2 seconds to build a slipstream speed boost.',
+      'Save your Nitro for long uphill stretches to maintain top velocity.',
+      'Watch out for flashing brake lights ahead to avoid high-speed crashes.'
+    ],
+    faqs: [
+      {
+        question: 'Does this retro PC game require downloading DOSBox or software?',
+        answer: 'No! The game package is streamed directly to your browser memory and executed via client-side WebAssembly.'
+      },
+      {
+        question: 'Is game progress and highest lap score saved?',
+        answer: 'Yes! Best times, unlocked vehicles, and high scores are automatically stored in your browser local storage.'
+      }
+    ],
+    badge: 'Hot',
+    coverImage: '/assets/covers/cyber-racer.jpg',
+    proBadge: '16-BIT PC TURBO',
+    heroImage: '/assets/heroes/hero-spotlight-arcade.jpg',
+    difficulty: 'Medium',
+    tags: ['Racing', 'Retro', 'DOS', 'Speed', 'Arcade', 'Synthwave'],
+    gradient: 'from-fuchsia-600 to-rose-900',
+    rating: 4.92,
+    reviewCount: 1120,
+    plays: 15300,
+    releaseDate: '2026-10-08',
+    engineType: 'retro_dos',
+    licenseType: 'Freeware',
+    developer: 'PixelSpeed Labs',
+    fileSizeMb: 2.4,
+    emulatorConfig: {
+      platform: 'dos',
+      aspectRatio: '4:3'
+    }
   },
   {
     id: 'snake',

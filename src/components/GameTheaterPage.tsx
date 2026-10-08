@@ -26,26 +26,7 @@ import {
 import { GameItem } from '../types/game';
 import { sounds } from '../utils/soundEngine';
 import { recordGamePlay } from '../utils/storage';
-
-// Game Component Imports
-import { MechaBlaster2Game } from './games/MechaBlaster2Game';
-import { SnakeGame } from './games/SnakeGame';
-import { Game2048 } from './games/Game2048';
-import { GalaxyDefender } from './games/GalaxyDefender';
-import { FlappyBirdGame } from './games/FlappyBirdGame';
-import { BreakoutGame } from './games/BreakoutGame';
-import { TetrisGame } from './games/TetrisGame';
-import { PacMazeGame } from './games/PacMazeGame';
-import { MemoryFlipGame } from './games/MemoryFlipGame';
-import { MinesweeperGame } from './games/MinesweeperGame';
-import { CyberPongGame } from './games/CyberPongGame';
-import { WordleGame } from './games/WordleGame';
-import { AsteroidBlasterGame } from './games/AsteroidBlasterGame';
-import { SudokuGame } from './games/SudokuGame';
-import { ConnectFourGame } from './games/ConnectFourGame';
-import { SimonEchoGame } from './games/SimonEchoGame';
-import { BubbleShooterGame } from './games/BubbleShooterGame';
-import { UltimateTicTacToeGame } from './games/UltimateTicTacToeGame';
+import { SandboxedGamePlayer } from './player/SandboxedGamePlayer';
 
 interface GameTheaterPageProps {
   game: GameItem;
@@ -68,34 +49,21 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
   soundEnabled,
   onToggleSound
 }) => {
-  const [isTheaterExpanded, setIsTheaterExpanded] = useState(false);
-  const [likes, setLikes] = useState<number>(() => Math.floor((game.plays || 12000) * 0.12));
-  const [dislikes, setDislikes] = useState<number>(() => Math.floor((game.plays || 12000) * 0.008));
+  const [likes, setLikes] = useState<number>(Math.floor((game.rating || 4.8) * 240));
+  const [dislikes, setDislikes] = useState<number>(12);
   const [userVote, setUserVote] = useState<'like' | 'dislike' | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+  const [gameKey, setGameKey] = useState(0);
   const [currentScore, setCurrentScore] = useState<number>(0);
-  const [gameKey, setGameKey] = useState<number>(0);
+  const [isTheaterExpanded, setIsTheaterExpanded] = useState(false);
+  const [activeFaqIndex, setActiveFaqIndex] = useState<number | null>(0);
 
-  const theaterContainerRef = useRef<HTMLDivElement | null>(null);
+  const theaterContainerRef = useRef<HTMLDivElement>(null);
 
-  // Update Page Title & URL for SEO
+  // Scroll to top on mount
   useEffect(() => {
-    document.title = `${game.title} - Play Free Online on Arcadex`;
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    // Update query param
-    const url = new URL(window.location.href);
-    url.searchParams.set('game', game.slug);
-    window.history.replaceState({}, '', url.toString());
-
-    // Record game play in storage
-    recordGamePlay(game.id, 0);
-
-    return () => {
-      document.title = 'Arcadex - Play 18+ Free Instant Online Web Games';
-    };
-  }, [game]);
+  }, [game.id]);
 
   const handleVote = (type: 'like' | 'dislike') => {
     sounds.playClick();
@@ -106,21 +74,24 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
     } else {
       if (userVote === 'like') setLikes(l => l - 1);
       if (userVote === 'dislike') setDislikes(d => d - 1);
+      
       setUserVote(type);
-      if (type === 'like') setLikes(l => l + 1);
-      else setDislikes(d => d + 1);
+      if (type === 'like') {
+        setLikes(l => l + 1);
+        sounds.playPowerup();
+      } else {
+        setDislikes(d => d + 1);
+      }
     }
   };
 
   const handleShare = () => {
     sounds.playClick();
-    const shareUrl = window.location.href;
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        setCopiedLink(true);
-        setTimeout(() => setCopiedLink(false), 2500);
-      });
-    }
+    const url = window.location.origin + '/?game=' + game.slug;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2500);
+    });
   };
 
   const handleFullscreen = () => {
@@ -143,179 +114,112 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
     .filter(g => g.id !== game.id)
     .slice(0, 6);
 
-  // Render Game Component by ID
-  const renderGame = () => {
-    const props = {
-      key: `${game.id}-${gameKey}`,
-      onScoreUpdate: (s: number) => setCurrentScore(s),
-      onGameOver: (s: number) => {
-        setCurrentScore(s);
-        recordGamePlay(game.id, s);
-      }
-    };
-
-    switch (game.id) {
-      case 'mecha-blaster-2':
-        return <MechaBlaster2Game {...props} />;
-      case 'snake':
-        return <SnakeGame {...props} />;
-      case 'game-2048':
-        return <Game2048 {...props} />;
-      case 'galaxy-defender':
-        return <GalaxyDefender {...props} />;
-      case 'flappy-bird':
-        return <FlappyBirdGame {...props} />;
-      case 'breakout':
-        return <BreakoutGame {...props} />;
-      case 'tetris':
-        return <TetrisGame {...props} />;
-      case 'pac-maze':
-        return <PacMazeGame {...props} />;
-      case 'memory-flip':
-        return <MemoryFlipGame {...props} />;
-      case 'minesweeper':
-        return <MinesweeperGame {...props} />;
-      case 'cyber-pong':
-        return <CyberPongGame {...props} />;
-      case 'wordle':
-        return <WordleGame {...props} />;
-      case 'asteroid-blaster':
-        return <AsteroidBlasterGame {...props} />;
-      case 'sudoku':
-        return <SudokuGame {...props} />;
-      case 'connect-four':
-        return <ConnectFourGame {...props} />;
-      case 'simon-echo':
-        return <SimonEchoGame {...props} />;
-      case 'bubble-shooter':
-        return <BubbleShooterGame {...props} />;
-      case 'ultimate-tictactoe':
-        return <UltimateTicTacToeGame {...props} />;
-      default:
-        return (
-          <div className="flex flex-col items-center justify-center p-12 text-slate-500">
-            <Gamepad2 className="w-12 h-12 mb-3 text-indigo-500 animate-bounce" />
-            <p className="font-bold text-lg text-slate-800">Game Loading...</p>
-          </div>
-        );
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
-      {/* Top Breadcrumb Navigation */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-2">
-        <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
-          <button 
-            onClick={onBackToLobby}
-            className="flex items-center gap-1 hover:text-indigo-600 transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Home
-          </button>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-          <span className="capitalize text-slate-600 font-bold">{game.category}</span>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-          <span className="text-slate-900 font-bold truncate max-w-xs">{game.title}</span>
-        </div>
-      </div>
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 transition-all duration-300">
+      {/* Breadcrumb Navigation */}
+      <nav className="flex items-center gap-2 text-xs text-slate-500 mb-4 font-medium">
+        <button 
+          onClick={onBackToLobby}
+          className="hover:text-indigo-600 flex items-center gap-1 transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Arcadex
+        </button>
+        <ChevronRight className="w-3 h-3 text-slate-400" />
+        <span className="capitalize text-slate-600 font-semibold">{game.category}</span>
+        <ChevronRight className="w-3 h-3 text-slate-400" />
+        <span className="text-slate-900 font-bold truncate max-w-[200px]">{game.title}</span>
+      </nav>
 
-      {/* Main Theater Stage Container */}
-      <div className={`mx-auto px-4 sm:px-6 transition-all duration-300 ${
-        isTheaterExpanded ? 'max-w-full' : 'max-w-7xl'
-      }`}>
-        {/* Game Title Bar */}
-        <div className="bg-white rounded-t-2xl border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+      {/* Main Theater Card Container */}
+      <div className={`transition-all duration-300 ${isTheaterExpanded ? 'max-w-none' : 'max-w-6xl mx-auto'}`}>
+        {/* Game Title Bar & Quick Actions */}
+        <div className="bg-white border border-slate-200 rounded-t-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <img 
-              src={game.coverImage || '/assets/covers/snake-retro.jpg'} 
-              alt={game.title} 
-              className="w-12 h-12 rounded-xl object-cover border border-slate-200 shadow-sm shrink-0"
-            />
+            <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${game.gradient || 'from-indigo-600 to-sky-500'} flex items-center justify-center text-white text-2xl shadow-md`}>
+              {game.icon || '🎮'}
+            </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                  {game.title}
-                </h1>
+                <h1 className="text-xl font-black text-slate-900 tracking-tight">{game.title}</h1>
                 {game.badge && (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-700 uppercase">
+                  <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-full border border-amber-300">
                     {game.badge}
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-3 text-xs text-slate-500 font-medium mt-0.5">
-                <span className="capitalize font-semibold text-indigo-600">{game.category}</span>
-                <span>•</span>
-                <span className="flex items-center gap-1 text-amber-600 font-bold">
-                  <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                  {game.rating}
+              <div className="flex items-center gap-3 text-xs text-slate-500 mt-0.5">
+                <span className="flex items-center gap-1 font-bold text-amber-500">
+                  <Star className="w-3.5 h-3.5 fill-amber-400" />
+                  {game.rating.toFixed(1)}
                 </span>
                 <span>•</span>
-                <span>{(game.plays || 12400).toLocaleString()} Plays</span>
+                <span>{((game.plays || 12000) / 1000).toFixed(1)}k Plays</span>
+                <span>•</span>
+                <span className="capitalize font-medium text-slate-600">{game.difficulty}</span>
               </div>
             </div>
           </div>
 
-          {/* Quick Action Buttons */}
-          <div className="flex items-center gap-2">
-            {/* Likes / Dislikes */}
-            <div className="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200/60">
-              <button
-                onClick={() => handleVote('like')}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-colors ${
-                  userVote === 'like' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="Like Game"
-              >
-                <ThumbsUp className="w-3.5 h-3.5" />
-                <span>{likes}</span>
-              </button>
-              <div className="w-[1px] h-4 bg-slate-300 mx-1" />
-              <button
-                onClick={() => handleVote('dislike')}
-                className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-bold transition-colors ${
-                  userVote === 'dislike' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-700'
-                }`}
-                title="Dislike Game"
-              >
-                <ThumbsDown className="w-3.5 h-3.5" />
-              </button>
-            </div>
+          {/* Action Bar */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Like Button */}
+            <button
+              onClick={() => handleVote('like')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                userVote === 'like'
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                  : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+              }`}
+              title="I like this game"
+            >
+              <ThumbsUp className={`w-3.5 h-3.5 ${userVote === 'like' ? 'fill-emerald-600' : ''}`} />
+              <span>{likes}</span>
+            </button>
+
+            {/* Dislike Button */}
+            <button
+              onClick={() => handleVote('dislike')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                userVote === 'dislike'
+                  ? 'bg-rose-50 text-rose-700 border-rose-300'
+                  : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+              }`}
+              title="I dislike this game"
+            >
+              <ThumbsDown className={`w-3.5 h-3.5 ${userVote === 'dislike' ? 'fill-rose-600' : ''}`} />
+              <span>{dislikes}</span>
+            </button>
 
             {/* Favorite Button */}
             <button
               onClick={() => {
-                sounds.playClick();
+                sounds.playPowerup();
                 onToggleFavorite(game.id);
               }}
-              className={`p-2 rounded-xl border transition-all ${
-                isFavorite 
-                  ? 'bg-rose-50 text-rose-600 border-rose-200' 
-                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+              className={`p-2 rounded-xl transition-all border ${
+                isFavorite
+                  ? 'bg-rose-50 text-rose-600 border-rose-200'
+                  : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
               }`}
-              title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+              title="Add to Favorites"
             >
               <Heart className={`w-4 h-4 ${isFavorite ? 'fill-rose-500' : ''}`} />
             </button>
 
-            {/* Share Button */}
+            {/* Sound Toggle */}
             <button
-              onClick={handleShare}
-              className="p-2 rounded-xl bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all relative"
-              title="Share Game"
+              onClick={onToggleSound}
+              className="p-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-colors"
+              title={soundEnabled ? 'Mute Audio' : 'Unmute Audio'}
             >
-              {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4" />}
-              {copiedLink && (
-                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-900 text-white text-[10px] font-bold rounded shadow-lg whitespace-nowrap">
-                  Link Copied!
-                </span>
-              )}
+              {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4 text-rose-500" />}
             </button>
 
             {/* Restart Button */}
             <button
               onClick={handleRestart}
-              className="p-2 rounded-xl bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all"
+              className="p-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-colors"
               title="Restart Game"
             >
               <RotateCcw className="w-4 h-4" />
@@ -324,8 +228,8 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             {/* Theater Mode Toggle */}
             <button
               onClick={() => setIsTheaterExpanded(!isTheaterExpanded)}
-              className="p-2 rounded-xl bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all hidden sm:block"
-              title={isTheaterExpanded ? 'Contract View' : 'Expand Theater Mode'}
+              className="hidden md:flex p-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-colors"
+              title="Expand Theater"
             >
               <Layers className="w-4 h-4" />
             </button>
@@ -333,10 +237,19 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             {/* Fullscreen Button */}
             <button
               onClick={handleFullscreen}
-              className="p-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all shadow-sm"
-              title="Play in Fullscreen"
+              className="p-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-colors"
+              title="Fullscreen Mode"
             >
               <Maximize2 className="w-4 h-4" />
+            </button>
+
+            {/* Share Button */}
+            <button
+              onClick={handleShare}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
+            >
+              {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
+              <span>{copiedLink ? 'Copied!' : 'Share'}</span>
             </button>
           </div>
         </div>
@@ -344,12 +257,20 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
         {/* Theater Game Canvas Area */}
         <div 
           ref={theaterContainerRef}
-          className="relative bg-slate-950 border-x border-b border-slate-200 overflow-hidden min-h-[520px] max-h-[750px] flex items-center justify-center rounded-b-2xl shadow-lg"
+          className="relative bg-slate-950 border-x border-b border-slate-200 overflow-hidden flex flex-col items-center justify-center rounded-b-2xl shadow-lg"
         >
-          {/* Active Game Component */}
-          <div className="w-full h-full flex items-center justify-center p-2 sm:p-4">
-            {renderGame()}
-          </div>
+          {/* Active Sandboxed Multi-Core Game Runner */}
+          <SandboxedGamePlayer
+            key={`${game.id}-${gameKey}`}
+            game={game}
+            soundEnabled={soundEnabled}
+            onToggleSound={onToggleSound}
+            onScoreUpdate={(s) => setCurrentScore(s)}
+            onGameOver={(s) => {
+              setCurrentScore(s);
+              recordGamePlay(game.id, s);
+            }}
+          />
         </div>
 
         {/* Policy-Safe Leaderboard Ad Placement Placeholder */}
@@ -362,128 +283,160 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
           </div>
         </div>
 
-        {/* Deep Content & SEO Article Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left 2 Columns: Rich Game Overview, How to Play, Controls & FAQs */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Overview & Long Description */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-              <h2 className="text-xl font-black text-slate-900 mb-3 flex items-center gap-2">
+        {/* 2-Column Main Section: Rich SEO Guide & Related Games */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 my-8">
+          {/* Left 2 Columns: Rich Game Guide, Controls, FAQs (SEO Dominance) */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Game Overview Section */}
+            <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+              <h2 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
                 <Info className="w-5 h-5 text-indigo-600" />
                 About {game.title}
               </h2>
-              <p className="text-sm text-slate-700 leading-relaxed font-normal mb-4">
+              <p className="text-sm text-slate-700 leading-relaxed">
                 {game.longDescription || game.description}
               </p>
-              <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
-                {game.tags.map(tag => (
-                  <span 
-                    key={tag} 
-                    className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-xs font-semibold"
-                  >
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            </div>
 
-            {/* Controls Guide Table */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-              <h2 className="text-xl font-black text-slate-900 mb-4 flex items-center gap-2">
+              {/* Game Features Bullet List */}
+              <div className="mt-4 pt-4 border-t border-slate-100">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Key Features</h3>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    100% Client-Side Web Execution
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                    Zero Downloads or Install Required
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                    Synthesized 60 FPS Web Audio
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                    Mobile Touch & Desktop Responsive
+                  </li>
+                </ul>
+              </div>
+            </section>
+
+            {/* Interactive Game Controls Table */}
+            <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+              <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                 <Gamepad2 className="w-5 h-5 text-indigo-600" />
-                Game Controls & Keybindings
+                Game Controls & Key Bindings
               </h2>
+
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-200 text-slate-400 text-xs uppercase font-bold">
-                      <th className="pb-3 px-2">Platform</th>
-                      <th className="pb-3 px-2">Input / Keybinding</th>
+                    <tr className="border-b border-slate-200 bg-slate-50/80 text-slate-700 font-bold">
+                      <th className="py-2.5 px-4 rounded-l-lg">Action</th>
+                      <th className="py-2.5 px-4">Desktop / Keyboard</th>
+                      <th className="py-2.5 px-4 rounded-r-lg">Mobile / Touchpad</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 text-slate-600 font-medium">
                     <tr>
-                      <td className="py-3 px-2 font-bold text-slate-800 flex items-center gap-2">
-                        <span>🖥️ Desktop PC</span>
+                      <td className="py-3 px-4 font-bold text-slate-900">Primary Movement</td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-slate-100 border border-slate-300 rounded font-mono text-[11px] text-slate-800">
+                          {game.controls?.keyboard || 'Arrow Keys / WASD'}
+                        </span>
                       </td>
-                      <td className="py-3 px-2 text-slate-600 font-mono text-xs">
-                        {game.controls.desktop || 'Arrow Keys / WASD, Mouse Click, Spacebar'}
+                      <td className="py-3 px-4 text-slate-700">
+                        {game.controls?.touch || 'Swipe on screen or Virtual D-Pad'}
                       </td>
                     </tr>
                     <tr>
-                      <td className="py-3 px-2 font-bold text-slate-800 flex items-center gap-2">
-                        <span>📱 Mobile / Touch</span>
+                      <td className="py-3 px-4 font-bold text-slate-900">Action / Fire / Select</td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-slate-100 border border-slate-300 rounded font-mono text-[11px] text-slate-800">
+                          Spacebar / Left Click / Enter
+                        </span>
                       </td>
-                      <td className="py-3 px-2 text-slate-600 font-mono text-xs">
-                        {game.controls.mobile || 'On-Screen Touch D-Pad, Tap & Swipe Gestures'}
+                      <td className="py-3 px-4 text-slate-700">
+                        Tap on Action Button / Screen
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 px-4 font-bold text-slate-900">Pause / Menu</td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-slate-100 border border-slate-300 rounded font-mono text-[11px] text-slate-800">
+                          P or ESC
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-slate-700">
+                        Pause icon at top-right
                       </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
-            </div>
+            </section>
 
             {/* How to Play & Pro Tips */}
             {game.howToPlay && game.howToPlay.length > 0 && (
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <h2 className="text-xl font-black text-slate-900 mb-3 flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-amber-500" />
+              <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <h2 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-amber-500" />
                   How to Play & Pro Strategies
                 </h2>
-                <ul className="space-y-2 mb-6">
+                <div className="space-y-3 text-xs text-slate-700 leading-relaxed">
                   {game.howToPlay.map((step, idx) => (
-                    <li key={idx} className="flex items-start gap-3 text-sm text-slate-700">
-                      <span className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 border border-indigo-200">
+                    <div key={idx} className="flex items-start gap-3">
+                      <span className="w-5 h-5 rounded-full bg-indigo-50 text-indigo-600 font-bold text-[11px] flex items-center justify-center shrink-0 border border-indigo-100">
                         {idx + 1}
                       </span>
-                      <span>{step}</span>
-                    </li>
+                      <p>{step}</p>
+                    </div>
                   ))}
-                </ul>
+                </div>
 
                 {game.tips && game.tips.length > 0 && (
-                  <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200">
-                    <h3 className="text-xs font-black uppercase tracking-wider text-amber-800 mb-2 flex items-center gap-1.5">
+                  <div className="mt-5 p-4 rounded-xl bg-amber-50/60 border border-amber-200/80">
+                    <h3 className="text-xs font-bold text-amber-900 flex items-center gap-1.5 mb-2">
                       <Flame className="w-4 h-4 text-amber-600" />
-                      Pro Gamer Tips
+                      Pro Tips for High Scores
                     </h3>
-                    <ul className="space-y-1.5 text-xs text-amber-900 font-medium">
+                    <ul className="space-y-1.5 list-disc list-inside text-xs text-amber-800">
                       {game.tips.map((tip, idx) => (
-                        <li key={idx} className="flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
-                          <span>{tip}</span>
-                        </li>
+                        <li key={idx}>{tip}</li>
                       ))}
                     </ul>
                   </div>
                 )}
-              </div>
+              </section>
             )}
 
-            {/* FAQ Section with Schema.org Compatibility */}
+            {/* Interactive FAQs Accordion (Schema.org FAQPage) */}
             {game.faqs && game.faqs.length > 0 && (
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <h2 className="text-xl font-black text-slate-900 mb-4 flex items-center gap-2">
+              <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                   <HelpCircle className="w-5 h-5 text-indigo-600" />
-                  Frequently Asked Questions (FAQs)
+                  Frequently Asked Questions (FAQ)
                 </h2>
+
                 <div className="space-y-3">
                   {game.faqs.map((faq, idx) => {
-                    const isOpen = openFaqIndex === idx;
+                    const isOpen = activeFaqIndex === idx;
                     return (
                       <div 
                         key={idx} 
-                        className="rounded-xl border border-slate-200 overflow-hidden transition-all"
+                        className="border border-slate-200 rounded-xl overflow-hidden transition-all"
                       >
                         <button
-                          onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                          className="w-full text-left p-4 bg-slate-50 hover:bg-slate-100 flex items-center justify-between font-bold text-sm text-slate-900 transition-colors"
+                          onClick={() => setActiveFaqIndex(isOpen ? null : idx)}
+                          className="w-full text-left p-3.5 bg-slate-50/70 hover:bg-slate-100 flex items-center justify-between text-xs font-bold text-slate-800 transition-colors"
                         >
                           <span>{faq.question}</span>
-                          <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+                          <span className={`text-slate-400 transform transition-transform ${isOpen ? 'rotate-180' : ''}`}>
+                            ▼
+                          </span>
                         </button>
                         {isOpen && (
-                          <div className="p-4 text-xs sm:text-sm text-slate-600 bg-white leading-relaxed border-t border-slate-100">
+                          <div className="p-4 bg-white text-xs text-slate-600 leading-relaxed border-t border-slate-100 animate-in fade-in duration-150">
                             {faq.answer}
                           </div>
                         )}
@@ -491,91 +444,87 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
                     );
                   })}
                 </div>
-              </div>
+              </section>
             )}
           </div>
 
-          {/* Right Column: Game Specifications, Developer Info & Related Games */}
+          {/* Right Column: Game Specs & Related Games Sidebar */}
           <div className="space-y-6">
-            {/* Game Technical Specs (E-E-A-T Authority) */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-              <h3 className="text-base font-black text-slate-900 mb-4 flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            {/* Game Specifications Meta Box */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 pb-2 border-b border-slate-100 flex items-center gap-2">
+                <Award className="w-4 h-4 text-indigo-600" />
                 Game Specifications
               </h3>
-              <div className="space-y-3 text-xs">
-                <div className="flex justify-between py-1.5 border-b border-slate-100">
-                  <span className="text-slate-500 font-medium">Developer</span>
-                  <span className="font-bold text-slate-900">Arcadex Studio</span>
+
+              <div className="space-y-2.5 text-xs">
+                <div className="flex justify-between py-1 border-b border-slate-50">
+                  <span className="text-slate-500">Developer</span>
+                  <span className="font-bold text-slate-800">{game.developer || 'Arcadex Studio'}</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-slate-100">
-                  <span className="text-slate-500 font-medium">Release Date</span>
-                  <span className="font-bold text-slate-900">{game.releaseDate || 'October 2026'}</span>
+                <div className="flex justify-between py-1 border-b border-slate-50">
+                  <span className="text-slate-500">Engine Type</span>
+                  <span className="font-bold text-indigo-600 uppercase text-[10px] bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
+                    {game.engineType || 'Native Canvas 2D'}
+                  </span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-slate-100">
-                  <span className="text-slate-500 font-medium">Technology</span>
-                  <span className="font-bold text-slate-900">HTML5, WebGL, Canvas 2D</span>
+                <div className="flex justify-between py-1 border-b border-slate-50">
+                  <span className="text-slate-500">License</span>
+                  <span className="font-bold text-emerald-600">{game.licenseType || '100% Freeware (DMCA Clean)'}</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-slate-100">
-                  <span className="text-slate-500 font-medium">Audio</span>
-                  <span className="font-bold text-slate-900">Web Audio API Synth</span>
+                <div className="flex justify-between py-1 border-b border-slate-50">
+                  <span className="text-slate-500">Platforms</span>
+                  <span className="font-bold text-slate-800">Web Browser, Mobile, PC</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-slate-100">
-                  <span className="text-slate-500 font-medium">Platforms</span>
-                  <span className="font-bold text-slate-900">Web Browser, Mobile, PC</span>
+                <div className="flex justify-between py-1 border-b border-slate-50">
+                  <span className="text-slate-500">Release Date</span>
+                  <span className="font-bold text-slate-800">{game.releaseDate || 'October 2026'}</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-slate-100">
-                  <span className="text-slate-500 font-medium">Classification</span>
-                  <span className="font-bold text-emerald-600">100% Free · No Download</span>
+                <div className="flex justify-between py-1">
+                  <span className="text-slate-500">Server Load</span>
+                  <span className="font-bold text-emerald-600">0% (Client Executed)</span>
                 </div>
               </div>
             </div>
 
-            {/* Skyscraper Ad Placeholder */}
-            <div className="p-4 rounded-2xl bg-slate-100 border border-slate-200 text-center flex flex-col items-center justify-center min-h-[300px]">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+            {/* Skyscraper Banner Ad Placement */}
+            <div className="p-4 rounded-2xl bg-slate-100 border border-slate-200 text-center flex flex-col items-center justify-center min-h-[250px]">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
                 ADVERTISEMENT
               </span>
-              <div className="text-xs text-slate-500 font-medium max-w-[200px]">
-                Google AdSense High-CTR Skyscraper (300x600 / 300x250)
+              <div className="text-xs text-slate-500 font-medium">
+                Google AdSense 300x250 Medium Rectangle Slot
               </div>
             </div>
 
-            {/* Related Games Carousel */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-              <h3 className="text-base font-black text-slate-900 mb-4 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-indigo-600" />
-                Recommended For You
+            {/* Related Games List */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center gap-2">
+                <Flame className="w-4 h-4 text-amber-500" />
+                More Games You May Like
               </h3>
+
               <div className="space-y-3">
-                {relatedGames.map(relGame => (
-                  <div
+                {relatedGames.map((relGame) => (
+                  <button
                     key={relGame.id}
-                    onClick={() => {
-                      sounds.playClick();
-                      onSelectGame(relGame);
-                    }}
-                    className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors group border border-slate-100"
+                    onClick={() => onSelectGame(relGame)}
+                    className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all text-left group"
                   >
-                    <img 
-                      src={relGame.coverImage || '/assets/covers/snake-retro.jpg'} 
-                      alt={relGame.title}
-                      className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0 group-hover:scale-105 transition-transform"
-                    />
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${relGame.gradient || 'from-indigo-600 to-sky-500'} flex items-center justify-center text-xl text-white shadow group-hover:scale-105 transition-transform`}>
+                      {relGame.icon || '🕹️'}
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-xs font-bold text-slate-900 group-hover:text-indigo-600 truncate">
+                      <h4 className="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
                         {relGame.title}
                       </h4>
-                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5">
-                        <span className="capitalize font-semibold text-slate-600">{relGame.category}</span>
+                      <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">
+                        <span className="text-amber-500 font-bold">★ {relGame.rating.toFixed(1)}</span>
                         <span>•</span>
-                        <span className="flex items-center gap-0.5 text-amber-600 font-bold">
-                          <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-                          {relGame.rating}
-                        </span>
+                        <span className="capitalize text-slate-500">{relGame.category}</span>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>

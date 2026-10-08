@@ -27,6 +27,7 @@ interface SidebarProps {
   currentCategory: GameCategory;
   onSelectCategory: (category: GameCategory) => void;
   onOpenLegal: (page: 'privacy' | 'terms' | 'dmca' | 'about' | 'contact') => void;
+  onOpenDeveloperPortal?: () => void;
   onSelectTag?: (tag: string) => void;
   onOpenRandom?: () => void;
   isCollapsed: boolean;
@@ -62,6 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   currentCategory,
   onSelectCategory,
   onOpenLegal,
+  onOpenDeveloperPortal,
   onSelectTag,
   onOpenRandom,
   isCollapsed,
@@ -192,6 +194,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {tag}
                 </button>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Developer Portal Callout (CrazyGames Style) */}
+        {!isCollapsed && onOpenDeveloperPortal && (
+          <div className="pt-2">
+            <div 
+              onClick={() => {
+                onOpenDeveloperPortal();
+                onCloseMobile();
+              }}
+              className="p-3 bg-gradient-to-br from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 border border-indigo-200/80 rounded-2xl cursor-pointer transition-all group shadow-sm hover:shadow"
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[10px] font-black uppercase tracking-wider text-indigo-600 bg-white px-2 py-0.5 rounded-full border border-indigo-200">
+                  Dev Program
+                </span>
+                <span className="text-[11px] font-extrabold text-emerald-600">50% Rev</span>
+              </div>
+              <h4 className="text-xs font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
+                Publish Your Game
+              </h4>
+              <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">
+                J2ME, DOS, WASM or Canvas. Monetize with zero server cost.
+              </p>
             </div>
           </div>
         )}

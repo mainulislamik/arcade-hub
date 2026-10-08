@@ -15,7 +15,8 @@ import {
   Flame,
   Swords,
   Puzzle,
-  RotateCcw
+  RotateCcw,
+  Code2
 } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 import { GameItem, GameCategory } from '../types/game';
@@ -28,6 +29,7 @@ interface HeaderProps {
   onPlayRandom: () => void;
   onOpenStats: () => void;
   onOpenAchievements: () => void;
+  onOpenDeveloperPortal?: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
   favoritesCount: number;
@@ -50,6 +52,7 @@ export const Header: React.FC<HeaderProps> = ({
   onPlayRandom,
   onOpenStats,
   onOpenAchievements,
+  onOpenDeveloperPortal,
   soundEnabled,
   onToggleSound,
   favoritesCount,
@@ -220,6 +223,22 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Right Side Action Buttons */}
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Developer Portal / Upload Hub */}
+          {onOpenDeveloperPortal && (
+            <button
+              onClick={() => {
+                sounds.playClick();
+                onOpenDeveloperPortal();
+              }}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200/80 text-xs font-bold transition-all active:scale-95"
+              title="Submit Games & 50% Revenue Share"
+            >
+              <Code2 className="w-3.5 h-3.5 text-indigo-500" />
+              <span className="hidden xl:inline">DEV HUB</span>
+              <span className="text-[10px] bg-indigo-600 text-white px-1.5 py-0.2 rounded-md">50% REV</span>
+            </button>
+          )}
+
           {/* Surprise Me / Random Game Button */}
           <button
             onClick={() => {

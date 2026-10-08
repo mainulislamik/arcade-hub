@@ -8,6 +8,7 @@ import { GameTheaterPage } from './components/GameTheaterPage';
 import { LegalPagesModal } from './components/LegalPagesModal';
 import { AchievementsModal } from './components/AchievementsModal';
 import { StatsDrawer } from './components/StatsDrawer';
+import { DeveloperPortalModal } from './components/developer/DeveloperPortalModal';
 import { sounds } from './utils/soundEngine';
 import { 
   getFavorites, 
@@ -34,6 +35,7 @@ export const App: React.FC = () => {
   const [activeLegalModal, setActiveLegalModal] = useState<'privacy' | 'terms' | 'dmca' | 'about' | 'contact' | null>(null);
   const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
+  const [isDeveloperPortalOpen, setIsDeveloperPortalOpen] = useState(false);
 
   // URL Routing Sync (Deep Linking for ?game=slug or ?category=action or ?legal=privacy)
   useEffect(() => {
@@ -178,6 +180,7 @@ export const App: React.FC = () => {
         onPlayRandom={handlePlayRandom}
         onOpenStats={() => setIsStatsOpen(true)}
         onOpenAchievements={() => setIsAchievementsOpen(true)}
+        onOpenDeveloperPortal={() => setIsDeveloperPortalOpen(true)}
         soundEnabled={soundEnabled}
         onToggleSound={handleToggleSound}
         favoritesCount={favorites.length}
@@ -190,6 +193,7 @@ export const App: React.FC = () => {
           currentCategory={activeCategory}
           onSelectCategory={handleSelectCategory}
           onOpenLegal={(page) => setActiveLegalModal(page)}
+          onOpenDeveloperPortal={() => setIsDeveloperPortalOpen(true)}
           onSelectTag={handleSelectTag}
           onOpenRandom={handlePlayRandom}
           isCollapsed={isSidebarCollapsed}
@@ -273,6 +277,12 @@ export const App: React.FC = () => {
         isOpen={isStatsOpen}
         onClose={() => setIsStatsOpen(false)}
         profile={profile}
+      />
+
+      {/* Developer Portal Modal */}
+      <DeveloperPortalModal
+        isOpen={isDeveloperPortalOpen}
+        onClose={() => setIsDeveloperPortalOpen(false)}
       />
     </div>
   );

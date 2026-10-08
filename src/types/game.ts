@@ -1,5 +1,12 @@
 export type GameCategory = 'all' | 'arcade' | 'puzzle' | 'retro' | 'action' | 'strategy' | 'word';
 
+export type GameEngineType = 
+  | 'native_canvas' 
+  | 'java_j2me' 
+  | 'retro_dos' 
+  | 'wasm_emulator' 
+  | 'iframe_web';
+
 export interface GameFAQ {
   question: string;
   answer: string;
@@ -10,6 +17,16 @@ export interface GameControls {
   touch?: string | string[];
   mobile?: string | string[];
   desktop?: string | string[];
+}
+
+export interface EmulatorConfig {
+  platform: 'java' | 'dos' | 'symbian' | 'arcade' | 'retro_pc' | 'native';
+  aspectRatio: '16:9' | '4:3' | '3:4' | '1:1';
+  screenResolution?: { width: number; height: number };
+  showMobileKeypad?: boolean;
+  biosUrl?: string;
+  entryFile?: string;
+  commandArgs?: string[];
 }
 
 export interface GameItem {
@@ -39,6 +56,16 @@ export interface GameItem {
   coverImage?: string;
   heroImage?: string;
   proBadge?: string;
+  
+  // Universal Multi-Core Engine Extensions
+  engineType?: GameEngineType;
+  binaryUrl?: string;
+  fileSizeMb?: number;
+  emulatorConfig?: EmulatorConfig;
+  licenseType?: 'Freeware' | 'Homebrew' | 'MIT' | 'Public Domain' | 'Arcadex Original' | 'Indie Authorized';
+  developer?: string;
+  developerWebsite?: string;
+  downloadCount?: number;
 }
 
 export type Game = GameItem;
