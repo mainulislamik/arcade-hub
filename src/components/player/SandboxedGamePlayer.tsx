@@ -44,6 +44,11 @@ import { CyberStackGame } from '../games/CyberStackGame';
 import { CyberDinoGame } from '../games/CyberDinoGame';
 import { SolitaireGame } from '../games/SolitaireGame';
 import { CyberChessGame } from '../games/CyberChessGame';
+import { StickmanFighterGame } from '../games/StickmanFighterGame';
+import { StickmanArcherGame } from '../games/StickmanArcherGame';
+import { StickmanRunnerGame } from '../games/StickmanRunnerGame';
+import { StickmanSniperGame } from '../games/StickmanSniperGame';
+import { StickmanWarriorsGame } from '../games/StickmanWarriorsGame';
 import { UniversalProceduralCore } from './UniversalProceduralCore';
 
 interface SandboxedGamePlayerProps {
@@ -167,6 +172,16 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
         return <SolitaireGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} />;
       case 'cyber-chess':
         return <CyberChessGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} />;
+      case 'stickman-fighter':
+        return <StickmanFighterGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
+      case 'stickman-archer':
+        return <StickmanArcherGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
+      case 'stickman-runner':
+        return <StickmanRunnerGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
+      case 'stickman-sniper':
+        return <StickmanSniperGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
+      case 'stickman-warriors':
+        return <StickmanWarriorsGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       default:
         return (
           <UniversalProceduralCore

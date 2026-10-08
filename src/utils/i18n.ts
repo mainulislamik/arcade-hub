@@ -56,7 +56,7 @@ export interface TranslationDict {
 
 export const TRANSLATIONS: Record<LanguageCode, TranslationDict> = {
   en: {
-    searchPlaceholder: 'Search 1,115+ free games (e.g. Mecha Blaster, Hextris, Dino)...',
+    searchPlaceholder: 'Search Stickman, Mecha Blaster, Hextris, Dino...',
     allGames: 'All Games',
     actionCombat: 'Action & Combat',
     puzzleLogic: 'Puzzle & Logic',
