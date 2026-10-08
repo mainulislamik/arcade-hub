@@ -277,6 +277,49 @@ class SoundEngine {
   public victory() {
     this.playVictory();
   }
+
+  public playLevelUp() {
+    if (!this.enabled) return;
+    try {
+      this.initContext();
+      if (!this.ctx) return;
+      const notes = [440, 554.37, 659.25, 880, 1108.73];
+      notes.forEach((freq, idx) => {
+        setTimeout(() => {
+          this.playBeep(freq, 'sine', 0.15, 0.14);
+        }, idx * 80);
+      });
+    } catch {}
+  }
+
+  // Web Audio AI Synth Voice Announcer (Zero Bandwidth / Pure Web Speech)
+  public announceVoice(text: string) {
+    if (!this.enabled || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.pitch = 1.15;
+      utterance.rate = 1.25;
+      utterance.volume = 0.8;
+      window.speechSynthesis.speak(utterance);
+    } catch {}
+  }
+
+  public announceCombo(comboCount: number) {
+    this.playPowerup();
+    if (comboCount >= 10) {
+      this.announceVoice('GODLIKE COMBO!');
+    } else if (comboCount >= 5) {
+      this.announceVoice('UNSTOPPABLE!');
+    } else if (comboCount >= 3) {
+      this.announceVoice('MEGA COMBO!');
+    }
+  }
+
+  public announceHighScore() {
+    this.playVictory();
+    this.announceVoice('NEW HIGH SCORE!');
+  }
 }
 
 export const sounds = new SoundEngine();

@@ -9,6 +9,7 @@ import { LegalPagesModal } from './components/LegalPagesModal';
 import { AchievementsModal } from './components/AchievementsModal';
 import { StatsDrawer } from './components/StatsDrawer';
 import { DeveloperPortalModal } from './components/developer/DeveloperPortalModal';
+import { DailyQuestsModal } from './components/gamification/DailyQuestsModal';
 import { sounds } from './utils/soundEngine';
 import { getFavorites, toggleFavorite as toggleFavStorage, getPlayerProfile, recordGamePlay } from './utils/storage';
 import { updatePageSEO } from './utils/seo';
@@ -38,6 +39,7 @@ export const App: React.FC = () => {
   // Modal Dialogs
   const [activeLegalModal, setActiveLegalModal] = useState<'privacy' | 'terms' | 'dmca' | 'about' | 'contact' | null>(null);
   const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
+  const [isDailyQuestsOpen, setIsDailyQuestsOpen] = useState(false);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [isDeveloperPortalOpen, setIsDeveloperPortalOpen] = useState(false);
 
@@ -184,6 +186,7 @@ export const App: React.FC = () => {
         onPlayRandom={handlePlayRandom}
         onOpenStats={() => setIsStatsOpen(true)}
         onOpenAchievements={() => setIsAchievementsOpen(true)}
+        onOpenDailyQuests={() => setIsDailyQuestsOpen(true)}
         onOpenDeveloperPortal={() => setIsDeveloperPortalOpen(true)}
         soundEnabled={soundEnabled}
         onToggleSound={handleToggleSound}
@@ -276,6 +279,12 @@ export const App: React.FC = () => {
         isOpen={isAchievementsOpen}
         onClose={() => setIsAchievementsOpen(false)}
         achievements={profile.achievements}
+      />
+
+      {/* Daily Quests & Lucky Spin Wheel Modal */}
+      <DailyQuestsModal
+        isOpen={isDailyQuestsOpen}
+        onClose={() => setIsDailyQuestsOpen(false)}
       />
 
       {/* Stats Drawer */}

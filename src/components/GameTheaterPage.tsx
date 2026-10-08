@@ -33,9 +33,12 @@ import { sounds } from '../utils/soundEngine';
 import { recordGamePlay } from '../utils/storage';
 import { SandboxedGamePlayer } from './player/SandboxedGamePlayer';
 import { AmbientBacklight } from './player/AmbientBacklight';
+import { RetroShaderOverlay, ShaderPreset } from './player/RetroShaderOverlay';
+import { SpeedrunTimer } from './player/SpeedrunTimer';
 import { MultiplayerLobbyModal } from './multiplayer/MultiplayerLobbyModal';
 import { WebRTCPeerEngine } from '../utils/webrtcMultiplayer';
 import { TRANSLATIONS, LanguageCode } from '../utils/i18n';
+import { recordQuestAction } from '../utils/gamification';
 
 interface GameTheaterPageProps {
   game: GameItem;
@@ -74,6 +77,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
   // Advanced features state
   const [ambientGlowEnabled, setAmbientGlowEnabled] = useState(true);
   const [aspectRatio, setAspectRatio] = useState<'auto' | '16:9' | '4:3' | '9:16'>('auto');
+  const [shaderPreset, setShaderPreset] = useState<ShaderPreset>('none');
   const [showMultiplayerModal, setShowMultiplayerModal] = useState(false);
   const [activePeerEngine, setActivePeerEngine] = useState<WebRTCPeerEngine | null>(null);
   const [peerRole, setPeerRole] = useState<'host' | 'guest' | null>(null);
@@ -81,9 +85,10 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
 
   const theaterContainerRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to top on mount
+  // Scroll to top and record daily quest play action
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    recordQuestAction('play', 1);
   }, [game.id]);
 
   const handleVote = (type: 'like' | 'dislike') => {
@@ -260,6 +265,45 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
               </button>
             </div>
 
+            {/* Retro CRT & Screen FX Shaders */}
+            <div className="hidden md:flex items-center bg-slate-100 rounded-xl p-0.5 border border-slate-200 text-xs font-bold text-slate-600">
+              <span className="text-[10px] font-mono text-slate-400 px-1.5 uppercase">FX:</span>
+              <button
+                onClick={() => { sounds.playClick(); setShaderPreset('none'); }}
+                className={`px-2 py-1 rounded-lg transition-all ${shaderPreset === 'none' ? 'bg-white text-indigo-600 shadow-sm' : 'hover:text-slate-900'}`}
+              >
+                Off
+              </button>
+              <button
+                onClick={() => { sounds.playClick(); setShaderPreset('crt'); }}
+                className={`px-2 py-1 rounded-lg transition-all ${shaderPreset === 'crt' ? 'bg-white text-emerald-600 shadow-sm' : 'hover:text-slate-900'}`}
+                title="CRT Monitor Scanlines & Phosphor"
+              >
+                CRT
+              </button>
+              <button
+                onClick={() => { sounds.playClick(); setShaderPreset('gameboy'); }}
+                className={`px-2 py-1 rounded-lg transition-all ${shaderPreset === 'gameboy' ? 'bg-white text-lime-600 shadow-sm' : 'hover:text-slate-900'}`}
+                title="Game Boy Dot-Matrix 4-Shade Green"
+              >
+                GameBoy
+              </button>
+              <button
+                onClick={() => { sounds.playClick(); setShaderPreset('cyberpunk'); }}
+                className={`px-2 py-1 rounded-lg transition-all ${shaderPreset === 'cyberpunk' ? 'bg-white text-pink-600 shadow-sm' : 'hover:text-slate-900'}`}
+                title="Cyberpunk Neon Bloom"
+              >
+                Cyber
+              </button>
+              <button
+                onClick={() => { sounds.playClick(); setShaderPreset('vhs'); }}
+                className={`px-2 py-1 rounded-lg transition-all ${shaderPreset === 'vhs' ? 'bg-white text-amber-600 shadow-sm' : 'hover:text-slate-900'}`}
+                title="VHS Tape Glitch"
+              >
+                VHS
+              </button>
+            </div>
+
             {/* Ambient LED Glow Toggle */}
             <button
               onClick={() => { sounds.playClick(); setAmbientGlowEnabled(!ambientGlowEnabled); }}
@@ -379,20 +423,32 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             ref={theaterContainerRef}
             className={`relative bg-slate-950 border-x border-b border-slate-200 overflow-hidden flex flex-col items-center justify-center rounded-b-2xl shadow-lg transition-all duration-300 ${getAspectRatioContainerClass()}`}
           >
-            {/* Active Sandboxed Multi-Core Game Runner */}
-            <SandboxedGamePlayer
-              key={`${game.id}-${gameKey}`}
-              game={game}
-              soundEnabled={soundEnabled}
-              onToggleSound={onToggleSound}
-              onScoreUpdate={(s) => setCurrentScore(s)}
-              onGameOver={(s) => {
-                setCurrentScore(s);
-                recordGamePlay(game.id, s);
-              }}
-            />
+            {/* Retro Shaders Overlay Wrapper (CRT / GameBoy / Cyber / VHS) */}
+            <RetroShaderOverlay preset={shaderPreset}>
+              {/* Active Sandboxed Multi-Core Game Runner */}
+              <SandboxedGamePlayer
+                key={`${game.id}-${gameKey}`}
+                game={game}
+                soundEnabled={soundEnabled}
+                onToggleSound={onToggleSound}
+                onScoreUpdate={(s) => {
+                  setCurrentScore(s);
+                  recordQuestAction('score', s);
+                }}
+                onGameOver={(s) => {
+                  setCurrentScore(s);
+                  recordGamePlay(game.id, s);
+                  recordQuestAction('score', s);
+                }}
+              />
+            </RetroShaderOverlay>
           </div>
         </AmbientBacklight>
+
+        {/* Speedrun Precision Timer & PB Tracker Bar */}
+        <div className="mt-3">
+          <SpeedrunTimer gameId={game.id} gameTitle={game.title} isGameActive={true} />
+        </div>
 
         {/* Policy-Safe Leaderboard Ad Placement Placeholder */}
         <div className="my-6 p-4 rounded-2xl bg-slate-100 border border-slate-200 text-center flex flex-col items-center justify-center min-h-[90px]">

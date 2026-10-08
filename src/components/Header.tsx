@@ -16,7 +16,8 @@ import {
   Swords,
   Puzzle,
   RotateCcw,
-  Code2
+  Code2,
+  Gift
 } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 import { GameItem, GameCategory } from '../types/game';
@@ -31,6 +32,7 @@ interface HeaderProps {
   onPlayRandom: () => void;
   onOpenStats: () => void;
   onOpenAchievements: () => void;
+  onOpenDailyQuests?: () => void;
   onOpenDeveloperPortal?: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
@@ -66,12 +68,13 @@ export const Header: React.FC<HeaderProps> = ({
   onPlayRandom,
   onOpenStats,
   onOpenAchievements,
+  onOpenDailyQuests,
   onOpenDeveloperPortal,
   soundEnabled,
   onToggleSound,
   favoritesCount,
   onOpenMobileSidebar,
-  currentLanguage,
+  currentLanguage = 'en',
   onSelectLanguage
 }) => {
   const [query, setQuery] = useState('');
@@ -252,6 +255,21 @@ export const Header: React.FC<HeaderProps> = ({
               <Code2 className="w-3.5 h-3.5 text-indigo-500" />
               <span className="hidden xl:inline">DEV HUB</span>
               <span className="text-[10px] bg-indigo-600 text-white px-1.5 py-0.2 rounded-md">50% REV</span>
+            </button>
+          )}
+
+          {/* Daily Quests & Lucky Wheel */}
+          {onOpenDailyQuests && (
+            <button
+              onClick={() => {
+                sounds.playClick();
+                onOpenDailyQuests();
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white text-xs font-black shadow-sm hover:shadow-md transition-all active:scale-95 animate-pulse"
+              title="Daily Quests & Lucky Spin Wheel"
+            >
+              <Gift className="w-4 h-4" />
+              <span className="hidden sm:inline">QUESTS</span>
             </button>
           )}
 
