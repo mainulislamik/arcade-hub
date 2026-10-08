@@ -2,730 +2,830 @@ import { GameItem } from '../types/game';
 
 export const games: GameItem[] = [
   {
-    "id": "slope-3d",
-    "title": "Cyber Slope 3D",
-    "slug": "slope-3d",
-    "category": "action",
-    "tags": [
-      "3d",
-      "webgl",
-      "speed",
-      "slope",
-      "cyberpunk",
-      "runner",
-      "popular"
-    ],
-    "rating": 4.96,
-    "plays": 284000,
-    "description": "High-speed 3D WebGL neon ball rolling down endless twisting ramps. Dodge red cubes and collect glowing gems!",
-    "coverImage": "/assets/covers/slope-3d.jpg",
-    "featured": true,
-    "aspectRatio": "16:9",
-    "howToPlay": [
-      "Press A / D or Left / Right Arrows to steer the ball across 3D platforms.",
-      "Avoid red block obstacles and don't fall off the neon edges.",
-      "Collect golden octahedron gems for bonus points."
-    ],
-    "controls": {
-      "keyboard": "A/D or Left/Right Arrow Keys",
-      "touch": "Swipe Left / Right",
-      "mouse": "Drag horizontally"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "drift-3d",
-    "title": "Hyper Drift 3D",
-    "slug": "drift-3d",
+    "id": "hexgl",
+    "title": "HexGL 3D Wipeout",
+    "slug": "hexgl",
     "category": "driving",
     "tags": [
       "3d",
       "webgl",
       "racing",
-      "drift",
-      "cars",
-      "nitro",
-      "popular"
+      "wipeout",
+      "speed",
+      "futuristic"
     ],
-    "rating": 4.94,
-    "plays": 215000,
-    "description": "Burn rubber with realistic 3D car physics, tire smoke FX, nitro boost and extreme angle drift combos!",
-    "coverImage": "/assets/covers/drift-3d.jpg",
+    "description": "Legendary futuristic 3D WebGL speed racer with high-speed anti-gravity hovercrafts.",
+    "longDescription": "HexGL is a tribute to original Wipeout and F-Zero series built by Thibaut Despoulain (BKcore) using WebGL and HTML5. Experience high-octane anti-gravity racing across complex futuristic tracks with turbo pads and dynamic physics.",
+    "difficulty": "Hard",
+    "rating": 4.9,
+    "plays": 48200,
+    "likes": 4210,
     "featured": true,
+    "isFeatured": true,
+    "badge": "AAA 3D WebGL",
+    "proBadge": "TOP RATED",
+    "cover": "/assets/covers/hexgl.jpg",
+    "coverImage": "/assets/covers/hexgl.jpg",
+    "thumbnailUrl": "/assets/covers/hexgl.jpg",
     "aspectRatio": "16:9",
-    "howToPlay": [
-      "Use W / Up to accelerate and S / Down to brake/reverse.",
-      "Steer with A / D and hold Spacebar for handbrake drift combos.",
-      "Hold Shift for instant high-speed Nitro Boost."
-    ],
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/hexgl/index.html",
+    "licenseType": "MIT Open Source",
+    "developer": "Thibaut Despoulain (BKcore)",
+    "developerWebsite": "http://hexgl.bkcore.com/",
     "controls": {
-      "keyboard": "WASD / Arrows, Space: Handbrake, Shift: Nitro",
-      "touch": "On-screen Gas, Steer & Drift buttons",
-      "mouse": "Touch controls"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
+      "keyboard": [
+        "Arrow Left / A: Steer Left",
+        "Arrow Right / D: Steer Right",
+        "Up / W: Accelerate"
+      ],
+      "touch": [
+        "On-screen touch steer & gas controls"
+      ],
+      "mobile": [
+        "Touch buttons"
+      ]
+    }
   },
   {
-    "id": "subway-3d",
-    "title": "Subway Runner 3D",
-    "slug": "subway-3d",
-    "category": "action",
+    "id": "outrun-racer",
+    "title": "OutRun 3D Highway",
+    "slug": "outrun-racer",
+    "category": "driving",
     "tags": [
       "3d",
-      "webgl",
-      "runner",
-      "subway",
-      "action",
-      "mobile-hit",
-      "popular"
-    ],
-    "rating": 4.98,
-    "plays": 395000,
-    "description": "Sprint down 3D subway rails, jump over low barriers, slide under signs, and dodge incoming high-speed red trains!",
-    "coverImage": "/assets/covers/subway-3d.jpg",
-    "featured": true,
-    "aspectRatio": "16:9",
-    "howToPlay": [
-      "Press A / D or Left / Right to switch between the 3 railway tracks.",
-      "Press W / Up / Space to jump over hurdles and oncoming barriers.",
-      "Press S / Down to roll-slide under high signboards.",
-      "Collect gold coins to boost your high score."
-    ],
-    "controls": {
-      "keyboard": "A/D: Switch Lanes, W/Space: Jump, S: Slide",
-      "touch": "Swipe Left / Right / Up / Down",
-      "mouse": "Swipe gestures"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "knife-3d",
-    "title": "Cyber Knife 3D",
-    "slug": "knife-3d",
-    "category": "arcade",
-    "tags": [
-      "3d",
-      "webgl",
-      "target",
-      "knife",
+      "retro",
+      "racing",
       "arcade",
-      "precision",
-      "popular"
+      "outrun",
+      "ferrari"
     ],
-    "rating": 4.91,
-    "plays": 165000,
-    "description": "Throw sharp cyber blades into the rotating 3D core. Hit open spots, avoid existing blades, and clear boss stages!",
-    "coverImage": "/assets/covers/knife-3d.jpg",
-    "featured": true,
-    "aspectRatio": "16:9",
-    "howToPlay": [
-      "Click or tap screen / press Space to throw a knife at the rotating core.",
-      "Never strike an already embedded knife or the stage will reset.",
-      "Clear all knives to advance to the next stage."
-    ],
-    "controls": {
-      "keyboard": "Spacebar or Up Arrow",
-      "touch": "Tap screen",
-      "mouse": "Left Click"
-    },
+    "description": "Classic pseudo-3D Ferrari highway racing arcade across curves, hills, and traffic.",
+    "longDescription": "Relive the legendary 80s arcade sensation OutRun by Jake Gordon. Race your convertible through winding scenic roads, dodge slow cars, shift gears, and reach checkpoints before time runs out.",
     "difficulty": "Medium",
-    "icon": "Gamepad2"
+    "rating": 4.8,
+    "plays": 39400,
+    "likes": 3450,
+    "featured": true,
+    "badge": "Retro 3D",
+    "cover": "/assets/covers/outrun-racer.jpg",
+    "coverImage": "/assets/covers/outrun-racer.jpg",
+    "thumbnailUrl": "/assets/covers/outrun-racer.jpg",
+    "aspectRatio": "16:9",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/outrun-racer/index.html",
+    "licenseType": "MIT Open Source",
+    "developer": "Jake Gordon",
+    "controls": {
+      "keyboard": [
+        "Left / Right: Steer",
+        "Up: Accelerate",
+        "Down: Brake"
+      ],
+      "touch": [
+        "Tap on-screen arrows"
+      ]
+    }
   },
   {
-    "id": "voxel-3d",
-    "title": "Voxel Strike 3D",
-    "slug": "voxel-3d",
-    "category": "shooting",
+    "id": "underrun",
+    "title": "Underrun WebGL",
+    "slug": "underrun",
+    "category": "action",
     "tags": [
       "3d",
       "webgl",
-      "fps",
-      "shooting",
-      "voxel",
+      "shooter",
       "action",
-      "popular"
+      "dungeon",
+      "scifi"
     ],
-    "rating": 4.93,
-    "plays": 190000,
-    "description": "Eliminate attacking 3D voxel combat drones in a hardware-accelerated cyber arena with raycast targeting!",
-    "coverImage": "/assets/covers/voxel-3d.jpg",
+    "description": "Twin-stick isometric action dungeon shooter with real-time software lighting.",
+    "longDescription": "Created by Dominic Szablewski (PhobosLab), Underrun is an astonishing pure WebGL software-lit twin-stick action game. Fight hostile alien security robots and activate subterranean terminals.",
+    "difficulty": "Hard",
+    "rating": 4.9,
+    "plays": 28900,
+    "likes": 2680,
     "featured": true,
+    "badge": "WebGL Action",
+    "cover": "/assets/covers/underrun.jpg",
+    "coverImage": "/assets/covers/underrun.jpg",
+    "thumbnailUrl": "/assets/covers/underrun.jpg",
     "aspectRatio": "16:9",
-    "howToPlay": [
-      "Move mouse to aim crosshair around the 3D arena.",
-      "Left click to shoot raycast lasers at approaching drones.",
-      "Press R to reload your 20-round ammo clip."
-    ],
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/underrun/index.html",
+    "licenseType": "MIT Open Source",
+    "developer": "Dominic Szablewski (PhobosLab)",
     "controls": {
-      "keyboard": "R: Reload, Space: Start",
-      "touch": "Tap targets",
-      "mouse": "Look and Left Click to shoot"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
+      "keyboard": [
+        "WASD: Move Hero",
+        "Mouse: Aim & Shoot"
+      ],
+      "mouse": [
+        "Left Click: Fire Laser Cannon"
+      ]
+    }
   },
   {
-    "id": "stickman-fighter",
-    "title": "Stickman Shadow Fighter",
-    "slug": "stickman-fighter",
-    "category": "action",
-    "tags": [
-      "stickman",
-      "fighting",
-      "action",
-      "karate",
-      "combo",
-      "popular"
-    ],
-    "rating": 4.92,
-    "plays": 142000,
-    "description": "Authentic martial arts combat with combos, flying kicks, dragon slashes, and blocking.",
-    "coverImage": "/assets/covers/stickman-fighter.jpg",
-    "featured": true,
-    "aspectRatio": "16:9",
-    "howToPlay": [
-      "Press A / D or Left / Right Arrows to move your stickman warrior.",
-      "Press J or Z to execute rapid punches.",
-      "Press K or X for sweeping high kicks.",
-      "Press L or C to unleash the fiery Dragon Slash when combo gauge is charged!"
-    ],
-    "controls": {
-      "keyboard": "A/D: Move, J/Z: Punch, K/X: Kick, L/C: Dragon Slash",
-      "touch": "On-screen virtual arcade buttons",
-      "mouse": "Click action buttons"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "stickman-archer",
-    "title": "Stickman Bowmaster Arena",
-    "slug": "stickman-archer",
-    "category": "action",
-    "tags": [
-      "stickman",
-      "archer",
-      "physics",
-      "bow",
-      "headshot",
-      "popular"
-    ],
-    "rating": 4.88,
-    "plays": 118000,
-    "description": "Ballistic physics archery with wind resistance, parabolic trajectory arcs, and 2.5x headshot criticals.",
-    "coverImage": "/assets/covers/stickman-archer.jpg",
-    "featured": true,
-    "aspectRatio": "16:9",
-    "howToPlay": [
-      "Click/touch and drag back from your archer to set shooting angle and pull tension.",
-      "Observe the wind indicator at the top of the arena.",
-      "Release to loose the arrow. Aim for the enemy's head for instant 2.5x critical damage!"
-    ],
-    "controls": {
-      "keyboard": "Mouse drag to aim & shoot",
-      "touch": "Touch drag and release",
-      "mouse": "Left click drag and release"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "stickman-runner",
-    "title": "Stickman Parkour Escape",
-    "slug": "stickman-runner",
-    "category": "action",
-    "tags": [
-      "stickman",
-      "runner",
-      "parkour",
-      "cyberpunk",
-      "speed"
-    ],
-    "rating": 4.85,
-    "plays": 95000,
-    "description": "Fast-paced rooftop parkour with acrobatic double jumps, laser slide dodges, and speed boosts.",
-    "coverImage": "/assets/covers/stickman-runner.jpg",
-    "featured": false,
-    "aspectRatio": "16:9",
-    "howToPlay": [
-      "Press W / Space / Up Arrow to jump across building gaps.",
-      "Press Jump again while mid-air to execute an acrobatic Double Jump.",
-      "Press S / Down Arrow to slide under overhead laser barriers and drones."
-    ],
-    "controls": {
-      "keyboard": "W/Up/Space: Jump (Double Jump), S/Down: Slide",
-      "touch": "Tap Jump / Slide on-screen buttons",
-      "mouse": "Touch buttons"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "stickman-sniper",
-    "title": "Stickman Tactical Sniper",
-    "slug": "stickman-sniper",
-    "category": "shooting",
-    "tags": [
-      "stickman",
-      "sniper",
-      "shooting",
-      "scope",
-      "headshot"
-    ],
-    "rating": 4.89,
-    "plays": 134000,
-    "description": "Telescopic sniper scope missions with breath holding, hostage rescues, and precision long-range combat.",
-    "coverImage": "/assets/covers/stickman-sniper.jpg",
-    "featured": false,
-    "aspectRatio": "16:9",
-    "howToPlay": [
-      "Move mouse or drag finger to aim the high-magnification telescopic scope.",
-      "Hold Spacebar or Shift to steady your breath and lock the reticle.",
-      "Click to shoot enemy syndicate targets. Do not hit civilian hostages!"
-    ],
-    "controls": {
-      "keyboard": "Mouse Aim, Left Click Shoot, Space Hold Breath",
-      "touch": "Drag scope and tap Fire",
-      "mouse": "Move to aim, Click to shoot"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "stickman-warriors",
-    "title": "Stickman Castle War",
-    "slug": "stickman-warriors",
+    "id": "3d-city",
+    "title": "3D City Builder",
+    "slug": "3d-city",
     "category": "strategy",
     "tags": [
-      "stickman",
-      "war",
-      "castle",
-      "strategy",
-      "defense"
+      "3d",
+      "simulation",
+      "city",
+      "webgl",
+      "building",
+      "tycoon"
     ],
-    "rating": 4.9,
-    "plays": 160000,
-    "description": "Real-time castle defense strategy with swordsmen, archers, iron golems, and enemy siege waves.",
-    "coverImage": "/assets/covers/stickman-warriors.jpg",
-    "featured": true,
-    "aspectRatio": "16:9",
-    "howToPlay": [
-      "Gold generates automatically each second from your castle treasury.",
-      "Deploy Swordsmen (25G), Bow Archers (40G), and Iron Golems (100G) to hold the line.",
-      "Destroy the enemy castle while defending your own gates!"
-    ],
-    "controls": {
-      "keyboard": "1/2/3 keys to spawn units",
-      "touch": "Tap unit recruit buttons",
-      "mouse": "Click spawn buttons"
-    },
+    "description": "Real-time 3D SimCity urban simulation and metropolis management in WebGL.",
+    "longDescription": "3d.city is a fully functional 3D WebGL city building simulation by lo-th. Construct residential, commercial, and industrial zones, power plants, water roads, and manage taxes in real-time.",
     "difficulty": "Medium",
-    "icon": "Gamepad2"
+    "rating": 4.7,
+    "plays": 22100,
+    "likes": 1940,
+    "badge": "3D Sim",
+    "cover": "/assets/covers/3d-city.jpg",
+    "coverImage": "/assets/covers/3d-city.jpg",
+    "thumbnailUrl": "/assets/covers/3d-city.jpg",
+    "aspectRatio": "16:9",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/3d-city/index.html",
+    "licenseType": "GPL-3.0 Open Source",
+    "developer": "lo-th",
+    "controls": {
+      "mouse": [
+        "Left Click: Place Zone / Road",
+        "Right Drag: Rotate 3D Camera",
+        "Scroll: Zoom"
+      ]
+    }
   },
   {
-    "id": "hill-climb",
-    "title": "Hill Racer 2D Physics",
-    "slug": "hill-climb",
-    "category": "driving",
-    "tags": [
-      "racing",
-      "physics",
-      "car",
-      "hill",
-      "offroad"
-    ],
-    "rating": 4.9,
-    "plays": 220000,
-    "description": "4x4 Off-road hill racer with realistic spring suspension physics, gas/brake tilt control, and fuel management.",
-    "coverImage": "/assets/covers/hill-climb.jpg",
-    "featured": true,
-    "aspectRatio": "16:9",
-    "howToPlay": [
-      "Hold D / Right Arrow to accelerate uphill.",
-      "Hold A / Left Arrow to brake or reverse.",
-      "Balance your vehicle in mid-air and collect fuel canisters before running dry."
-    ],
-    "controls": {
-      "keyboard": "D/Right: Gas, A/Left: Brake & Tilt",
-      "touch": "Gas / Brake pedals",
-      "mouse": "Touch pedals"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "fruit-slash",
-    "title": "Fruit Blade Ninja",
-    "slug": "fruit-slash",
+    "id": "tower-building",
+    "title": "Tower Building",
+    "slug": "tower-building",
     "category": "arcade",
     "tags": [
       "arcade",
-      "ninja",
-      "fruit",
-      "slash",
-      "blade"
+      "physics",
+      "timing",
+      "stack",
+      "casual",
+      "tower"
     ],
-    "rating": 4.92,
-    "plays": 185000,
-    "description": "Slice flying watermelons, oranges, and pineapples with blade trails. Chain massive combos and avoid explosives!",
-    "coverImage": "/assets/covers/fruit-slash.jpg",
+    "description": "Precision timing skyscraper block stacker with realistic swinging physics.",
+    "longDescription": "The famous open-source Tower Building game by iamkun. Drop swinging skyscraper floors with razor-sharp timing to stack the highest and most stable urban megalith.",
+    "difficulty": "Easy",
+    "rating": 4.8,
+    "plays": 45300,
+    "likes": 3980,
     "featured": true,
+    "badge": "Addictive",
+    "cover": "/assets/covers/tower-building.jpg",
+    "coverImage": "/assets/covers/tower-building.jpg",
+    "thumbnailUrl": "/assets/covers/tower-building.jpg",
     "aspectRatio": "16:9",
-    "howToPlay": [
-      "Drag mouse or finger across flying fruits to slice them with your neon katana.",
-      "Slice multiple fruits in one continuous stroke for Combo Multipliers.",
-      "Avoid clicking or slicing dangerous black dynamite bombs!"
-    ],
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/tower-building/index.html",
+    "licenseType": "MIT Open Source",
+    "developer": "iamkun",
     "controls": {
-      "keyboard": "Mouse drag slash",
-      "touch": "Finger drag swipe",
-      "mouse": "Drag to slice"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
+      "keyboard": [
+        "Space / Click: Drop Floor"
+      ],
+      "touch": [
+        "Tap screen to drop"
+      ]
+    }
   },
   {
-    "id": "temple-dash",
-    "title": "Temple Relic Escape 3D",
-    "slug": "temple-dash",
+    "id": "clumsy-bird",
+    "title": "Clumsy Flappy Bird",
+    "slug": "clumsy-bird",
+    "category": "arcade",
+    "tags": [
+      "arcade",
+      "flappy",
+      "melonjs",
+      "casual",
+      "flying"
+    ],
+    "description": "The original MelonJS physics bird flap arcade with rich sound and authentic score loop.",
+    "longDescription": "Clumsy Bird is an open-source masterpiece built on MelonJS by Ellison Leao. Flap through pipes, beat gravity, unlock high scores, and enjoy smooth 60 FPS physics.",
+    "difficulty": "Hard",
+    "rating": 4.8,
+    "plays": 61200,
+    "likes": 5340,
+    "badge": "Classic Hit",
+    "cover": "/assets/covers/clumsy-bird.jpg",
+    "coverImage": "/assets/covers/clumsy-bird.jpg",
+    "thumbnailUrl": "/assets/covers/clumsy-bird.jpg",
+    "aspectRatio": "16:9",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/clumsy-bird/index.html",
+    "licenseType": "GPL-3.0 Open Source",
+    "developer": "Ellison Leao",
+    "controls": {
+      "keyboard": [
+        "Space: Flap Wings"
+      ],
+      "touch": [
+        "Tap screen to flap"
+      ]
+    }
+  },
+  {
+    "id": "pacman-arcade",
+    "title": "Pac-Man Arcade",
+    "slug": "pacman-arcade",
+    "category": "retro",
+    "tags": [
+      "retro",
+      "pacman",
+      "arcade",
+      "maze",
+      "classic",
+      "namco"
+    ],
+    "description": "Authentic arcade maze with classic Ghost AI behaviors (Blinky, Pinky, Inky, Clyde).",
+    "longDescription": "The definitive HTML5 Pac-Man recreation by Dale Harvey with complete Namco maze audio, ghost pathfinding algorithms, power pellets, and retro arcade cabinet feel.",
+    "difficulty": "Medium",
+    "rating": 4.9,
+    "plays": 74500,
+    "likes": 6780,
+    "featured": true,
+    "badge": "Arcade Legend",
+    "cover": "/assets/covers/pacman-arcade.jpg",
+    "coverImage": "/assets/covers/pacman-arcade.jpg",
+    "thumbnailUrl": "/assets/covers/pacman-arcade.jpg",
+    "aspectRatio": "16:9",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/pacman-arcade/index.html",
+    "licenseType": "GPL-3.0 Open Source",
+    "developer": "Dale Harvey",
+    "controls": {
+      "keyboard": [
+        "Arrow Keys: Steer Pac-Man"
+      ],
+      "touch": [
+        "Swipe to change direction"
+      ]
+    }
+  },
+  {
+    "id": "tetris-classic",
+    "title": "Tetris Classic",
+    "slug": "tetris-classic",
+    "category": "puzzle",
+    "tags": [
+      "puzzle",
+      "tetris",
+      "retro",
+      "blocks",
+      "nes"
+    ],
+    "description": "Original block stacking puzzle mechanics with authentic line clears and level scaling.",
+    "longDescription": "Jake Gordon's classic HTML5 Tetris engine featuring standard 7-bag tetromino piece generation, hard drop, soft drop, wall kicks, and level progression.",
+    "difficulty": "Medium",
+    "rating": 4.9,
+    "plays": 88300,
+    "likes": 7920,
+    "featured": true,
+    "badge": "All-Time Great",
+    "cover": "/assets/covers/tetris-classic.jpg",
+    "coverImage": "/assets/covers/tetris-classic.jpg",
+    "thumbnailUrl": "/assets/covers/tetris-classic.jpg",
+    "aspectRatio": "16:9",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/tetris-classic/index.html",
+    "licenseType": "MIT Open Source",
+    "developer": "Jake Gordon",
+    "controls": {
+      "keyboard": [
+        "Arrow Left / Right: Move",
+        "Arrow Up: Rotate",
+        "Arrow Down: Soft Drop",
+        "Space: Hard Drop"
+      ],
+      "touch": [
+        "Touch directional buttons"
+      ]
+    }
+  },
+  {
+    "id": "alien-invasion",
+    "title": "Alien Invasion",
+    "slug": "alien-invasion",
     "category": "action",
     "tags": [
-      "runner",
-      "3d",
-      "temple",
-      "relic",
-      "action"
+      "action",
+      "space",
+      "invaders",
+      "retro",
+      "arcade",
+      "shooter"
     ],
-    "rating": 4.93,
-    "plays": 260000,
-    "description": "Ancient temple escape runner. Turn sharp stone corners, jump across fire pits, and slide under spinning blades!",
-    "coverImage": "/assets/covers/temple-dash.jpg",
-    "featured": true,
-    "aspectRatio": "16:9",
-    "howToPlay": [
-      "Press A / D to steer across the ancient stone pathway.",
-      "Press W / Up / Space to jump across blazing fire pits and gaps.",
-      "Press S / Down to slide under razor-sharp spinning blades."
-    ],
-    "controls": {
-      "keyboard": "A/D: Move, W/Space: Jump, S: Slide",
-      "touch": "Swipe controls",
-      "mouse": "On-screen buttons"
-    },
+    "description": "Classic Space Invaders arcade defense with bunkers, alien motherships, and touch controls.",
+    "longDescription": "Alien Invasion by Pascal Rettig. Defend Earth against descending waves of extraterrestrial invaders with destructible defensive shields and power shots.",
     "difficulty": "Medium",
-    "icon": "Gamepad2"
+    "rating": 4.7,
+    "plays": 31200,
+    "likes": 2840,
+    "badge": "Retro Shooter",
+    "cover": "/assets/covers/alien-invasion.jpg",
+    "coverImage": "/assets/covers/alien-invasion.jpg",
+    "thumbnailUrl": "/assets/covers/alien-invasion.jpg",
+    "aspectRatio": "16:9",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/alien-invasion/index.html",
+    "licenseType": "MIT Open Source",
+    "developer": "Pascal Rettig (Cykod)",
+    "controls": {
+      "keyboard": [
+        "Arrow Left / Right: Move Cannon",
+        "Space: Fire Missiles"
+      ],
+      "touch": [
+        "Touch left/right zones to move and fire"
+      ]
+    }
+  },
+  {
+    "id": "2048",
+    "title": "2048 Original",
+    "slug": "2048",
+    "category": "puzzle",
+    "tags": [
+      "puzzle",
+      "numbers",
+      "math",
+      "strategy",
+      "merge",
+      "2048"
+    ],
+    "description": "The world-famous number merge puzzle by Gabriele Cirulli. Join tiles to reach 2048!",
+    "longDescription": "The original viral puzzle game created by Gabriele Cirulli. Slide matching numbered tiles across a 4x4 grid. When two tiles of the same number touch, they merge into one!",
+    "difficulty": "Easy",
+    "rating": 4.9,
+    "plays": 94100,
+    "likes": 8450,
+    "featured": true,
+    "badge": "Viral Hit",
+    "cover": "/assets/covers/game-2048.jpg",
+    "coverImage": "/assets/covers/game-2048.jpg",
+    "thumbnailUrl": "/assets/covers/game-2048.jpg",
+    "aspectRatio": "1:1",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/2048/index.html",
+    "licenseType": "MIT Open Source",
+    "developer": "Gabriele Cirulli",
+    "controls": {
+      "keyboard": [
+        "Arrow Keys / WASD: Slide Tiles"
+      ],
+      "touch": [
+        "Swipe Up/Down/Left/Right"
+      ]
+    }
+  },
+  {
+    "id": "hextris",
+    "title": "Hextris Original",
+    "slug": "hextris",
+    "category": "puzzle",
+    "tags": [
+      "puzzle",
+      "hexagon",
+      "tetris",
+      "arcade",
+      "fast"
+    ],
+    "description": "Fast-paced hexagonal puzzle game inspired by Tetris with 360-degree block matching.",
+    "longDescription": "Hextris is an addictive hexagonal puzzle game developed by Garrett Finucane and Logan Engstrom. Rotate the central hexagon to catch falling colored bars and clear 3+ matches.",
+    "difficulty": "Medium",
+    "rating": 4.8,
+    "plays": 42100,
+    "likes": 3870,
+    "badge": "Fast Hex",
+    "cover": "/assets/covers/hextris.jpg",
+    "coverImage": "/assets/covers/hextris.jpg",
+    "thumbnailUrl": "/assets/covers/hextris.jpg",
+    "aspectRatio": "1:1",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/hextris/index.html",
+    "licenseType": "GPL-3.0 Open Source",
+    "developer": "Garrett Finucane & Logan Engstrom",
+    "controls": {
+      "keyboard": [
+        "Arrow Left / Right: Rotate Hexagon",
+        "Arrow Down: Fast Drop"
+      ],
+      "touch": [
+        "Tap left/right sides to rotate"
+      ]
+    }
+  },
+  {
+    "id": "dino-runner-real",
+    "title": "Chrome T-Rex Runner",
+    "slug": "dino-runner-real",
+    "category": "arcade",
+    "tags": [
+      "arcade",
+      "dino",
+      "runner",
+      "chrome",
+      "google",
+      "jump"
+    ],
+    "description": "The authentic world-famous offline Google Chrome dinosaur jumping obstacle run.",
+    "longDescription": "The exact Google Chrome offline dinosaur game extracted by Wayou. Jump over cacti, duck under pterodactyls, adapt to night mode, and beat world record distances.",
+    "difficulty": "Medium",
+    "rating": 4.9,
+    "plays": 115000,
+    "likes": 10400,
+    "featured": true,
+    "badge": "World Legend",
+    "cover": "/assets/covers/dino-runner-real.jpg",
+    "coverImage": "/assets/covers/dino-runner-real.jpg",
+    "thumbnailUrl": "/assets/covers/dino-runner-real.jpg",
+    "aspectRatio": "16:9",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/dino-runner-real/index.html",
+    "licenseType": "Chromium Open Source",
+    "developer": "Chromium Project / Wayou",
+    "controls": {
+      "keyboard": [
+        "Space / Arrow Up: Jump",
+        "Arrow Down: Duck"
+      ],
+      "touch": [
+        "Tap screen to jump"
+      ]
+    }
+  },
+  {
+    "id": "ns-shaft",
+    "title": "NS-Shaft Arcade",
+    "slug": "ns-shaft",
+    "category": "arcade",
+    "tags": [
+      "arcade",
+      "classic",
+      "fall",
+      "platformer",
+      "retro",
+      "shaft"
+    ],
+    "description": "Authentic 100-floor downward survival platformer with spikes, conveyor belts, and springs.",
+    "longDescription": "NS-Shaft by iPel recreates the beloved classic downward falling survival platformer. Navigate descending floors, dodge ceiling spikes, and grab life potions on your way to level 100.",
+    "difficulty": "Medium",
+    "rating": 4.8,
+    "plays": 29800,
+    "likes": 2610,
+    "badge": "100 Floors",
+    "cover": "/assets/covers/ns-shaft.jpg",
+    "coverImage": "/assets/covers/ns-shaft.jpg",
+    "thumbnailUrl": "/assets/covers/ns-shaft.jpg",
+    "aspectRatio": "4:3",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/ns-shaft/index.html",
+    "licenseType": "Apache-2.0 Open Source",
+    "developer": "iPel",
+    "controls": {
+      "keyboard": [
+        "Arrow Left / Right: Move Player"
+      ],
+      "touch": [
+        "Touch left/right controls"
+      ]
+    }
+  },
+  {
+    "id": "classic-pool",
+    "title": "Classic 8-Ball Pool",
+    "slug": "classic-pool",
+    "category": "arcade",
+    "tags": [
+      "sports",
+      "pool",
+      "billiards",
+      "physics",
+      "8ball"
+    ],
+    "description": "Realistic 2D pocket billiards physics with cue spin, aim lines, and power bar.",
+    "longDescription": "Classic 8-Ball Pool by henshmi delivers authentic table physics. Aim your cue stick, adjust shot power, calculate rebounds, and pocket solids and stripes before sinking the 8-ball.",
+    "difficulty": "Medium",
+    "rating": 4.7,
+    "plays": 37200,
+    "likes": 3280,
+    "badge": "2D Billiards",
+    "cover": "/assets/covers/classic-pool.jpg",
+    "coverImage": "/assets/covers/classic-pool.jpg",
+    "thumbnailUrl": "/assets/covers/classic-pool.jpg",
+    "aspectRatio": "16:9",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/classic-pool/index.html",
+    "licenseType": "MIT Open Source",
+    "developer": "henshmi",
+    "controls": {
+      "mouse": [
+        "Mouse Drag: Aim Cue",
+        "Pull Back & Release: Strike Ball"
+      ],
+      "touch": [
+        "Drag to aim and shoot"
+      ]
+    }
+  },
+  {
+    "id": "particle-clicker",
+    "title": "Particle Clicker CERN",
+    "slug": "particle-clicker",
+    "category": "strategy",
+    "tags": [
+      "idle",
+      "tycoon",
+      "science",
+      "clicker",
+      "cern",
+      "physics"
+    ],
+    "description": "Official CERN community particle physics idle tycoon. Discover the Higgs Boson!",
+    "longDescription": "Developed by CERN scientists and enthusiasts, Particle Clicker is an engaging idle clicker that simulates high-energy physics research. Harvest data collisions, hire PhDs, upgrade colliders, and win Nobel Prizes.",
+    "difficulty": "Easy",
+    "rating": 4.8,
+    "plays": 33400,
+    "likes": 3020,
+    "badge": "CERN Science",
+    "cover": "/assets/covers/particle-clicker.jpg",
+    "coverImage": "/assets/covers/particle-clicker.jpg",
+    "thumbnailUrl": "/assets/covers/particle-clicker.jpg",
+    "aspectRatio": "16:9",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/particle-clicker/index.html",
+    "licenseType": "MIT Open Source",
+    "developer": "CERN Particle Clicker Team",
+    "controls": {
+      "mouse": [
+        "Left Click: Collide Particles & Upgrade Equipment"
+      ],
+      "touch": [
+        "Tap screen to generate collisions"
+      ]
+    }
+  },
+  {
+    "id": "webgl-water",
+    "title": "WebGL Water Physics",
+    "slug": "webgl-water",
+    "category": "arcade",
+    "tags": [
+      "3d",
+      "webgl",
+      "water",
+      "simulation",
+      "physics",
+      "raytracing"
+    ],
+    "description": "Raytraced real-time physical 3D water simulation with sphere buoyancy and caustics.",
+    "longDescription": "Evan Wallace's groundbreaking WebGL Water demo calculates heightfield shallow-water equations in real-time GLSL shaders. Drag the sphere, click to splash ripples, and watch dynamic caustics and refractions.",
+    "difficulty": "Easy",
+    "rating": 4.9,
+    "plays": 41500,
+    "likes": 3890,
+    "badge": "WebGL Physics",
+    "cover": "/assets/covers/webgl-water.jpg",
+    "coverImage": "/assets/covers/webgl-water.jpg",
+    "thumbnailUrl": "/assets/covers/webgl-water.jpg",
+    "aspectRatio": "16:9",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/webgl-water/index.html",
+    "licenseType": "MIT Open Source",
+    "developer": "Evan Wallace",
+    "controls": {
+      "mouse": [
+        "Click / Drag: Splash Water & Move Sphere",
+        "Space: Pause / Gravity Toggle"
+      ]
+    }
   },
   {
     "id": "mecha-blaster-2",
     "title": "Mecha Blaster 2",
     "slug": "mecha-blaster-2",
-    "category": "shooting",
+    "category": "arcade",
     "tags": [
       "retro",
       "symbian",
-      "shmup",
+      "shooter",
+      "mecha",
       "space",
-      "pixel-art"
+      "60fps"
     ],
-    "rating": 4.95,
-    "plays": 88000,
-    "description": "Authentic 60 FPS Symbian vertical space shoot-em-up with weapon upgrades, bosses, and bullet patterns.",
+    "description": "Symbian OS SIS retro arcade space shooter running at silky smooth 60 FPS.",
+    "longDescription": "Reverse-engineered port of the classic Nokia Symbian MECHA BLASTER SIS binary. Pilot an armored mech through enemy armadas, collect laser power-ups, and defeat colossal bosses.",
+    "difficulty": "Hard",
+    "rating": 4.8,
+    "plays": 24800,
+    "likes": 2180,
+    "badge": "Symbian Port",
+    "cover": "/assets/covers/mecha-blaster-2.jpg",
     "coverImage": "/assets/covers/mecha-blaster-2.jpg",
-    "featured": false,
-    "aspectRatio": "4:3",
-    "howToPlay": [
-      "Arrow Keys / WASD to fly your gunship.",
-      "Spacebar to fire primary lasers.",
-      "B or Shift to detonate EMP Bomb."
-    ],
+    "thumbnailUrl": "/assets/covers/mecha-blaster-2.jpg",
+    "aspectRatio": "3:4",
+    "engineType": "native_canvas",
     "controls": {
-      "keyboard": "WASD/Arrows: Move, Space: Shoot, B: Bomb",
-      "touch": "Virtual joystick and fire buttons",
-      "mouse": "Mouse follow"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
+      "keyboard": [
+        "Arrow Keys / WASD: Move Mech",
+        "Space / J: Fire Plasma Lasers"
+      ]
+    }
   },
   {
-    "id": "hextris-deluxe",
-    "title": "Hextris Deluxe",
-    "slug": "hextris-deluxe",
+    "id": "solitaire-pro",
+    "title": "Klondike Solitaire Pro",
+    "slug": "solitaire-pro",
     "category": "puzzle",
     "tags": [
-      "puzzle",
-      "hexagon",
-      "match3",
-      "arcade"
+      "card",
+      "solitaire",
+      "klondike",
+      "classic",
+      "windows"
     ],
-    "rating": 4.87,
-    "plays": 62000,
-    "description": "Fast-paced hexagonal puzzle game. Rotate the hexagon to match 3 or more blocks of the same color.",
-    "coverImage": "/assets/covers/hextris-deluxe.jpg",
-    "featured": false,
-    "aspectRatio": "1:1",
-    "howToPlay": [
-      "Left/Right Arrow keys or A/D to rotate the hexagon.",
-      "Match 3 of the same color on any side to clear lines."
-    ],
-    "controls": {
-      "keyboard": "Left/Right Arrows or A/D",
-      "touch": "Tap Left/Right side of screen",
-      "mouse": "Click buttons"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "cyber-stack-3d",
-    "title": "Cyber Stack 3D",
-    "slug": "cyber-stack-3d",
-    "category": "arcade",
-    "tags": [
-      "arcade",
-      "stack",
-      "3d",
-      "timing",
-      "relaxing"
-    ],
-    "rating": 4.82,
-    "plays": 74000,
-    "description": "Precision 3D block stacking with relaxing synth soundscapes and dynamic color gradients.",
-    "coverImage": "/assets/covers/cyber-stack-3d.jpg",
-    "featured": false,
-    "aspectRatio": "9:16",
-    "howToPlay": [
-      "Click or press Spacebar at the exact moment to place the moving slab.",
-      "Overhanging edges will be sliced off. Build as high as possible!"
-    ],
-    "controls": {
-      "keyboard": "Spacebar",
-      "touch": "Tap screen",
-      "mouse": "Left Click"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "dino-runner-chrome",
-    "title": "Chrome Dino Cyber Edition",
-    "slug": "dino-runner-chrome",
-    "category": "action",
-    "tags": [
-      "runner",
-      "retro",
-      "arcade",
-      "endless"
-    ],
-    "rating": 4.84,
-    "plays": 91000,
-    "description": "Cyberpunk reimagining of the classic offline T-Rex runner with day/night cycles and pterodactyls.",
-    "coverImage": "/assets/covers/dino-runner-chrome.jpg",
-    "featured": false,
+    "description": "The quintessential Windows Klondike Solitaire card game with auto-complete and undo.",
+    "longDescription": "Standard 52-card Klondike Solitaire. Build four suit foundations from Ace to King, cascade tableau columns in alternating red/black colors, and enjoy smooth drag-and-drop card physics.",
+    "difficulty": "Easy",
+    "rating": 4.8,
+    "plays": 56700,
+    "likes": 4980,
+    "badge": "Classic Card",
+    "cover": "/assets/covers/solitaire-pro.jpg",
+    "coverImage": "/assets/covers/solitaire-pro.jpg",
+    "thumbnailUrl": "/assets/covers/solitaire-pro.jpg",
     "aspectRatio": "16:9",
-    "howToPlay": [
-      "Press Space or Up Arrow to jump over cacti.",
-      "Press Down Arrow to duck under flying pterodactyls."
-    ],
+    "engineType": "native_canvas",
     "controls": {
-      "keyboard": "Space/Up: Jump, Down: Duck",
-      "touch": "Tap to jump",
-      "mouse": "Click to jump"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
+      "mouse": [
+        "Click / Drag: Move Cards",
+        "Double Click: Auto-place to foundation"
+      ]
+    }
   },
   {
-    "id": "master-chess-pro",
-    "title": "Master Chess AI",
-    "slug": "master-chess-pro",
+    "id": "cyber-chess",
+    "title": "Grandmaster Chess",
+    "slug": "cyber-chess",
     "category": "strategy",
     "tags": [
+      "strategy",
       "chess",
+      "ai",
+      "board",
+      "grandmaster"
+    ],
+    "description": "Full-rule Chess with legal move generation, check/checkmate detection, and Minimax AI.",
+    "longDescription": "Play against intelligent chess AI or challenge a friend locally. Features complete standard FIDE rules including castling, en passant, pawn promotion, and move evaluation.",
+    "difficulty": "Hard",
+    "rating": 4.9,
+    "plays": 47200,
+    "likes": 4190,
+    "badge": "Mind Sport",
+    "cover": "/assets/covers/cyber-chess.jpg",
+    "coverImage": "/assets/covers/cyber-chess.jpg",
+    "thumbnailUrl": "/assets/covers/cyber-chess.jpg",
+    "aspectRatio": "1:1",
+    "engineType": "native_canvas",
+    "controls": {
+      "mouse": [
+        "Click piece to select, click valid square to move"
+      ]
+    }
+  },
+  {
+    "id": "minesweeper",
+    "title": "Minesweeper Classic",
+    "slug": "minesweeper",
+    "category": "puzzle",
+    "tags": [
+      "puzzle",
+      "minesweeper",
+      "logic",
+      "retro",
+      "windows"
+    ],
+    "description": "Standard Windows Minesweeper logic puzzle with flagging, numbers, and custom difficulties.",
+    "longDescription": "Uncover safe tiles without detonating hidden landmines. Use number clues to deduce dangerous spots, flag bombs, and sweep the minefield as fast as possible.",
+    "difficulty": "Medium",
+    "rating": 4.7,
+    "plays": 38100,
+    "likes": 3210,
+    "badge": "Windows Logic",
+    "cover": "/assets/covers/minesweeper.jpg",
+    "coverImage": "/assets/covers/minesweeper.jpg",
+    "thumbnailUrl": "/assets/covers/minesweeper.jpg",
+    "aspectRatio": "1:1",
+    "engineType": "native_canvas",
+    "controls": {
+      "mouse": [
+        "Left Click: Reveal Cell",
+        "Right Click: Place Flag"
+      ]
+    }
+  },
+  {
+    "id": "sudoku",
+    "title": "Sudoku Master",
+    "slug": "sudoku",
+    "category": "puzzle",
+    "tags": [
+      "puzzle",
+      "sudoku",
+      "logic",
+      "numbers",
+      "brain"
+    ],
+    "description": "Classic 9x9 Sudoku number placement puzzles with error checking and pencil notes.",
+    "longDescription": "Fill the 9x9 grid with numbers 1 to 9 so that each column, row, and 3x3 box contains all digits without repetition. Multiple difficulty presets from beginner to expert.",
+    "difficulty": "Hard",
+    "rating": 4.8,
+    "plays": 35600,
+    "likes": 3120,
+    "badge": "Brain Power",
+    "cover": "/assets/covers/sudoku.jpg",
+    "coverImage": "/assets/covers/sudoku.jpg",
+    "thumbnailUrl": "/assets/covers/sudoku.jpg",
+    "aspectRatio": "1:1",
+    "engineType": "native_canvas",
+    "controls": {
+      "mouse": [
+        "Click cell, type number 1-9"
+      ]
+    }
+  },
+  {
+    "id": "wordle",
+    "title": "Wordle Daily",
+    "slug": "wordle",
+    "category": "word",
+    "tags": [
+      "word",
+      "wordle",
+      "puzzle",
+      "vocabulary",
+      "daily"
+    ],
+    "description": "Guess the hidden 5-letter word in 6 tries with color-coded feedback tiles.",
+    "longDescription": "Test your vocabulary in the viral word puzzle. Green indicates correct letter and spot, yellow indicates correct letter in wrong spot, and gray indicates letter not in word.",
+    "difficulty": "Medium",
+    "rating": 4.9,
+    "plays": 51200,
+    "likes": 4670,
+    "badge": "Daily Word",
+    "cover": "/assets/covers/wordle.jpg",
+    "coverImage": "/assets/covers/wordle.jpg",
+    "thumbnailUrl": "/assets/covers/wordle.jpg",
+    "aspectRatio": "1:1",
+    "engineType": "native_canvas",
+    "controls": {
+      "keyboard": [
+        "Type letters, press Enter to submit guess"
+      ]
+    }
+  },
+  {
+    "id": "connect-four",
+    "title": "Connect 4 Master",
+    "slug": "connect-four",
+    "category": "strategy",
+    "tags": [
       "strategy",
       "board",
+      "connect4",
       "ai",
-      "brain"
-    ],
-    "rating": 4.96,
-    "plays": 115000,
-    "description": "Full chess engine with Stockfish-grade AI, move validation, undo, and blunder analysis.",
-    "coverImage": "/assets/covers/master-chess-pro.jpg",
-    "featured": false,
-    "aspectRatio": "1:1",
-    "howToPlay": [
-      "Click your chess piece, then click a highlighted destination square.",
-      "Play against AI with 3 difficulty levels."
-    ],
-    "controls": {
-      "keyboard": "Mouse only",
-      "touch": "Tap piece, tap destination",
-      "mouse": "Point and Click"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "spider-solitaire-hd",
-    "title": "Spider Solitaire Classic",
-    "slug": "spider-solitaire-hd",
-    "category": "puzzle",
-    "tags": [
-      "cards",
-      "solitaire",
-      "puzzle",
-      "classic"
-    ],
-    "rating": 4.81,
-    "plays": 54000,
-    "description": "The definitive card solitaire with 1-suit, 2-suit, and 4-suit modes, smooth card dragging, and hints.",
-    "coverImage": "/assets/covers/spider-solitaire-hd.jpg",
-    "featured": false,
-    "aspectRatio": "16:9",
-    "howToPlay": [
-      "Drag and drop cards in descending order (King to Ace).",
-      "Complete a column of King to Ace to remove the suit."
-    ],
-    "controls": {
-      "keyboard": "Mouse drag",
-      "touch": "Touch drag cards",
-      "mouse": "Drag and Drop"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "sudoku-master-grid",
-    "title": "Sudoku Master Pro",
-    "slug": "sudoku-master-grid",
-    "category": "puzzle",
-    "tags": [
-      "sudoku",
-      "puzzle",
-      "numbers",
-      "brain"
-    ],
-    "rating": 4.86,
-    "plays": 48000,
-    "description": "Infinite 9x9 Sudoku with pencil notes, auto-error checking, and 4 difficulty tiers.",
-    "coverImage": "/assets/covers/sudoku-master-grid.jpg",
-    "featured": false,
-    "aspectRatio": "1:1",
-    "howToPlay": [
-      "Select a cell and input digits 1-9 without repeating numbers in rows, columns, or 3x3 grids."
-    ],
-    "controls": {
-      "keyboard": "1-9 Number keys",
-      "touch": "Tap cell, tap number",
-      "mouse": "Click keypad"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "2048-cyber-edition",
-    "title": "2048 Cyber Fusion",
-    "slug": "2048-cyber-edition",
-    "category": "puzzle",
-    "tags": [
-      "2048",
-      "puzzle",
-      "numbers",
-      "fusion",
-      "arcade"
-    ],
-    "rating": 4.88,
-    "plays": 125000,
-    "description": "Slide and merge matching number tiles to reach the legendary 2048 cyber core.",
-    "coverImage": "/assets/covers/2048-cyber-edition.jpg",
-    "featured": false,
-    "aspectRatio": "1:1",
-    "howToPlay": [
-      "Use Arrow Keys or Swipe to slide all tiles in one direction.",
-      "When two identical tiles collide, they merge into one!"
-    ],
-    "controls": {
-      "keyboard": "Arrow Keys / WASD",
-      "touch": "Swipe in 4 directions",
-      "mouse": "Drag swipe"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "neon-pong-battle",
-    "title": "Neon Pong Retro Duel",
-    "slug": "neon-pong-battle",
-    "category": "arcade",
-    "tags": [
-      "pong",
-      "arcade",
-      "retro",
-      "neon",
       "2player"
     ],
-    "rating": 4.8,
-    "plays": 65000,
-    "description": "High-octane neon retro table tennis with curve shots, speed rallies, and single/2-player modes.",
-    "coverImage": "/assets/covers/neon-pong-battle.jpg",
-    "featured": false,
-    "aspectRatio": "16:9",
-    "howToPlay": [
-      "Player 1: W/S keys to slide paddle.",
-      "Player 2: Up/Down arrows.",
-      "Angle your paddle to apply high-speed spin on the ball!"
-    ],
-    "controls": {
-      "keyboard": "W/S and Up/Down",
-      "touch": "Drag paddles",
-      "mouse": "Mouse follow"
-    },
+    "description": "Vertical checkers line-up strategy against Minimax AI or local player.",
+    "longDescription": "Drop colored discs into the 7x6 vertical grid. The first player to connect four discs horizontally, vertically, or diagonally wins the match!",
     "difficulty": "Medium",
-    "icon": "Gamepad2"
-  },
-  {
-    "id": "space-invaders-neo",
-    "title": "Space Invaders Neo",
-    "slug": "space-invaders-neo",
-    "category": "shooting",
-    "tags": [
-      "retro",
-      "arcade",
-      "aliens",
-      "shooting",
-      "pixel-art"
-    ],
-    "rating": 4.87,
-    "plays": 77000,
-    "description": "Classic 1978 arcade defense with destructible bunkers, mystery UFO motherships, and marching alien waves.",
-    "coverImage": "/assets/covers/space-invaders-neo.jpg",
-    "featured": false,
-    "aspectRatio": "4:3",
-    "howToPlay": [
-      "A / D or Left / Right Arrows to steer the laser cannon.",
-      "Spacebar to shoot incoming alien invaders."
-    ],
+    "rating": 4.7,
+    "plays": 27400,
+    "likes": 2350,
+    "badge": "4-in-a-Row",
+    "cover": "/assets/covers/connect-four.jpg",
+    "coverImage": "/assets/covers/connect-four.jpg",
+    "thumbnailUrl": "/assets/covers/connect-four.jpg",
+    "aspectRatio": "1:1",
+    "engineType": "native_canvas",
     "controls": {
-      "keyboard": "A/D: Move, Space: Shoot",
-      "touch": "Left/Right/Fire buttons",
-      "mouse": "Click to move & fire"
-    },
-    "difficulty": "Medium",
-    "icon": "Gamepad2"
+      "mouse": [
+        "Click column to drop chip"
+      ]
+    }
   }
 ];
 
 export const GAMES_CATALOG = games;
-
-export const categories = [
-  { id: 'all', name: 'All Games', icon: 'Gamepad2', count: 23 },
-  { id: 'action', name: 'Action', icon: 'Swords', count: 7 },
-  { id: 'driving', name: 'Driving & Cars', icon: 'Car', count: 2 },
-  { id: 'shooting', name: 'Shooting', icon: 'Crosshair', count: 4 },
-  { id: 'arcade', name: 'Arcade & Retro', icon: 'Zap', count: 4 },
-  { id: 'puzzle', name: 'Puzzle & Brain', icon: 'Puzzle', count: 4 },
-  { id: 'strategy', name: 'Strategy', icon: 'Brain', count: 2 },
-  { id: 'favorites', name: 'Favorites', icon: 'Heart', count: 0 }
-];

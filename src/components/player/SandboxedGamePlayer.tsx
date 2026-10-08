@@ -294,77 +294,15 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
             {(!game.engineType || game.engineType === 'native_canvas') ? (
               renderNativeGame()
             ) : (
-              <div className="w-full aspect-[4/3] max-w-2xl bg-black rounded-xl border border-slate-800 relative flex items-center justify-center overflow-hidden shadow-2xl">
-                {/* Embedded Sandboxed Emulator Frame */}
+              <div className="w-full h-full min-h-[560px] bg-black rounded-xl border border-slate-800 relative flex items-center justify-center overflow-hidden shadow-2xl">
+                {/* Embedded Real Game Frame */}
                 <iframe
                   ref={iframeRef}
                   title={game.title}
-                  srcDoc={`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                      <meta charset="utf-8">
-                      <style>
-                        body { margin:0; background:#050505; color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-family:sans-serif; overflow:hidden; }
-                        canvas { border:2px solid #334155; background:#000; box-shadow:0 0 20px rgba(0,0,0,0.8); }
-                        .info { position:absolute; bottom:10px; font-size:12px; color:#64748b; font-family:monospace; }
-                      </style>
-                    </head>
-                    <body>
-                      <canvas id="screen" width="240" height="320"></canvas>
-                      <div class="info">ARCADEX ${game.engineType?.toUpperCase()} CLIENT ENGINE · 60 FPS</div>
-                      <script>
-                        const canvas = document.getElementById('screen');
-                        const ctx = canvas.getContext('2d');
-                        let frame = 0;
-
-                        function loop() {
-                          ctx.fillStyle = '#0f172a';
-                          ctx.fillRect(0, 0, canvas.width, canvas.height);
-                          
-                          // Draw Retro Grid
-                          ctx.strokeStyle = '#1e293b';
-                          ctx.lineWidth = 1;
-                          for(let x=0; x<canvas.width; x+=20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
-                          for(let y=0; y<canvas.height; y+=20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
-
-                          // Draw Game Title
-                          ctx.fillStyle = '#f59e0b';
-                          ctx.font = 'bold 16px monospace';
-                          ctx.textAlign = 'center';
-                          ctx.fillText('${game.title.toUpperCase()}', canvas.width/2, 60);
-
-                          ctx.fillStyle = '#38bdf8';
-                          ctx.font = '12px monospace';
-                          ctx.fillText('EMULATOR RUNNING', canvas.width/2, 90);
-
-                          // Animated Cyber Hero
-                          ctx.fillStyle = '#10b981';
-                          const py = 150 + Math.sin(frame*0.05)*10;
-                          ctx.fillRect(canvas.width/2 - 20, py, 40, 40);
-
-                          ctx.fillStyle = '#ffffff';
-                          ctx.font = '10px monospace';
-                          ctx.fillText('PRESS KEYPAD', canvas.width/2, 230);
-                          ctx.fillText('SCORE: ' + (frame * 10), canvas.width/2, 260);
-
-                          frame++;
-                          requestAnimationFrame(loop);
-                        }
-                        loop();
-
-                        window.addEventListener('message', (e) => {
-                          if (e.data && e.data.type === 'KEY_DOWN') {
-                            ctx.fillStyle = '#ef4444';
-                            ctx.fillText('KEY: ' + e.data.key, canvas.width/2, 290);
-                          }
-                        });
-                      </script>
-                    </body>
-                    </html>
-                  `}
-                  className="w-full h-full border-0"
-                  sandbox="allow-scripts allow-same-origin"
+                  src={game.binaryUrl || `/games/${game.id}/index.html`}
+                  className="w-full h-full min-h-[560px] border-0 rounded-xl"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                  sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups"
                 />
               </div>
             )}

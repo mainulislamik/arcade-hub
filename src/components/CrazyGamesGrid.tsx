@@ -54,7 +54,7 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
   const displayedGames = filteredGames.slice(0, visibleCount);
 
   // Top featured game
-  const featuredGame = games.find(g => g.id === 'slope-3d') || games.find(g => g.id === 'subway-3d') || games[0];
+  const featuredGame = games.find(g => g.id === 'hexgl') || games.find(g => g.id === 'outrun-racer') || games.find(g => g.id === 'underrun') || games[0];
 
   const renderGameCard = (game: Game, size: 'normal' | 'large' | 'compact' = 'normal') => {
     const isFav = favorites.includes(game.id);
