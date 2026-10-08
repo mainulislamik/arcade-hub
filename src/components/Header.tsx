@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 import { GameItem, GameCategory } from '../types/game';
+import { LanguageCode } from '../utils/i18n';
+import { Globe } from 'lucide-react';
 
 interface HeaderProps {
   games: GameItem[];
@@ -34,7 +36,19 @@ interface HeaderProps {
   onToggleSound: () => void;
   favoritesCount: number;
   onOpenMobileSidebar: () => void;
+  currentLanguage?: LanguageCode;
+  onSelectLanguage?: (lang: LanguageCode) => void;
 }
+
+const LANGUAGES: { code: LanguageCode; label: string; flag: string }[] = [
+  { code: 'en', label: 'EN', flag: '🇺🇸' },
+  { code: 'bn', label: 'বাং', flag: '🇧🇩' },
+  { code: 'es', label: 'ES', flag: '🇪🇸' },
+  { code: 'fr', label: 'FR', flag: '🇫🇷' },
+  { code: 'de', label: 'DE', flag: '🇩🇪' },
+  { code: 'hi', label: 'हिं', flag: '🇮🇳' },
+  { code: 'ar', label: 'عر', flag: '🇸🇦' },
+];
 
 const CATEGORY_PILLS: { id: GameCategory; label: string; icon: React.ReactNode }[] = [
   { id: 'all', label: '🔥 All Games', icon: <Flame className="w-3.5 h-3.5 text-amber-500" /> },
@@ -56,7 +70,9 @@ export const Header: React.FC<HeaderProps> = ({
   soundEnabled,
   onToggleSound,
   favoritesCount,
-  onOpenMobileSidebar
+  onOpenMobileSidebar,
+  currentLanguage,
+  onSelectLanguage
 }) => {
   const [query, setQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -275,6 +291,41 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
+
+          {/* Language Selector Dropdown */}
+          {onSelectLanguage && (
+            <div className="relative group">
+              <button
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition-colors"
+                title="Change Language"
+              >
+                <Globe className="w-3.5 h-3.5 text-indigo-600" />
+                <span className="uppercase text-[11px]">{currentLanguage || 'en'}</span>
+              </button>
+              <div className="absolute right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl py-1 px-1 min-w-[120px] hidden group-hover:block z-50 animate-in fade-in zoom-in-95 duration-150">
+                {LANGUAGES.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      sounds.playClick();
+                      onSelectLanguage(lang.code);
+                    }}
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                      currentLanguage === lang.code
+                        ? 'bg-indigo-50 text-indigo-600 font-bold'
+                        : 'text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <span>{lang.flag}</span>
+                      <span>{lang.label}</span>
+                    </span>
+                    {currentLanguage === lang.code && <span className="text-indigo-600 text-[10px]">●</span>}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Sound Synthesizer Toggle */}
           <button

@@ -10,13 +10,9 @@ import { AchievementsModal } from './components/AchievementsModal';
 import { StatsDrawer } from './components/StatsDrawer';
 import { DeveloperPortalModal } from './components/developer/DeveloperPortalModal';
 import { sounds } from './utils/soundEngine';
-import { 
-  getFavorites, 
-  toggleFavorite as toggleFavStorage, 
-  getPlayerProfile, 
-  recordGamePlay 
-} from './utils/storage';
+import { getFavorites, toggleFavorite as toggleFavStorage, getPlayerProfile, recordGamePlay } from './utils/storage';
 import { updatePageSEO } from './utils/seo';
+import { LanguageCode } from './utils/i18n';
 
 export const App: React.FC = () => {
   // Navigation State
@@ -25,6 +21,14 @@ export const App: React.FC = () => {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>(() => {
+    return (localStorage.getItem('arcadex_lang') as LanguageCode) || 'en';
+  });
+
+  const handleSelectLanguage = (lang: LanguageCode) => {
+    setCurrentLanguage(lang);
+    localStorage.setItem('arcadex_lang', lang);
+  };
 
   // Audio & User state
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -185,6 +189,8 @@ export const App: React.FC = () => {
         onToggleSound={handleToggleSound}
         favoritesCount={favorites.length}
         onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
+        currentLanguage={currentLanguage}
+        onSelectLanguage={handleSelectLanguage}
       />
 
       <div className="flex-1 flex">

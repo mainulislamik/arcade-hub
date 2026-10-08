@@ -63,6 +63,8 @@ export interface GameItem {
   fileSizeMb?: number;
   emulatorConfig?: EmulatorConfig;
   licenseType?: string;
+  license?: string;
+  platform?: string;
   developer?: string;
   developerWebsite?: string;
   downloadCount?: number;
