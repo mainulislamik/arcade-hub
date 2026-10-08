@@ -49,6 +49,15 @@ export const saveProfile = (profile: PlayerProfile): void => {
   }
 };
 
+export const resetProfile = (): PlayerProfile => {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (e) {
+    console.error('Failed to clear player profile', e);
+  }
+  return defaultProfile;
+};
+
 export const getGameHighScore = (gameId: string): number => {
   const profile = getStoredProfile();
   return profile.gameStats[gameId]?.highScore || 0;
@@ -108,7 +117,7 @@ export const recordGamePlay = (
     plays: currentStats.plays + 1,
     highScore: Math.max(currentStats.highScore, score),
     lastPlayed: new Date().toISOString(),
-    totalTimeSeconds: currentStats.totalTimeSeconds + durationSeconds,
+    totalTimeSeconds: (currentStats.totalTimeSeconds || 0) + durationSeconds,
   };
 
   const recent = [gameId, ...profile.recentGames.filter((id) => id !== gameId)].slice(0, 8);

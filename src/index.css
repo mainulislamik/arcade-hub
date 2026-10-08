@@ -4,28 +4,28 @@
 
 @layer base {
   body {
-    @apply bg-slate-950 text-slate-100 font-sans antialiased selection:bg-cyan-500 selection:text-slate-950 min-h-screen overflow-x-hidden;
+    @apply bg-slate-50 text-slate-900 font-sans antialiased selection:bg-indigo-500 selection:text-white min-h-screen overflow-x-hidden;
   }
 }
 
-/* Custom retro scanline effect (optional subtle overlay) */
-.scanline-bg {
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-  background-size: 100% 3px, 6px 100%;
+/* Subtle dot-grid pattern for light mode */
+.light-dot-grid {
+  background-image: radial-gradient(rgba(148, 163, 184, 0.25) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
-/* Custom scrollbars */
+/* Custom crisp scrollbars for light theme */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #020617;
+  background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #cbd5e1;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #94a3b8;
 }

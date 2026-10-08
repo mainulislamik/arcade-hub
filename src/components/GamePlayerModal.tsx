@@ -10,10 +10,11 @@ import {
   Shield,
   Sparkles,
   BookOpen,
-  HelpCircle as QuestionIcon,
   Lightbulb,
   Share2,
+  Star,
   Check,
+  HelpCircle as QuestionIcon,
 } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 
@@ -21,24 +22,25 @@ import { sounds } from '../utils/soundEngine';
 import { SnakeGame } from './games/SnakeGame';
 import { Game2048 } from './games/Game2048';
 import { GalaxyDefender } from './games/GalaxyDefender';
-import { WordleGame } from './games/WordleGame';
-import { AsteroidBlasterGame } from './games/AsteroidBlasterGame';
-import { SudokuGame } from './games/SudokuGame';
 import { FlappyBirdGame } from './games/FlappyBirdGame';
 import { BreakoutGame } from './games/BreakoutGame';
 import { TetrisGame } from './games/TetrisGame';
-import { ConnectFourGame } from './games/ConnectFourGame';
-import { BubbleShooterGame } from './games/BubbleShooterGame';
-import { UltimateTicTacToeGame } from './games/UltimateTicTacToeGame';
 import { PacMazeGame } from './games/PacMazeGame';
 import { MemoryFlipGame } from './games/MemoryFlipGame';
 import { MinesweeperGame } from './games/MinesweeperGame';
 import { CyberPongGame } from './games/CyberPongGame';
+import { WordleGame } from './games/WordleGame';
+import { AsteroidBlasterGame } from './games/AsteroidBlasterGame';
+import { SudokuGame } from './games/SudokuGame';
+import { ConnectFourGame } from './games/ConnectFourGame';
 import { SimonEchoGame } from './games/SimonEchoGame';
+import { BubbleShooterGame } from './games/BubbleShooterGame';
+import { UltimateTicTacToeGame } from './games/UltimateTicTacToeGame';
 
 interface GamePlayerModalProps {
   game: GameItem | null;
   onClose: () => void;
+  onRecordGameOver?: (gameId: string, finalScore: number) => void;
   isFavorite: boolean;
   onToggleFavorite: (gameId: string) => void;
 }
@@ -46,11 +48,12 @@ interface GamePlayerModalProps {
 export const GamePlayerModal: React.FC<GamePlayerModalProps> = ({
   game,
   onClose,
+  onRecordGameOver,
   isFavorite,
   onToggleFavorite,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showGuide, setShowGuide] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
   useEffect(() => {
@@ -61,143 +64,166 @@ export const GamePlayerModal: React.FC<GamePlayerModalProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose, isFullscreen]);
+  }, [isFullscreen, onClose]);
 
   if (!game) return null;
 
-  const toggleFullscreen = () => {
+  const handleShareGame = () => {
     sounds.playClick();
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
-    } else {
-      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {});
+    const shareUrl = `${window.location.origin}/?game=${game.slug}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2500);
     }
   };
 
-  const handleShare = () => {
-    sounds.playClick();
-    const url = `${window.location.origin}/?game=${game.slug}`;
-    navigator.clipboard.writeText(url);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
+  const handleGameOver = (score: number) => {
+    if (onRecordGameOver) {
+      onRecordGameOver(game.id, score);
+    }
   };
 
-  const renderActiveGame = () => {
+  // Render specific interactive game component
+  const renderGameComponent = () => {
+    const props = {
+      onGameOver: handleGameOver,
+      onScoreUpdate: (s: number) => {},
+    };
+
     switch (game.id) {
       case 'snake':
-        return <SnakeGame />;
+        return <SnakeGame {...props} />;
       case '2048':
-        return <Game2048 />;
+        return <Game2048 {...props} />;
       case 'galaxy-defender':
-        return <GalaxyDefender />;
-      case 'word-quest':
-        return <WordleGame />;
-      case 'asteroid-blaster':
-        return <AsteroidBlasterGame />;
-      case 'sudoku':
-        return <SudokuGame />;
+        return <GalaxyDefender {...props} />;
       case 'flappy-bird':
-        return <FlappyBirdGame />;
+        return <FlappyBirdGame {...props} />;
       case 'breakout':
-        return <BreakoutGame />;
+        return <BreakoutGame {...props} />;
       case 'tetris':
-        return <TetrisGame />;
-      case 'connect-four':
-        return <ConnectFourGame />;
-      case 'bubble-shooter':
-        return <BubbleShooterGame />;
-      case 'ultimate-tictactoe':
-        return <UltimateTicTacToeGame />;
+        return <TetrisGame {...props} />;
       case 'pac-maze':
-        return <PacMazeGame />;
+        return <PacMazeGame {...props} />;
       case 'memory-flip':
-        return <MemoryFlipGame />;
+        return <MemoryFlipGame {...props} />;
       case 'minesweeper':
-        return <MinesweeperGame />;
+        return <MinesweeperGame {...props} />;
       case 'cyber-pong':
-        return <CyberPongGame />;
+        return <CyberPongGame {...props} />;
+      case 'word-quest':
+        return <WordleGame {...props} />;
+      case 'asteroid-blaster':
+        return <AsteroidBlasterGame {...props} />;
+      case 'sudoku':
+        return <SudokuGame {...props} />;
+      case 'connect-four':
+        return <ConnectFourGame {...props} />;
       case 'simon-echo':
-        return <SimonEchoGame />;
+        return <SimonEchoGame {...props} />;
+      case 'bubble-shooter':
+        return <BubbleShooterGame {...props} />;
+      case 'ultimate-tictactoe':
+        return <UltimateTicTacToeGame {...props} />;
       default:
-        return <SnakeGame />;
+        return (
+          <div className="flex flex-col items-center justify-center p-12 text-center text-slate-600">
+            <p>Game engine initialized. Ready to play!</p>
+          </div>
+        );
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col justify-between select-none overflow-hidden animate-fade-in">
-      {/* Top Navigation Bar */}
-      <div className="px-4 py-3 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between z-10">
+    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex flex-col justify-between overflow-hidden">
+      {/* Top Controls Bar */}
+      <div className="h-16 px-4 sm:px-6 bg-white border-b border-slate-200 flex items-center justify-between shadow-sm z-10">
+        {/* Left: Back button & Title */}
         <div className="flex items-center gap-3">
           <button
             onClick={() => {
               sounds.playClick();
               onClose();
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition text-xs font-semibold"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Back to Games</span>
+            <span className="hidden sm:inline">Exit to Lobby</span>
           </button>
-          <div>
-            <h1 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-              {game.title}
-              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800">
-                {game.category}
-              </span>
-            </h1>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xl">{game.icon || '🎮'}</span>
+            <div>
+              <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-tight">
+                {game.title}
+              </h3>
+              <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono">
+                <span className="capitalize">{game.category}</span>
+                <span>•</span>
+                <span className="text-indigo-600 font-semibold">{game.difficulty}</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Right: Actions */}
         <div className="flex items-center gap-2">
-          {/* Share Link Button */}
+          {/* Share Direct Game Link */}
           <button
-            onClick={handleShare}
-            title="Copy Game Direct URL"
-            className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white transition text-xs font-semibold"
+            onClick={handleShareGame}
+            title="Copy Direct Game URL"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold hover:bg-indigo-100 transition shadow-sm"
           >
-            {copiedLink ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
-            <span className="hidden md:inline">{copiedLink ? 'Link Copied!' : 'Share'}</span>
+            {copiedLink ? (
+              <>
+                <Check className="w-4 h-4 text-emerald-600" />
+                <span>Link Copied!</span>
+              </>
+            ) : (
+              <>
+                <Share2 className="w-4 h-4" />
+                <span className="hidden md:inline">Share</span>
+              </>
+            )}
           </button>
 
-          {/* Guide & Strategy Drawer Toggle */}
-          <button
-            onClick={() => {
-              sounds.playClick();
-              setShowGuide(!showGuide);
-            }}
-            title="Game Rules & Guide"
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
-              showGuide
-                ? 'bg-cyan-500 text-slate-950 font-bold'
-                : 'bg-slate-800 text-slate-300 hover:text-white'
-            }`}
-          >
-            <BookOpen className="w-4 h-4" />
-            <span className="hidden sm:inline">Guide & Tips</span>
-          </button>
-
-          {/* Favorite Toggle */}
+          {/* Toggle Favorite */}
           <button
             onClick={() => {
               sounds.playClick();
               onToggleFavorite(game.id);
             }}
-            title="Toggle Favorite"
-            className={`p-2 rounded-xl transition ${
-              isFavorite
-                ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
-                : 'bg-slate-800 text-slate-400 hover:text-white'
-            }`}
+            title={isFavorite ? 'Remove Favorite' : 'Save Favorite'}
+            className="p-2 rounded-xl bg-slate-100 text-slate-600 hover:text-rose-500 hover:bg-rose-50 transition"
           >
-            <Heart className={`w-4 h-4 ${isFavorite ? 'fill-rose-500' : ''}`} />
+            <Heart className={`w-4 h-4 ${isFavorite ? 'fill-rose-500 text-rose-500' : ''}`} />
           </button>
 
-          {/* Fullscreen Button */}
+          {/* Rules & Strategy Drawer Toggle */}
           <button
-            onClick={toggleFullscreen}
-            title="Toggle Fullscreen"
-            className="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white transition hidden sm:block"
+            onClick={() => {
+              sounds.playClick();
+              setShowInfo(!showInfo);
+            }}
+            title="View Game Rules & SEO Guide"
+            className={`p-2 rounded-xl transition ${
+              showInfo
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            <BookOpen className="w-4 h-4" />
+          </button>
+
+          {/* Fullscreen Toggle */}
+          <button
+            onClick={() => {
+              sounds.playClick();
+              setIsFullscreen(!isFullscreen);
+            }}
+            title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+            className="p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition hidden sm:block"
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
@@ -209,31 +235,34 @@ export const GamePlayerModal: React.FC<GamePlayerModalProps> = ({
               onClose();
             }}
             title="Close Game"
-            className="p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-rose-500/20 hover:text-rose-400 transition"
+            className="p-2 rounded-xl bg-slate-100 text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      {/* Main Game Screen + Guide Drawer */}
-      <div className="flex-1 relative flex overflow-hidden">
+      {/* Main Game Stage & Rules Splitter */}
+      <div className="flex-1 flex overflow-hidden relative bg-slate-100">
         {/* Game Canvas Container */}
-        <div className="flex-1 flex items-center justify-center p-2 sm:p-4 overflow-auto">
-          {renderActiveGame()}
+        <div className="flex-1 flex items-center justify-center p-2 sm:p-6 overflow-auto">
+          <div className="w-full max-w-4xl bg-white rounded-3xl p-3 sm:p-6 shadow-xl border border-slate-200 flex flex-col items-center justify-center">
+            {renderGameComponent()}
+          </div>
         </div>
 
-        {/* SEO-Rich Game Guide Slideout Drawer */}
-        {showGuide && (
-          <div className="w-full sm:w-96 bg-slate-900 border-l border-slate-800 p-6 overflow-y-auto space-y-6 shadow-2xl z-20 animate-slide-left">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-cyan-400" />
-                Game Manual & SEO Guide
-              </h3>
+        {/* Game Guide & SEO Info Drawer */}
+        {showInfo && (
+          <div className="w-full sm:w-96 bg-white border-l border-slate-200 p-6 overflow-y-auto space-y-6 shadow-2xl z-20">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-indigo-600" />
+                <h3 className="font-bold text-slate-900 text-sm">Game Guide & Manual</h3>
+              </div>
               <button
-                onClick={() => setShowGuide(false)}
-                className="p-1 rounded-lg bg-slate-800 text-slate-400 hover:text-white"
+                onClick={() => setShowInfo(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -241,8 +270,8 @@ export const GamePlayerModal: React.FC<GamePlayerModalProps> = ({
 
             {/* Overview */}
             <div>
-              <h4 className="text-xs uppercase font-mono font-bold text-cyan-400 mb-2">Overview</h4>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <h4 className="text-xs uppercase font-mono font-bold text-indigo-600 mb-2">Overview</h4>
+              <p className="text-xs text-slate-600 leading-relaxed">
                 {game.longDescription || game.description}
               </p>
             </div>
@@ -250,10 +279,10 @@ export const GamePlayerModal: React.FC<GamePlayerModalProps> = ({
             {/* How to Play */}
             {game.howToPlay && game.howToPlay.length > 0 && (
               <div>
-                <h4 className="text-xs uppercase font-mono font-bold text-emerald-400 mb-2">
+                <h4 className="text-xs uppercase font-mono font-bold text-emerald-600 mb-2">
                   How to Play (Step-by-Step)
                 </h4>
-                <ol className="space-y-2 text-xs text-slate-300 list-decimal list-inside">
+                <ol className="space-y-2 text-xs text-slate-600 list-decimal list-inside">
                   {game.howToPlay.map((step, idx) => (
                     <li key={idx} className="leading-relaxed">
                       {step}
@@ -266,11 +295,11 @@ export const GamePlayerModal: React.FC<GamePlayerModalProps> = ({
             {/* Strategy & Pro Tips */}
             {game.tips && game.tips.length > 0 && (
               <div>
-                <h4 className="text-xs uppercase font-mono font-bold text-amber-400 mb-2 flex items-center gap-1.5">
-                  <Lightbulb className="w-4 h-4 text-amber-400" />
+                <h4 className="text-xs uppercase font-mono font-bold text-amber-600 mb-2 flex items-center gap-1.5">
+                  <Lightbulb className="w-4 h-4 text-amber-500" />
                   Pro Strategies & High Score Tips
                 </h4>
-                <ul className="space-y-2 text-xs text-slate-300 list-disc list-inside">
+                <ul className="space-y-2 text-xs text-slate-600 list-disc list-inside">
                   {game.tips.map((tip, idx) => (
                     <li key={idx} className="leading-relaxed">
                       {tip}
@@ -282,32 +311,32 @@ export const GamePlayerModal: React.FC<GamePlayerModalProps> = ({
 
             {/* Controls Cheat Sheet */}
             <div>
-              <h4 className="text-xs uppercase font-mono font-bold text-blue-400 mb-2">Controls</h4>
-              <div className="space-y-1.5 text-xs text-slate-300">
-                <p className="font-semibold text-slate-200">Keyboard / PC:</p>
+              <h4 className="text-xs uppercase font-mono font-bold text-blue-600 mb-2">Controls</h4>
+              <div className="space-y-2 text-xs text-slate-600">
+                <p className="font-semibold text-slate-800">Keyboard / PC:</p>
                 <div className="flex flex-wrap gap-1.5">
                   {Array.isArray(game.controls.keyboard) ? (
                     game.controls.keyboard.map((ctrl: string, i: number) => (
-                      <span key={i} className="px-2 py-0.5 rounded bg-slate-800 text-cyan-300 font-mono text-[11px] border border-slate-700">
+                      <span key={i} className="px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-mono text-[11px] border border-slate-200">
                         {ctrl}
                       </span>
                     ))
                   ) : game.controls.keyboard ? (
-                    <span className="px-2 py-0.5 rounded bg-slate-800 text-cyan-300 font-mono text-[11px] border border-slate-700">
+                    <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-mono text-[11px] border border-slate-200">
                       {game.controls.keyboard}
                     </span>
                   ) : null}
                 </div>
-                <p className="font-semibold text-slate-200 mt-2">Touch / Mobile:</p>
+                <p className="font-semibold text-slate-800 mt-2">Touch / Mobile:</p>
                 <div className="flex flex-wrap gap-1.5">
                   {Array.isArray(game.controls.touch || game.controls.mobile) ? (
                     ((game.controls.touch || game.controls.mobile) as string[]).map((ctrl: string, i: number) => (
-                      <span key={i} className="px-2 py-0.5 rounded bg-slate-800 text-teal-300 font-mono text-[11px] border border-slate-700">
+                      <span key={i} className="px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-mono text-[11px] border border-slate-200">
                         {ctrl}
                       </span>
                     ))
                   ) : (game.controls.touch || game.controls.mobile) ? (
-                    <span className="px-2 py-0.5 rounded bg-slate-800 text-teal-300 font-mono text-[11px] border border-slate-700">
+                    <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-mono text-[11px] border border-slate-200">
                       {game.controls.touch || game.controls.mobile}
                     </span>
                   ) : null}
@@ -318,15 +347,15 @@ export const GamePlayerModal: React.FC<GamePlayerModalProps> = ({
             {/* Frequently Asked Questions */}
             {game.faqs && game.faqs.length > 0 && (
               <div>
-                <h4 className="text-xs uppercase font-mono font-bold text-purple-400 mb-2 flex items-center gap-1.5">
-                  <QuestionIcon className="w-4 h-4 text-purple-400" />
+                <h4 className="text-xs uppercase font-mono font-bold text-purple-600 mb-2 flex items-center gap-1.5">
+                  <QuestionIcon className="w-4 h-4 text-purple-600" />
                   Frequently Asked Questions
                 </h4>
                 <div className="space-y-3 text-xs">
                   {game.faqs.map((faq, i) => (
-                    <div key={i} className="bg-slate-950/60 p-3 rounded-xl border border-slate-800">
-                      <p className="font-bold text-slate-200">{faq.question}</p>
-                      <p className="text-slate-400 mt-1 leading-relaxed">{faq.answer}</p>
+                    <div key={i} className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                      <p className="font-bold text-slate-900">{faq.question}</p>
+                      <p className="text-slate-600 mt-1 leading-relaxed">{faq.answer}</p>
                     </div>
                   ))}
                 </div>
@@ -337,13 +366,13 @@ export const GamePlayerModal: React.FC<GamePlayerModalProps> = ({
       </div>
 
       {/* Footer Info Strip */}
-      <div className="px-4 py-2 bg-slate-950 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+      <div className="px-4 py-2.5 bg-white border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500 font-mono">
         <span className="flex items-center gap-1.5">
-          <Shield className="w-3.5 h-3.5 text-emerald-400" />
-          Guest Session • Zero Server Compute • Auto-saved Locally
+          <Shield className="w-3.5 h-3.5 text-emerald-600" />
+          Guest Session • 0% Server Compute • Auto-saved Locally
         </span>
         <span className="hidden sm:inline text-slate-500">
-          Difficulty: <strong className="text-cyan-400">{game.difficulty}</strong> • Rating: ★ {game.rating.toFixed(1)}
+          Difficulty: <strong className="text-indigo-600">{game.difficulty}</strong> • Rating: ★ {game.rating.toFixed(1)}
         </span>
       </div>
     </div>

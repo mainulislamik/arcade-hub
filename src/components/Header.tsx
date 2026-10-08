@@ -7,10 +7,11 @@ interface HeaderProps {
   onToggleSound: () => void;
   onOpenStats: () => void;
   onOpenAchievements: () => void;
-  showFavoritesOnly: boolean;
-  onToggleFavorites: () => void;
-  favoriteCount: number;
+  favoritesCount: number;
   unlockedAchievementsCount: number;
+  totalAchievementsCount: number;
+  showFavoritesOnly: boolean;
+  onToggleFavoritesOnly: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -18,66 +19,57 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleSound,
   onOpenStats,
   onOpenAchievements,
-  showFavoritesOnly,
-  onToggleFavorites,
-  favoriteCount,
+  favoritesCount,
   unlockedAchievementsCount,
+  totalAchievementsCount,
+  showFavoritesOnly,
+  onToggleFavoritesOnly,
 }) => {
   return (
-    <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80 transition-all">
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Brand Logo */}
-        <a
-          href="/"
-          onClick={(e) => {
-            if (window.location.search) {
-              e.preventDefault();
-              window.history.pushState({}, '', window.location.pathname);
-              window.dispatchEvent(new PopStateEvent('popstate'));
-            }
-          }}
-          className="flex items-center gap-3 group cursor-pointer"
-        >
-          <div className="relative p-2.5 rounded-2xl bg-gradient-to-br from-cyan-500 via-blue-600 to-indigo-600 text-slate-950 shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition duration-300">
-            <Gamepad2 className="w-5 h-5 fill-current" />
-            <span className="absolute -top-1 -right-1 flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-400"></span>
-            </span>
+        {/* Logo & Brand */}
+        <div className="flex items-center gap-3 cursor-pointer select-none" onClick={() => window.location.href = '/'}>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-cyan-500 p-0.5 shadow-md shadow-indigo-500/20 flex items-center justify-center">
+            <div className="w-full h-full bg-white rounded-[10px] flex items-center justify-center">
+              <Gamepad2 className="w-5 h-5 text-indigo-600 animate-pulse" />
+            </div>
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-lg sm:text-xl tracking-wider bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400 bg-clip-text text-transparent">
-                ARCADEX
-              </span>
-              <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800/50 font-bold">
-                PRO
+              <h1 className="text-xl font-black tracking-tight text-slate-900 flex items-center">
+                ARCAD<span className="text-indigo-600">EX</span>
+              </h1>
+              <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono">
+                v2.0
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 hidden sm:block">0% Server Compute • 100% Client Arcade</p>
+            <p className="text-[11px] font-medium text-slate-500 hidden sm:block">
+              Zero Server Compute • Instant Web Arcade
+            </p>
           </div>
-        </a>
+        </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5">
+        <div className="flex items-center gap-2 sm:gap-3">
           {/* Favorites Filter */}
           <button
             onClick={() => {
               sounds.playClick();
-              onToggleFavorites();
+              onToggleFavoritesOnly();
             }}
-            title="Toggle Favorites"
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
               showFavoritesOnly
-                ? 'bg-rose-500/20 border-rose-500/50 text-rose-400 shadow-lg shadow-rose-500/20'
-                : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-850'
+                ? 'bg-rose-50 text-rose-700 border-rose-300 shadow-sm'
+                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-rose-600'
             }`}
+            title="Toggle Favorites Filter"
           >
-            <Heart className={`w-4 h-4 ${showFavoritesOnly ? 'fill-rose-500 text-rose-500' : ''}`} />
+            <Heart className={`w-4 h-4 ${showFavoritesOnly ? 'fill-rose-500 text-rose-500' : 'text-slate-400'}`} />
             <span className="hidden md:inline">Favorites</span>
-            {favoriteCount > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-950 text-rose-300 border border-rose-800">
-                {favoriteCount}
+            {favoritesCount > 0 && (
+              <span className="ml-0.5 px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-700 text-[10px] font-bold">
+                {favoritesCount}
               </span>
             )}
           </button>
@@ -88,43 +80,38 @@ export const Header: React.FC<HeaderProps> = ({
               sounds.playClick();
               onOpenAchievements();
             }}
-            title="Arcade Badges & Achievements"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 border border-slate-800 text-amber-400 hover:text-amber-300 hover:bg-slate-850 transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-700 border border-slate-200 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300 transition-all shadow-sm"
+            title="View Achievements"
           >
-            <Award className="w-4 h-4" />
-            <span className="hidden md:inline">Badges</span>
-            {unlockedAchievementsCount > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-950 text-amber-300 border border-amber-800">
-                {unlockedAchievementsCount}
-              </span>
-            )}
+            <Trophy className="w-4 h-4 text-amber-500" />
+            <span className="hidden md:inline">Trophies</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
+              {unlockedAchievementsCount}/{totalAchievementsCount}
+            </span>
           </button>
 
-          {/* Stats Button */}
+          {/* Stats Drawer Button */}
           <button
             onClick={() => {
               sounds.playClick();
               onOpenStats();
             }}
-            title="Player Stats & Records"
-            className="p-2 sm:px-3 sm:py-1.5 rounded-xl text-xs font-semibold bg-slate-900 border border-slate-800 text-cyan-400 hover:text-cyan-300 hover:bg-slate-850 transition-all flex items-center gap-1.5"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-700 border border-slate-200 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-300 transition-all shadow-sm"
+            title="Player Stats & Save Data"
           >
-            <BarChart3 className="w-4 h-4" />
-            <span className="hidden md:inline">Stats</span>
+            <BarChart3 className="w-4 h-4 text-indigo-600" />
+            <span className="hidden md:inline">My Stats</span>
           </button>
 
-          {/* Audio Synthesizer Toggle */}
+          {/* Sound Toggle */}
           <button
-            onClick={() => {
-              sounds.playClick();
-              onToggleSound();
-            }}
-            title={soundEnabled ? 'Mute Procedural Web Audio' : 'Enable Procedural Web Audio'}
-            className={`p-2 rounded-xl border transition-all ${
+            onClick={onToggleSound}
+            className={`p-2 rounded-lg border transition-all ${
               soundEnabled
-                ? 'bg-cyan-950/40 border-cyan-800/60 text-cyan-400 hover:bg-cyan-900/50'
-                : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-400'
+                ? 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100'
+                : 'bg-slate-100 text-slate-400 border-slate-200 hover:bg-slate-200'
             }`}
+            title={soundEnabled ? 'Mute Sound Synthesis' : 'Unmute Sound Synthesis'}
           >
             {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
           </button>
