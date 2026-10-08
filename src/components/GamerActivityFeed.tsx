@@ -25,7 +25,7 @@ export const GamerActivityFeed: React.FC = () => {
 
   useEffect(() => {
     const randomGamers = ['Vortex_9', 'AlphaZero', 'ApexLegend', 'SwiftRunner', 'NovaGamer', 'MatrixDrifter'];
-    const games = ['Retro Snake', 'Neon Breakout', 'Cyber Minesweeper', 'Connect 4', 'Bubble Shooter'];
+    const games = ['Retro Snake', 'Neon Breakout', 'Cyber Minesweeper', 'Grid 4 Cyber', 'Bubble Shooter'];
     
     const interval = setInterval(() => {
       const randomGamer = randomGamers[Math.floor(Math.random() * randomGamers.length)];

@@ -38,7 +38,7 @@ export interface GameItem {
   isFeatured?: boolean;
   coverImage?: string;
   heroImage?: string;
-  playStationBadge?: string;
+  proBadge?: string;
 }
 
 export interface GameStats {

@@ -213,7 +213,7 @@ export const ConnectFourGame: React.FC<ConnectFourProps> = ({ onScoreUpdate, onG
         </div>
       )}
 
-      {/* 7x6 Connect 4 Grid */}
+      {/* 7x6 Grid 4 Cyber */}
       <div className="p-3 sm:p-4 bg-blue-950/70 border-4 border-blue-800/80 rounded-3xl shadow-2xl shadow-blue-950/50 mb-4">
         <div className="grid grid-cols-7 gap-2 sm:gap-3">
           {Array.from({ length: COLS }).map((_, col) => (

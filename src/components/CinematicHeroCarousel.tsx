@@ -3,7 +3,7 @@ import { GameItem } from '../types/game';
 import { Play, Sparkles, Star, Trophy, Info, ChevronLeft, ChevronRight, Gamepad2, Shield, Heart, Eye, Box } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 
-interface PlayStationHeroCarouselProps {
+interface CinematicHeroCarouselProps {
   games: GameItem[];
   onPlayGame: (game: GameItem) => void;
   onOpenInfo: (game: GameItem) => void;
@@ -13,7 +13,7 @@ interface PlayStationHeroCarouselProps {
   is3DViewActive: boolean;
 }
 
-export const PlayStationHeroCarousel: React.FC<PlayStationHeroCarouselProps> = ({
+export const CinematicHeroCarousel: React.FC<CinematicHeroCarouselProps> = ({
   games,
   onPlayGame,
   onOpenInfo,
@@ -77,7 +77,7 @@ export const PlayStationHeroCarousel: React.FC<PlayStationHeroCarouselProps> = (
         <div className="flex items-center gap-2">
           <span className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-indigo-600/90 text-white font-bold text-xs tracking-wider uppercase backdrop-blur-md shadow-lg shadow-indigo-500/30 border border-indigo-400/40">
             <Sparkles className="w-3.5 h-3.5" />
-            {currentGame.playStationBadge || 'PLAYSTATION SPOTLIGHT'}
+            {currentGame.proBadge || 'ARCADE SPOTLIGHT'}
           </span>
           <span className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-800/80 text-emerald-400 font-semibold text-xs border border-slate-700/60 backdrop-blur-md">
             <Shield className="w-3 h-3" /> 0% SERVER COMPUTE
@@ -129,7 +129,7 @@ export const PlayStationHeroCarousel: React.FC<PlayStationHeroCarouselProps> = (
             {currentGame.longDescription || currentGame.description}
           </p>
 
-          {/* Action Buttons (PlayStation Style) */}
+          {/* Action Buttons (Cinematic Style) */}
           <div className="flex flex-wrap items-center gap-4">
             <button
               onClick={() => {
@@ -173,7 +173,7 @@ export const PlayStationHeroCarousel: React.FC<PlayStationHeroCarouselProps> = (
         {/* Right Side PlayStation Miniature Thumbnails Carousel */}
         <div className="lg:col-span-4 flex flex-col justify-end">
           <div className="flex items-center justify-between mb-3 text-xs font-bold text-slate-400 uppercase tracking-wider">
-            <span>PlayStation Featured ({currentIndex + 1}/{featuredGames.length})</span>
+            <span>Featured Spotlight ({currentIndex + 1}/{featuredGames.length})</span>
             <div className="flex items-center gap-1.5">
               <button
                 onClick={handlePrev}

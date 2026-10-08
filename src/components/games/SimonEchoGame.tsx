@@ -101,7 +101,7 @@ export const SimonEchoGame: React.FC<SimonEchoProps> = ({ onScoreUpdate, onGameO
         <div className="flex items-center gap-2">
           <span className="text-xl">🎛️</span>
           <div>
-            <h3 className="text-sm font-bold text-white">Simon Cyber Echo</h3>
+            <h3 className="text-sm font-bold text-white">Sonic Color Echo</h3>
             <p className="text-[10px] text-slate-400">Audio & Visual Pattern Memory</p>
           </div>
         </div>

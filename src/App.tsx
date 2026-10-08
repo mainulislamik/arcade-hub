@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { GameItem, GameCategory, PlayerProfile } from './types/game';
 import { GAMES_CATALOG } from './data/games';
 import { Header } from './components/Header';
-import { PlayStationHeroCarousel } from './components/PlayStationHeroCarousel';
+import { CinematicHeroCarousel } from './components/CinematicHeroCarousel';
 import { Arcade3DHero } from './components/Arcade3DHero';
 import { InfiniteMarquee } from './components/InfiniteMarquee';
 import { GamerActivityFeed } from './components/GamerActivityFeed';
@@ -216,7 +216,7 @@ export const App: React.FC = () => {
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-20">
-        {/* Toggle between PlayStation Cinematic Spotlight and 3D WebGL Arcade Hero */}
+        {/* Toggle between Cinematic Pro Cinematic Spotlight and 3D WebGL Arcade Hero */}
         {is3DViewActive ? (
           <div className="mb-8">
             <Arcade3DHero
@@ -232,12 +232,12 @@ export const App: React.FC = () => {
                 onClick={() => setIs3DViewActive(false)}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-100 shadow-sm transition-colors"
               >
-                <span>◀ Return to PlayStation Spotlight Carousel</span>
+                <span>◀ Return to Cinematic Pro Spotlight Carousel</span>
               </button>
             </div>
           </div>
         ) : (
-          <PlayStationHeroCarousel
+          <CinematicHeroCarousel
             games={GAMES_CATALOG}
             onPlayGame={handleOpenGame}
             onOpenInfo={handleOpenGame}
@@ -248,7 +248,7 @@ export const App: React.FC = () => {
           />
         )}
 
-        {/* PlayStation Network Live Activity Pulse */}
+        {/* Cinematic Pro Network Live Activity Pulse */}
         <GamerActivityFeed />
 
         {/* Dual-Row Infinite Gamer Marquee */}

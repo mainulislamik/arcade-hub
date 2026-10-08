@@ -30,7 +30,7 @@ export const GameCard: React.FC<GameCardProps> = ({
       onMouseEnter={() => setIsCardHovered(true)}
       onMouseLeave={() => setIsCardHovered(false)}
     >
-      {/* PlayStation-Grade Cover Poster (4:3 aspect) */}
+      {/* Cinematic-Grade Cover Poster (4:3 aspect) */}
       <div className="relative h-48 sm:h-52 w-full bg-slate-900 overflow-hidden">
         {game.coverImage ? (
           <img
@@ -52,7 +52,7 @@ export const GameCard: React.FC<GameCardProps> = ({
         <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10">
           <div className="flex items-center gap-1.5">
             <span className="px-2.5 py-1 rounded-lg bg-slate-950/80 text-white text-[10px] font-black uppercase tracking-wider backdrop-blur-md border border-white/10 font-mono shadow-sm">
-              {game.playStationBadge || game.category}
+              {game.proBadge || game.category}
             </span>
             {game.badge && (
               <span className="px-2 py-1 rounded-lg bg-amber-400 text-slate-950 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-sm font-mono">
