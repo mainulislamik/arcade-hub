@@ -1,152 +1,132 @@
 import React from 'react';
 import { PlayerProfile } from '../types/game';
 import { GAMES_CATALOG } from '../data/games';
-import { X, Trophy, Gamepad2, Heart, Trash2, Download, Upload, ShieldCheck } from 'lucide-react';
-import { sounds } from '../utils/soundEngine';
+import { X, Trophy, Gamepad2, Heart, Trash2, Download, Upload, ShieldCheck, Sparkles, Award } from 'lucide-react';
 
 interface StatsDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   profile: PlayerProfile;
-  onResetData: () => void;
+  onResetProfile?: () => void;
 }
 
-export const StatsDrawer: React.FC<StatsDrawerProps> = ({
-  isOpen,
-  onClose,
-  profile,
-  onResetData,
-}) => {
+export const StatsDrawer: React.FC<StatsDrawerProps> = ({ isOpen, onClose, profile, onResetProfile }) => {
   if (!isOpen) return null;
 
-  const totalHighScoresSum = Object.values(profile.gameStats).reduce(
-    (acc, cur) => acc + (cur.highScore || 0),
-    0
-  );
+  const totalPlays = profile.totalGamesPlayed;
+  const uniqueGamesPlayed = Object.keys(profile.gameStats).length;
 
-  const exportSaveData = () => {
-    sounds.playCoin();
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(profile));
+  const handleExportData = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(profile, null, 2));
     const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `arcadex_backup_${new Date().toISOString().slice(0, 10)}.json`);
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `arcadex_backup_${new Date().toISOString().split('T')[0]}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
   };
 
-  const importSaveData = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const fileReader = new FileReader();
-    if (e.target.files && e.target.files[0]) {
-      fileReader.readAsText(e.target.files[0], 'UTF-8');
-      fileReader.onload = event => {
-        try {
-          const parsed = JSON.parse(event.target?.result as string);
-          localStorage.setItem('arcade_hub_player_profile', JSON.stringify(parsed));
-          sounds.playVictory();
-          window.location.reload();
-        } catch {
-          alert('Invalid backup file format.');
-        }
-      };
+  const handleClearData = () => {
+    if (window.confirm("Are you sure you want to reset all local high scores and statistics? This cannot be undone.")) {
+      if (onResetProfile) onResetProfile();
+      else localStorage.clear();
+      window.location.reload();
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex justify-end animate-in fade-in">
-      <div className="w-full max-w-md bg-slate-950 border-l border-slate-800 h-full p-6 flex flex-col justify-between overflow-y-auto animate-in slide-in-from-right duration-300">
-        <div>
+    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex justify-end animate-fade-in select-none">
+      <div className="w-full max-w-md bg-slate-900 border-l border-slate-800 h-full p-6 overflow-y-auto flex flex-col justify-between shadow-2xl animate-slide-left">
+        <div className="space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-            <div className="flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-amber-400" />
-              <h2 className="text-lg font-bold text-slate-100 font-display">PLAYER STATS</h2>
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-cyan-950 border border-cyan-800 text-cyan-400">
+                <Gamepad2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-bold text-base text-white">Player Dashboard</h3>
+                <p className="text-[11px] text-slate-400">100% Local Device Persistence</p>
+              </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white rounded-xl transition"
+              className="p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white transition"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Quick Stats Grid */}
-          <div className="grid grid-cols-2 gap-3 my-5">
-            <div className="bg-slate-900/80 border border-slate-800/80 p-3.5 rounded-2xl">
-              <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
-                <Gamepad2 className="w-4 h-4 text-cyan-400" />
-                <span>Plays</span>
-              </div>
-              <span className="text-2xl font-black font-mono text-cyan-400">
-                {profile.totalGamesPlayed}
+          {/* Key Metrics Cards */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-1">
+              <span className="text-xs text-slate-400 flex items-center gap-1.5">
+                <Trophy className="w-3.5 h-3.5 text-amber-400" /> Total Plays
               </span>
+              <p className="text-2xl font-bold font-mono text-white">{totalPlays}</p>
             </div>
 
-            <div className="bg-slate-900/80 border border-slate-800/80 p-3.5 rounded-2xl">
-              <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
-                <Heart className="w-4 h-4 text-rose-400" />
-                <span>Favorites</span>
-              </div>
-              <span className="text-2xl font-black font-mono text-rose-400">
-                {profile.favoriteGames.length}
+            <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-1">
+              <span className="text-xs text-slate-400 flex items-center gap-1.5">
+                <Heart className="w-3.5 h-3.5 text-rose-400" /> Favorites
               </span>
+              <p className="text-2xl font-bold font-mono text-white">{profile.favoriteGames.length}</p>
             </div>
           </div>
 
-          {/* High Scores List */}
-          <h3 className="text-xs uppercase font-bold text-slate-400 tracking-wider mb-3">
-            Game High Scores
-          </h3>
-          <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
-            {GAMES_CATALOG.map(game => {
-              const stat = profile.gameStats[game.id];
-              const score = stat?.highScore || 0;
-              const plays = stat?.timesPlayed || 0;
+          {/* Game High Scores Leaderboard */}
+          <div className="space-y-3">
+            <h4 className="text-xs uppercase font-mono font-bold text-cyan-400 tracking-wider">
+              Local High Scores
+            </h4>
+            <div className="space-y-2">
+              {GAMES_CATALOG.map((game) => {
+                const stat = profile.gameStats[game.id];
+                const best = stat?.highScore || 0;
+                const plays = stat?.plays || 0;
 
-              return (
-                <div
-                  key={game.id}
-                  className="flex items-center justify-between p-3 bg-slate-900/50 hover:bg-slate-900 border border-slate-800/60 rounded-xl transition"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-lg">🎮</span>
+                return (
+                  <div
+                    key={game.id}
+                    className="p-3 rounded-2xl bg-slate-950/40 border border-slate-800/80 flex items-center justify-between"
+                  >
                     <div>
-                      <span className="text-xs font-bold text-slate-200 block">{game.title}</span>
-                      <span className="text-[10px] text-slate-500">{plays} session(s) played</span>
+                      <p className="text-xs font-bold text-slate-200">{game.title}</p>
+                      <p className="text-[10px] text-slate-500 font-mono">Plays: {plays}</p>
                     </div>
+                    <span className="text-xs font-mono font-bold text-amber-400">
+                      {best > 0 ? best.toLocaleString() : '—'}
+                    </span>
                   </div>
-                  <span className="text-sm font-bold font-mono text-amber-400">{score}</span>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Footer Backup & Reset Controls */}
-        <div className="pt-4 border-t border-slate-800 space-y-3">
-          <div className="grid grid-cols-2 gap-2">
+        {/* Data Portability & Storage Controls */}
+        <div className="pt-6 border-t border-slate-800 space-y-3">
+          <div className="flex items-center gap-2">
             <button
-              onClick={exportSaveData}
-              className="flex items-center justify-center gap-1.5 py-2.5 bg-slate-900 hover:bg-slate-850 text-slate-200 border border-slate-800 text-xs font-bold rounded-xl transition"
+              onClick={handleExportData}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition"
             >
-              <Download className="w-3.5 h-3.5" /> Backup Data
+              <Download className="w-4 h-4 text-cyan-400" />
+              <span>Export Save Data</span>
             </button>
-            <label className="flex items-center justify-center gap-1.5 py-2.5 bg-slate-900 hover:bg-slate-850 text-slate-200 border border-slate-800 text-xs font-bold rounded-xl transition cursor-pointer">
-              <Upload className="w-3.5 h-3.5" /> Restore
-              <input type="file" accept=".json" onChange={importSaveData} className="hidden" />
-            </label>
+
+            <button
+              onClick={handleClearData}
+              className="p-2.5 rounded-xl bg-rose-950/40 border border-rose-900/60 hover:bg-rose-900/50 text-rose-400 transition"
+              title="Reset All High Scores"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
           </div>
 
-          <button
-            onClick={() => {
-              if (confirm('Are you sure you want to reset all your local high scores and stats?')) {
-                onResetData();
-              }
-            }}
-            className="w-full flex items-center justify-center gap-1.5 py-2 text-rose-400 hover:bg-rose-500/10 text-xs font-bold rounded-xl transition"
-          >
-            <Trash2 className="w-3.5 h-3.5" /> Reset Local High Scores
-          </button>
+          <p className="text-[10px] text-slate-500 text-center font-mono">
+            Zero telemetry. Zero cookies. Privacy by design.
+          </p>
         </div>
       </div>
     </div>

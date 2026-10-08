@@ -1,28 +1,57 @@
-export type GameCategory = 'all' | 'arcade' | 'puzzle' | 'retro' | 'action' | 'strategy';
+export type GameCategory = 'all' | 'arcade' | 'puzzle' | 'retro' | 'action' | 'strategy' | 'word';
+
+export interface GameFAQ {
+  question: string;
+  answer: string;
+}
+
+export interface GameControls {
+  keyboard?: string | string[];
+  touch?: string | string[];
+  mobile?: string | string[];
+  desktop?: string | string[];
+}
 
 export interface GameItem {
   id: string;
+  slug: string;
   title: string;
-  category: 'arcade' | 'puzzle' | 'retro' | 'action' | 'strategy';
+  category: 'arcade' | 'puzzle' | 'retro' | 'action' | 'strategy' | 'word';
   description: string;
-  tags: string[];
-  thumbnailGradient: string;
-  iconName: string;
+  longDescription?: string;
+  howToPlay?: string[];
+  tips?: string[];
+  faqs?: GameFAQ[];
+  controls: GameControls;
+  thumbnailGradient?: string;
+  gradient?: string;
+  accentColor?: string;
+  icon?: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard' | 'Adaptive';
+  playCount?: number;
+  plays?: number;
   rating: number;
-  plays: number;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  controls: {
-    keyboard: string[];
-    touch: string;
-  };
+  reviewCount?: number;
+  releaseDate?: string;
+  tags: string[];
+  badge?: string;
+  isFeatured?: boolean;
 }
 
 export interface GameStats {
+  plays: number;
   highScore: number;
-  timesPlayed: number;
-  totalPlayTimeSeconds: number;
-  lastPlayed?: string;
-  favorite: boolean;
+  lastPlayed: string;
+  totalTimeSeconds: number;
+}
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  unlocked: boolean;
+  unlockedAt?: string;
 }
 
 export interface PlayerProfile {
@@ -30,5 +59,6 @@ export interface PlayerProfile {
   favoriteGames: string[];
   recentGames: string[];
   gameStats: Record<string, GameStats>;
+  achievements: Achievement[];
   soundEnabled: boolean;
 }

@@ -1,90 +1,132 @@
 import React from 'react';
-import { Volume2, VolumeX, Sparkles, Trophy, Gamepad2, BarChart3, Heart } from 'lucide-react';
+import { Volume2, VolumeX, Sparkles, Trophy, Gamepad2, BarChart3, Heart, Award } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 
 interface HeaderProps {
   soundEnabled: boolean;
   onToggleSound: () => void;
   onOpenStats: () => void;
+  onOpenAchievements: () => void;
   showFavoritesOnly: boolean;
-  onToggleFavoritesOnly: () => void;
-  favoritesCount: number;
+  onToggleFavorites: () => void;
+  favoriteCount: number;
+  unlockedAchievementsCount: number;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   soundEnabled,
   onToggleSound,
   onOpenStats,
+  onOpenAchievements,
   showFavoritesOnly,
-  onToggleFavoritesOnly,
-  favoritesCount,
+  onToggleFavorites,
+  favoriteCount,
+  unlockedAchievementsCount,
 }) => {
   return (
-    <header className="sticky top-0 z-30 w-full bg-slate-950/85 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3.5 transition-all">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80 transition-all">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand Logo */}
-        <div className="flex items-center gap-3 cursor-pointer group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-pink-500 p-0.5 shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-all duration-300">
-            <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-              <Gamepad2 className="w-5 h-5 text-cyan-400 group-hover:scale-110 transition-transform" />
-            </div>
+        <a
+          href="/"
+          onClick={(e) => {
+            if (window.location.search) {
+              e.preventDefault();
+              window.history.pushState({}, '', window.location.pathname);
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }
+          }}
+          className="flex items-center gap-3 group cursor-pointer"
+        >
+          <div className="relative p-2.5 rounded-2xl bg-gradient-to-br from-cyan-500 via-blue-600 to-indigo-600 text-slate-950 shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition duration-300">
+            <Gamepad2 className="w-5 h-5 fill-current" />
+            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-400"></span>
+            </span>
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-black tracking-tight font-display text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-300 to-pink-400">
+            <div className="flex items-center gap-1.5">
+              <span className="font-extrabold text-lg sm:text-xl tracking-wider bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400 bg-clip-text text-transparent">
                 ARCADEX
-              </h1>
-              <span className="px-1.5 py-0.5 text-[10px] font-extrabold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-md">
-                NO LOGIN
+              </span>
+              <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800/50 font-bold">
+                PRO
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 font-medium hidden sm:block">
-              Zero Server Compute • 100% Client-Side Games
-            </p>
+            <p className="text-[10px] text-slate-400 hidden sm:block">0% Server Compute • 100% Client Arcade</p>
           </div>
-        </div>
+        </a>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
           {/* Favorites Filter */}
           <button
-            onClick={onToggleFavoritesOnly}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition ${
+            onClick={() => {
+              sounds.playClick();
+              onToggleFavorites();
+            }}
+            title="Toggle Favorites"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
               showFavoritesOnly
-                ? 'bg-rose-500/20 border-rose-500/40 text-rose-400'
-                : 'bg-slate-900/80 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white'
+                ? 'bg-rose-500/20 border-rose-500/50 text-rose-400 shadow-lg shadow-rose-500/20'
+                : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-850'
             }`}
-            title="Show Favorites"
           >
-            <Heart className={`w-3.5 h-3.5 ${showFavoritesOnly ? 'fill-rose-500 text-rose-500' : ''}`} />
+            <Heart className={`w-4 h-4 ${showFavoritesOnly ? 'fill-rose-500 text-rose-500' : ''}`} />
             <span className="hidden md:inline">Favorites</span>
-            {favoritesCount > 0 && (
-              <span className="px-1.5 py-0.2 bg-rose-500 text-slate-950 text-[10px] font-black rounded-full">
-                {favoritesCount}
+            {favoriteCount > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-950 text-rose-300 border border-rose-800">
+                {favoriteCount}
               </span>
             )}
           </button>
 
-          {/* Sound Synthesizer Toggle */}
+          {/* Achievements Button */}
           <button
-            onClick={onToggleSound}
-            className={`p-2 rounded-lg border transition ${
-              soundEnabled
-                ? 'bg-slate-900/80 border-slate-800 text-cyan-400 hover:bg-slate-800'
-                : 'bg-slate-900/80 border-slate-800 text-slate-500 hover:bg-slate-800'
-            }`}
-            title={soundEnabled ? 'Mute 8-Bit Audio' : 'Unmute 8-Bit Audio'}
+            onClick={() => {
+              sounds.playClick();
+              onOpenAchievements();
+            }}
+            title="Arcade Badges & Achievements"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 border border-slate-800 text-amber-400 hover:text-amber-300 hover:bg-slate-850 transition-all"
           >
-            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+            <Award className="w-4 h-4" />
+            <span className="hidden md:inline">Badges</span>
+            {unlockedAchievementsCount > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-950 text-amber-300 border border-amber-800">
+                {unlockedAchievementsCount}
+              </span>
+            )}
           </button>
 
-          {/* Stats & Highscores Drawer Trigger */}
+          {/* Stats Button */}
           <button
-            onClick={onOpenStats}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 text-xs font-bold rounded-lg shadow-md shadow-cyan-500/20 transition active:scale-95"
+            onClick={() => {
+              sounds.playClick();
+              onOpenStats();
+            }}
+            title="Player Stats & Records"
+            className="p-2 sm:px-3 sm:py-1.5 rounded-xl text-xs font-semibold bg-slate-900 border border-slate-800 text-cyan-400 hover:text-cyan-300 hover:bg-slate-850 transition-all flex items-center gap-1.5"
           >
-            <BarChart3 className="w-3.5 h-3.5" />
-            <span>My Stats</span>
+            <BarChart3 className="w-4 h-4" />
+            <span className="hidden md:inline">Stats</span>
+          </button>
+
+          {/* Audio Synthesizer Toggle */}
+          <button
+            onClick={() => {
+              sounds.playClick();
+              onToggleSound();
+            }}
+            title={soundEnabled ? 'Mute Procedural Web Audio' : 'Enable Procedural Web Audio'}
+            className={`p-2 rounded-xl border transition-all ${
+              soundEnabled
+                ? 'bg-cyan-950/40 border-cyan-800/60 text-cyan-400 hover:bg-cyan-900/50'
+                : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-400'
+            }`}
+          >
+            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
           </button>
         </div>
       </div>

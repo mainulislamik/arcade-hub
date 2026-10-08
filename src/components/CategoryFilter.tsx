@@ -1,48 +1,49 @@
 import React from 'react';
 import { GameCategory } from '../types/game';
-import { LayoutGrid, Zap, Puzzle, Gamepad2, Swords, ShieldAlert } from 'lucide-react';
+import { LayoutGrid, Zap, Puzzle, Gamepad2, Swords, ShieldAlert, BookOpen, Compass } from 'lucide-react';
 
 interface CategoryFilterProps {
   selectedCategory: GameCategory;
-  onSelectCategory: (cat: GameCategory) => void;
-  counts: Record<GameCategory, number>;
+  onSelectCategory: (category: GameCategory) => void;
+  categoryCounts: Record<GameCategory, number>;
 }
-
-const CATEGORIES: { id: GameCategory; label: string; icon: React.ReactNode }[] = [
-  { id: 'all', label: 'All Games', icon: <LayoutGrid className="w-4 h-4" /> },
-  { id: 'arcade', label: 'Arcade', icon: <Gamepad2 className="w-4 h-4" /> },
-  { id: 'retro', label: 'Retro 8-Bit', icon: <Zap className="w-4 h-4" /> },
-  { id: 'puzzle', label: 'Puzzle & Mind', icon: <Puzzle className="w-4 h-4" /> },
-  { id: 'action', label: 'Action Shooter', icon: <Swords className="w-4 h-4" /> },
-  { id: 'strategy', label: 'Strategy', icon: <ShieldAlert className="w-4 h-4" /> },
-];
 
 export const CategoryFilter: React.FC<CategoryFilterProps> = ({
   selectedCategory,
   onSelectCategory,
-  counts,
+  categoryCounts,
 }) => {
+  const categories: { id: GameCategory; label: string; icon: React.ReactNode }[] = [
+    { id: 'all', label: 'All Games', icon: <LayoutGrid className="w-4 h-4" /> },
+    { id: 'arcade', label: 'Arcade', icon: <Gamepad2 className="w-4 h-4" /> },
+    { id: 'puzzle', label: 'Puzzle', icon: <Puzzle className="w-4 h-4" /> },
+    { id: 'retro', label: 'Retro', icon: <Zap className="w-4 h-4" /> },
+    { id: 'action', label: 'Action', icon: <Swords className="w-4 h-4" /> },
+    { id: 'strategy', label: 'Strategy', icon: <ShieldAlert className="w-4 h-4" /> },
+    { id: 'word', label: 'Word Games', icon: <BookOpen className="w-4 h-4" /> },
+  ];
+
   return (
-    <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-      {CATEGORIES.map(cat => {
+    <div className="flex items-center gap-2 overflow-x-auto py-2 px-1 scrollbar-none select-none max-w-full">
+      {categories.map((cat) => {
         const isSelected = selectedCategory === cat.id;
-        const count = counts[cat.id] || 0;
+        const count = categoryCounts[cat.id] || 0;
 
         return (
           <button
             key={cat.id}
             onClick={() => onSelectCategory(cat.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 border ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 border ${
               isSelected
-                ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-cyan-500/50 text-cyan-300 shadow-md shadow-cyan-500/10'
-                : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:bg-slate-850 hover:text-slate-200'
+                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 border-cyan-400 shadow-lg shadow-cyan-500/25 scale-[1.02]'
+                : 'bg-slate-900/80 hover:bg-slate-800/90 text-slate-300 hover:text-white border-slate-800'
             }`}
           >
-            {cat.icon}
+            <span className={isSelected ? 'text-slate-950' : 'text-cyan-400'}>{cat.icon}</span>
             <span>{cat.label}</span>
             <span
-              className={`px-1.5 py-0.5 text-[10px] rounded-full font-mono ${
-                isSelected ? 'bg-cyan-500 text-slate-950 font-extrabold' : 'bg-slate-800 text-slate-400'
+              className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                isSelected ? 'bg-slate-950/30 text-slate-950' : 'bg-slate-800 text-slate-400'
               }`}
             >
               {count}

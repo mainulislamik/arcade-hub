@@ -1,100 +1,112 @@
 import React from 'react';
 import { GameItem, GameStats } from '../types/game';
-import { Play, Trophy, Heart, Star, Flame } from 'lucide-react';
+import { Play, Trophy, Heart, Star, Flame, Sparkles } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 
 interface GameCardProps {
   game: GameItem;
   stats?: GameStats;
   isFavorite: boolean;
-  onPlay: (game: GameItem) => void;
-  onToggleFavorite: (gameId: string, e: React.MouseEvent) => void;
+  onSelect?: (game: GameItem) => void;
+  onPlay?: (game: GameItem) => void;
+  onToggleFavorite: (gameId: string) => void;
 }
 
 export const GameCard: React.FC<GameCardProps> = ({
   game,
   stats,
   isFavorite,
+  onSelect,
   onPlay,
   onToggleFavorite,
 }) => {
+  const handleCardClick = () => {
+    sounds.playClick();
+    if (onSelect) onSelect(game);
+    else if (onPlay) onPlay(game);
+  };
+
   return (
     <div
-      onClick={() => {
-        sounds.playClick();
-        onPlay(game);
-      }}
-      className="group relative bg-slate-900/70 hover:bg-slate-900 border border-slate-800 hover:border-slate-700/80 rounded-2xl p-3.5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-cyan-950/30 cursor-pointer overflow-hidden"
+      onClick={handleCardClick}
+      className="group relative rounded-3xl bg-slate-900 border border-slate-800 hover:border-cyan-500/50 p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-cyan-950/40 flex flex-col justify-between cursor-pointer overflow-hidden"
     >
-      {/* Thumbnail Banner with Gradient */}
-      <div
-        className={`relative w-full h-36 rounded-xl bg-gradient-to-tr ${game.thumbnailGradient} p-3 flex flex-col justify-between overflow-hidden shadow-inner group-hover:scale-[1.02] transition-transform duration-300`}
-      >
-        {/* Background glow overlay */}
-        <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]" />
+      {/* Top Banner & Badges */}
+      <div>
+        <div
+          className={`h-36 rounded-2xl bg-gradient-to-br ${game.thumbnailGradient} p-4 flex flex-col justify-between relative overflow-hidden shadow-inner`}
+        >
+          <div className="flex items-center justify-between z-10">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-slate-950/70 text-cyan-300 backdrop-blur border border-white/10">
+              {game.category}
+            </span>
 
-        {/* Top Badges */}
-        <div className="relative z-10 flex items-center justify-between">
-          <span className="px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-black/40 backdrop-blur-md text-white border border-white/15 rounded-lg">
-            {game.category}
-          </span>
-          <button
-            onClick={e => onToggleFavorite(game.id, e)}
-            className="p-1.5 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md text-white transition active:scale-90"
-            title="Favorite"
-          >
-            <Heart className={`w-3.5 h-3.5 ${isFavorite ? 'fill-rose-500 text-rose-500' : 'text-white'}`} />
-          </button>
-        </div>
-
-        {/* Play Overlay Button */}
-        <div className="relative z-10 flex items-center justify-center">
-          <div className="w-12 h-12 rounded-full bg-white/95 text-slate-950 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-cyan-400 transition-all duration-300">
-            <Play className="w-5 h-5 fill-current ml-0.5" />
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                sounds.playClick();
+                onToggleFavorite(game.id);
+              }}
+              title="Add to Favorites"
+              className={`p-2 rounded-xl backdrop-blur transition ${
+                isFavorite
+                  ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30'
+                  : 'bg-slate-950/60 text-white/80 hover:text-white hover:bg-slate-950/90'
+              }`}
+            >
+              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+            </button>
           </div>
-        </div>
 
-        {/* Bottom Stats Badge */}
-        <div className="relative z-10 flex items-center justify-between text-[11px] font-bold text-white/90">
-          <span className="flex items-center gap-1 bg-black/30 backdrop-blur-md px-2 py-0.5 rounded-md">
-            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-            {game.rating}
-          </span>
-          <span className="bg-black/30 backdrop-blur-md px-2 py-0.5 rounded-md font-mono">
-            {game.difficulty}
-          </span>
-        </div>
-      </div>
+          <div className="z-10 flex items-end justify-between">
+            <div className="flex items-center gap-1.5 text-xs text-amber-300 font-bold bg-slate-950/70 px-2.5 py-1 rounded-xl backdrop-blur border border-amber-500/20">
+              <Star className="w-3.5 h-3.5 fill-current" />
+              <span>{game.rating.toFixed(1)}</span>
+            </div>
 
-      {/* Info Section */}
-      <div className="mt-3 flex-1 flex flex-col justify-between">
-        <div>
-          <div className="flex items-center justify-between gap-1 mb-1">
-            <h3 className="font-bold text-slate-100 font-display text-base group-hover:text-cyan-400 transition-colors line-clamp-1">
-              {game.title}
-            </h3>
+            {game.isFeatured && (
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 backdrop-blur">
+                <Flame className="w-3 h-3 text-amber-400" /> Featured
+              </span>
+            )}
           </div>
-          <p className="text-slate-400 text-xs line-clamp-2 mb-3 leading-relaxed">
+
+          {/* Background Ambient Glow */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+        </div>
+
+        {/* Title & Description */}
+        <div className="mt-3.5 space-y-1.5">
+          <h3 className="text-base font-bold text-white group-hover:text-cyan-300 transition flex items-center justify-between">
+            <span>{game.title}</span>
+          </h3>
+          <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
             {game.description}
           </p>
         </div>
+      </div>
 
-        {/* Highscore & Play Button Footer */}
-        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <Trophy className="w-3.5 h-3.5 text-amber-400" />
-            <div className="flex flex-col">
-              <span className="text-[9px] uppercase font-bold text-slate-500 leading-none">HIGH SCORE</span>
-              <span className="text-xs font-mono font-bold text-amber-400 leading-tight">
-                {stats?.highScore ?? 0}
-              </span>
-            </div>
+      {/* Footer Details */}
+      <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+        {stats && stats.highScore > 0 ? (
+          <div className="flex items-center gap-1.5 text-amber-400 font-mono text-xs">
+            <Trophy className="w-3.5 h-3.5" />
+            <span>Best: {stats.highScore.toLocaleString()}</span>
           </div>
+        ) : (
+          <span className="text-slate-500 text-[11px] font-mono">Difficulty: {game.difficulty}</span>
+        )}
 
-          <span className="text-[11px] font-bold text-cyan-400 group-hover:underline flex items-center gap-1">
-            Play Now →
-          </span>
-        </div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleCardClick();
+          }}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition group-hover:shadow-lg group-hover:shadow-cyan-500/25"
+        >
+          <Play className="w-3.5 h-3.5 fill-current" />
+          <span>Play</span>
+        </button>
       </div>
     </div>
   );

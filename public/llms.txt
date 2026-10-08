@@ -1,0 +1,28 @@
+# Arcadex — 100% Free Client-Side Web Arcade Games Platform
+
+> Arcadex is a modern web arcade featuring 15 interactive HTML5 games with zero-login, instant play, Web Audio sound synthesis, and 100% client-side execution (0% server compute).
+
+## Platform Features
+- **Zero Server Compute:** Game physics, collision detection, and procedural audio run entirely inside the player's web browser using HTML5 Canvas, WebGL, and Web Audio API.
+- **No Sign-Up or Authentication Required:** Instant guest play with local persistent high scores, statistics, and achievement tracking via LocalStorage.
+- **Device Support:** Fully optimized for desktop keyboard/mouse and mobile touch gestures (swipe, tap, on-screen D-pads).
+- **Offline & Low Latency:** Zero external sound asset downloads; instant sub-millisecond response times.
+
+## Games Catalog & Rules
+- [Retro Snake 2.0](http://localhost:3080/?game=snake): Classic arcade snake with power-ups, speed boosts, and particle effects.
+- [2048 Master](http://localhost:3080/?game=2048): Sliding tile numerical puzzle with move undo and smooth merges.
+- [Galaxy Defender](http://localhost:3080/?game=galaxy-defender): Fast-paced arcade space shooter with shields, alien waves, and particle explosions.
+- [Word Quest](http://localhost:3080/?game=word-quest): 5-letter daily and unlimited vocabulary word guess with color hints.
+- [Asteroid Blaster](http://localhost:3080/?game=asteroid-blaster): 360-degree vector space combat with inertia physics and asteroid splitting.
+- [Cyber Sudoku](http://localhost:3080/?game=sudoku): 9x9 logic grid with candidate note-taking, error validation, and multi-difficulty modes.
+- [Flappy Cyber Bird](http://localhost:3080/?game=flappy-bird): Physics tap-to-fly obstacle arcade with highscore medal tiers.
+- [Neon Breakout](http://localhost:3080/?game=breakout): Brick-breaker game with angle deflection physics and destructive neon bricks.
+- [Tetra Block Drop](http://localhost:3080/?game=tetris): 7-tetromino falling block matrix with ghost piece drop and line clears.
+- [Connect 4 Cyber](http://localhost:3080/?game=connect-four): 7x6 four-in-a-row strategy game vs smart AI bot or 2-player local play.
+- [Neon Bubble Shooter](http://localhost:3080/?game=bubble-shooter): Match-3 cluster bubble cannon popper with physics wall bounces.
+- [Ultimate Tic-Tac-Toe](http://localhost:3080/?game=ultimate-tictactoe): 9-grid nested strategic board game with tactical territory control.
+- [Cyber Pac Runner](http://localhost:3080/?game=pac-maze): Maze runner with AI ghost bots, energizers, and score multipliers.
+- [Matrix Memory Flip](http://localhost:3080/?game=memory-flip): Cyber card pair matching with streak combos and memory training.
+- [Cyber Minesweeper](http://localhost:3080/?game=minesweeper): Safe first-click minefield sweeper with flag mode and auto-reveal.
+- [Neon Cyber Pong](http://localhost:3080/?game=cyber-pong): 1P vs AI or 2P local couch paddle sports with curving ball spin.
+- [Simon Cyber Echo](http://localhost:3080/?game=simon-echo): 4-color auditory and visual sequence memory repeater.
