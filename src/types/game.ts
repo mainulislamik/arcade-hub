@@ -15,6 +15,7 @@ export interface GameFAQ {
 export interface GameControls {
   keyboard?: string | string[];
   touch?: string | string[];
+  mouse?: string | string[];
   mobile?: string | string[];
   desktop?: string | string[];
 }
@@ -36,6 +37,8 @@ export interface GameItem {
   category: 'arcade' | 'puzzle' | 'retro' | 'action' | 'strategy' | 'word' | string;
   description: string;
   longDescription?: string;
+  instructions?: string;
+  aspectRatio?: '16:9' | '4:3' | '1:1' | '9:16' | string;
   howToPlay?: string[];
   tips?: string[];
   faqs?: GameFAQ[];
@@ -43,6 +46,10 @@ export interface GameItem {
   thumbnailGradient?: string;
   gradient?: string;
   accentColor?: string;
+  cover?: string;
+  thumbnailUrl?: string;
+  likes?: number;
+  featured?: boolean;
   icon?: string;
   difficulty: 'Easy' | 'Medium' | 'Hard' | 'Adaptive' | string;
   playCount?: number;

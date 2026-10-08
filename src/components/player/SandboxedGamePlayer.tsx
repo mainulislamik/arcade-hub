@@ -49,6 +49,10 @@ import { StickmanArcherGame } from '../games/StickmanArcherGame';
 import { StickmanRunnerGame } from '../games/StickmanRunnerGame';
 import { StickmanSniperGame } from '../games/StickmanSniperGame';
 import { StickmanWarriorsGame } from '../games/StickmanWarriorsGame';
+import { SubwaySurferGame } from '../games/SubwaySurferGame';
+import { TempleDashGame } from '../games/TempleDashGame';
+import { HillClimbGame } from '../games/HillClimbGame';
+import { FruitSlashGame } from '../games/FruitSlashGame';
 import { UniversalProceduralCore } from './UniversalProceduralCore';
 
 interface SandboxedGamePlayerProps {
@@ -182,6 +186,14 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
         return <StickmanSniperGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'stickman-warriors':
         return <StickmanWarriorsGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
+      case 'subway-surfer':
+        return <SubwaySurferGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
+      case 'temple-dash':
+        return <TempleDashGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
+      case 'hill-climb':
+        return <HillClimbGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
+      case 'fruit-slash':
+        return <FruitSlashGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       default:
         return (
           <UniversalProceduralCore
