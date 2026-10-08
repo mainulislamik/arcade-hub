@@ -44,6 +44,7 @@ import { CyberStackGame } from '../games/CyberStackGame';
 import { CyberDinoGame } from '../games/CyberDinoGame';
 import { SolitaireGame } from '../games/SolitaireGame';
 import { CyberChessGame } from '../games/CyberChessGame';
+import { UniversalProceduralCore } from './UniversalProceduralCore';
 
 interface SandboxedGamePlayerProps {
   game: GameItem;
@@ -167,7 +168,14 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
       case 'cyber-chess':
         return <CyberChessGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} />;
       default:
-        return <MechaBlaster2Game />;
+        return (
+          <UniversalProceduralCore
+            game={game}
+            soundEnabled={soundEnabled}
+            onScoreUpdate={onScoreUpdate}
+            onGameOver={onGameOver}
+          />
+        );
     }
   };
 

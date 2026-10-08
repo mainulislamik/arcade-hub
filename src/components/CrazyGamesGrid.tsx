@@ -37,6 +37,7 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
   selectedTag
 }) => {
   const [hoveredGameId, setHoveredGameId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState<number>(36);
 
   // Filter games based on category or tag
   let filteredGames = games;
@@ -47,6 +48,8 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
   } else if (activeCategory !== 'all') {
     filteredGames = games.filter(g => g.category === activeCategory);
   }
+
+  const displayedGames = filteredGames.slice(0, visibleCount);
 
   // Top featured game
   const featuredGame = games.find(g => g.id === 'mecha-blaster-2') || games[0];
@@ -226,10 +229,10 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
         <div className="flex items-center gap-2">
           <Gamepad2 className="w-5 h-5 text-indigo-600" />
           <h2 className="text-lg sm:text-xl font-black text-slate-900 capitalize">
-            {selectedTag ? `Games tagged #${selectedTag}` : activeCategory === 'all' ? 'All Free Games' : `${activeCategory} Games`}
+            {selectedTag ? `Games tagged #${selectedTag}` : activeCategory === 'all' ? 'All Free Open-Source Games' : `${activeCategory} Games`}
           </h2>
-          <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
-            {filteredGames.length}
+          <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">
+            Showing {Math.min(displayedGames.length, filteredGames.length)} of {filteredGames.length}
           </span>
         </div>
       </div>
@@ -246,9 +249,30 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
-          {filteredGames.map(game => renderGameCard(game))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+            {displayedGames.map(game => renderGameCard(game))}
+          </div>
+
+          {/* Load More Button */}
+          {visibleCount < filteredGames.length && (
+            <div className="flex flex-col items-center justify-center pt-6 pb-2 gap-2">
+              <button
+                onClick={() => {
+                  sounds.playClick();
+                  setVisibleCount(prev => prev + 36);
+                }}
+                className="px-8 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-black text-sm uppercase tracking-wider shadow-lg shadow-indigo-500/25 flex items-center gap-2 transition-all"
+              >
+                <Zap className="w-4 h-4 fill-white" />
+                Load More Open-Source Games (+36)
+              </button>
+              <span className="text-xs text-slate-400 font-medium">
+                {filteredGames.length - visibleCount} more games ready in client cache
+              </span>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

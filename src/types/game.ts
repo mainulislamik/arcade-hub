@@ -33,7 +33,7 @@ export interface GameItem {
   id: string;
   slug: string;
   title: string;
-  category: 'arcade' | 'puzzle' | 'retro' | 'action' | 'strategy' | 'word';
+  category: 'arcade' | 'puzzle' | 'retro' | 'action' | 'strategy' | 'word' | string;
   description: string;
   longDescription?: string;
   howToPlay?: string[];
@@ -44,7 +44,7 @@ export interface GameItem {
   gradient?: string;
   accentColor?: string;
   icon?: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard' | 'Adaptive';
+  difficulty: 'Easy' | 'Medium' | 'Hard' | 'Adaptive' | string;
   playCount?: number;
   plays?: number;
   rating: number;
@@ -62,7 +62,7 @@ export interface GameItem {
   binaryUrl?: string;
   fileSizeMb?: number;
   emulatorConfig?: EmulatorConfig;
-  licenseType?: 'Freeware' | 'Homebrew' | 'MIT' | 'BSD' | 'Apache-2.0' | 'GPL' | 'Public Domain' | 'Arcadex Original' | 'Indie Authorized' | 'MIT Open-Source Engine' | 'BSD/MIT Open-Source Engine' | string;
+  licenseType?: string;
   developer?: string;
   developerWebsite?: string;
   downloadCount?: number;
