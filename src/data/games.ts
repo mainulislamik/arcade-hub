@@ -6,19 +6,20 @@ export const GAMES_CATALOG: GameItem[] = [
     slug: 'mecha-blaster-2',
     title: 'Mecha Blaster 2: Cyber Assault',
     category: 'action',
-    description: 'Retro Symbian-inspired top-down mech combat. Pilot an armored titan with 360° aim, homing missiles, and boss battles.',
-    longDescription: 'Mecha Blaster 2: Cyber Assault delivers adrenaline-pumping retro mech combat inspired by classic mobile mech shooters. Command an armored walking titan across hazardous futuristic battlefields. Blast through swarms of robotic scout drones, crawling spider mechs, and heavy tanks. Upgrade your arsenal from dual vulcan gatling guns to triple plasma cannons and quad hyper lasers, launch homing swarm missiles, trigger tactical EMP nukes, and defeat colossal multi-phase mech titans with zero lag in your browser.',
+    description: 'Faithful Symbian S60 retro top-down tank & mech combat. 6 story campaign missions, independent turret aim, homing rockets, and colossal boss titans.',
+    longDescription: 'Mecha Blaster 2: Cyber Assault is a faithful client-side recreation of the legendary Symbian mobile classic top-down mechanized combat shooter. Take command of an armored heavy battle tank with independent 360° rotating turret, twin MG88 autocannons, guided rocket salvos, plasma blasters, and tactical EMP shockwave bombs. Battle across all 6 authentic campaign parts — Encounter, Rescue, Sudden Strike, Assault, Sacrifice, and Victory — against enemy foot soldiers, RPG rocket boys, armored tanks, bipedal Cricket and Ostrich mechs, and colossal boss titans (TURTLE-011 Fortress Tank, HIPPO-023 Heavy Behemoth, and MANTIS-Omega Dreadnought) with 100% zero server lag.',
     howToPlay: [
-      'Use WASD or Arrow Keys to maneuver your combat mech in 8 directions.',
-      'Aim with your mouse or right joystick; click/hold to fire your primary vulcan cannons.',
-      'Press Spacebar to launch homing swarm missiles against enemy clusters.',
-      'Press Shift to activate your directional thruster dash and dodge bullet storms.',
-      'Collect glowing power-ups: ⚡ Weapon Overdrive, 🛡️ Shield Battery, 🚀 Missile Packs, and 💣 Tactical Nuke EMPs.',
-      'Survive relentless enemy waves and eliminate mega titan bosses every 3 waves.'
+      'Use WASD or Arrow Keys to steer your tank chassis in 8 directions.',
+      'Aim 360° with your mouse or right joystick; click or press 1 / Space to fire twin MG88 autocannons.',
+      'Press 2 or Right Click to launch lock-on homing swarm missiles.',
+      'Press 3 for heavy armor-piercing combat plasma blaster shots.',
+      'Press B or E (or click on-screen button) to unleash an EMP Shockwave Bomb that clears all enemy bullets.',
+      'Press Shift to engage emergency thruster dash and dodge heavy tank shells.',
+      'Conquer all 6 story campaign parts and defeat the three legendary Boss Titans.'
     ],
     controls: {
-      desktop: 'WASD/Arrows to Move, Mouse to Aim & Fire, Space for Missiles, Shift for Dash',
-      mobile: 'Dual touch controls, on-screen Missile and Dash buttons'
+      desktop: 'WASD/Arrows to Drive, Mouse to Aim & Shoot, 1/2/3 for Weapons, B/E for EMP Bomb, Shift for Dash',
+      mobile: 'Dual on-screen joysticks (drive + aim/fire), weapon switch buttons, EMP and Dash shortcuts'
     },
     tips: [
       'Keep moving constantly to prevent swarm drones and heavy tank shells from surrounding you.',

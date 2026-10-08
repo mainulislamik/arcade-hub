@@ -78,6 +78,14 @@ class SoundEngine {
     this.playMove();
   }
 
+  public playShoot() {
+    this.playBeep(900, 'sawtooth', 0.06, 0.1);
+  }
+
+  public shoot() {
+    this.playShoot();
+  }
+
   public playCoin() {
     if (!this.enabled) return;
     try {
@@ -160,6 +168,22 @@ class SoundEngine {
 
   public pop() {
     this.playPop();
+  }
+
+  public playClear() {
+    this.playBeep(880, 'triangle', 0.15, 0.12);
+  }
+
+  public clear() {
+    this.playClear();
+  }
+
+  public playFall() {
+    this.playBeep(220, 'sawtooth', 0.25, 0.12);
+  }
+
+  public fall() {
+    this.playFall();
   }
 
   public playLaser() {
