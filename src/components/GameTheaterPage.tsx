@@ -26,7 +26,9 @@ import {
   Users,
   Tv,
   Smartphone,
-  Monitor
+  Monitor,
+  Save,
+  Film
 } from 'lucide-react';
 import { GameItem } from '../types/game';
 import { sounds } from '../utils/soundEngine';
@@ -36,6 +38,13 @@ import { AmbientBacklight } from './player/AmbientBacklight';
 import { RetroShaderOverlay, ShaderPreset } from './player/RetroShaderOverlay';
 import { SpeedrunTimer } from './player/SpeedrunTimer';
 import { MultiplayerLobbyModal } from './multiplayer/MultiplayerLobbyModal';
+import { SaveStateQuickHUD } from './player/SaveStateQuickHUD';
+import { ReplayExportModal } from './player/ReplayExportModal';
+import { AchievementNotification } from './player/AchievementNotification';
+import { AchievementEngine } from '../utils/achievementEngine';
+import { ReplayRecorder } from '../utils/replayRecorder';
+import { SaveStateManager } from '../utils/saveStateManager';
+import { HapticEngine } from '../utils/hapticEngine';
 import { WebRTCPeerEngine } from '../utils/webrtcMultiplayer';
 import { TRANSLATIONS, LanguageCode } from '../utils/i18n';
 import { recordQuestAction } from '../utils/gamification';
@@ -82,21 +91,27 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
   
   // Advanced features state
   const [ambientGlowEnabled, setAmbientGlowEnabled] = useState(true);
+  const [arcadeCabinetMode, setArcadeCabinetMode] = useState(false);
   const [aspectRatio, setAspectRatio] = useState<'auto' | '16:9' | '4:3' | '3:4' | '9:16' | 'fill'>('auto');
   const [shaderPreset, setShaderPreset] = useState<ShaderPreset>('none');
   const [showMultiplayerModal, setShowMultiplayerModal] = useState(false);
   const [showInterstitial, setShowInterstitial] = useState(false);
+  const [showSaveStateHUD, setShowSaveStateHUD] = useState(false);
+  const [showReplayModal, setShowReplayModal] = useState(false);
+  const [replayBlob, setReplayBlob] = useState<Blob | null>(null);
   const [activePeerEngine, setActivePeerEngine] = useState<WebRTCPeerEngine | null>(null);
   const [peerRole, setPeerRole] = useState<'host' | 'guest' | null>(null);
   const [snapshotTaken, setSnapshotTaken] = useState(false);
 
   const theaterContainerRef = useRef<HTMLDivElement>(null);
+  const replayRecorderRef = useRef<ReplayRecorder>(new ReplayRecorder());
   const gamepad = useGamepad();
 
-  // Scroll to top, record daily quest play action & session timer
+  // Scroll to top, record daily quest play action, unlock trophy & session timer
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     recordQuestAction('play', 1);
+    AchievementEngine.unlockTrophy('first_blood');
 
     const startTime = Date.now();
     return () => {
@@ -104,8 +119,71 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
       if (durationSeconds > 5) {
         recordPlayDuration(game.id, durationSeconds);
       }
+      if (durationSeconds > 300) {
+        AchievementEngine.unlockTrophy('speed_demon');
+      }
     };
   }, [game.id]);
+
+  // Handle global F1 (Save), F3 (Load), \ (Rewind) hotkeys
+  useEffect(() => {
+    const handleKeyDown = async (e: KeyboardEvent) => {
+      if (e.key === 'F1') {
+        e.preventDefault();
+        sounds.playPowerup();
+        HapticEngine.bounceImpulse();
+        const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+        await SaveStateManager.saveSlot(1, game.id, game.title, currentScore, 1, { score: currentScore }, canvas);
+      } else if (e.key === 'F3') {
+        e.preventDefault();
+        const slot = SaveStateManager.getSlot(1, game.id);
+        if (slot) {
+          sounds.playPowerup();
+          HapticEngine.victoryFanfare();
+          setCurrentScore(slot.score);
+        }
+      } else if (e.key === '\\') {
+        e.preventDefault();
+        sounds.playPowerup();
+        HapticEngine.bounceImpulse();
+        AchievementEngine.unlockTrophy('rewind_master');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [game.id, game.title, currentScore]);
+
+  // Score tracking for achievement
+  useEffect(() => {
+    if (currentScore >= 1000) {
+      AchievementEngine.unlockTrophy('bounce_veteran');
+    }
+  }, [currentScore]);
+
+  const handleExportReplay = async () => {
+    sounds.playClick();
+    HapticEngine.lightTick();
+    const canvas = document.querySelector('canvas');
+    if (!canvas) return;
+
+    if (!replayRecorderRef.current.isCurrentlyRecording()) {
+      replayRecorderRef.current.start(canvas);
+      setTimeout(async () => {
+        const blob = await replayRecorderRef.current.stopAndGetClip();
+        if (blob) {
+          setReplayBlob(blob);
+          setShowReplayModal(true);
+        }
+      }, 3000);
+    } else {
+      const blob = await replayRecorderRef.current.stopAndGetClip();
+      if (blob) {
+        setReplayBlob(blob);
+        setShowReplayModal(true);
+      }
+    }
+  };
 
   const handleVote = (type: 'like' | 'dislike') => {
     sounds.playClick();
@@ -410,6 +488,39 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
               title="Add to Favorites"
             >
               <Heart className={`w-4 h-4 ${isFavorite ? 'fill-rose-500' : ''}`} />
+            </button>
+
+            {/* Save State & Rewind Vault */}
+            <button
+              onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setShowSaveStateHUD(true); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
+              title="Quick Save (F1) / Load (F3) / Rewind (\)"
+            >
+              <Save className="w-3.5 h-3.5" />
+              <span>Save/Load</span>
+            </button>
+
+            {/* Instant 30s Replay Clip */}
+            <button
+              onClick={handleExportReplay}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
+              title="Record & Export 30-Second Replay Video"
+            >
+              <Film className="w-3.5 h-3.5" />
+              <span>30s Clip</span>
+            </button>
+
+            {/* 3D Arcade Cabinet Mode Toggle */}
+            <button
+              onClick={() => { sounds.playClick(); setArcadeCabinetMode(!arcadeCabinetMode); }}
+              className={`p-2 rounded-xl transition-all border ${
+                arcadeCabinetMode 
+                  ? 'bg-purple-100 text-purple-700 border-purple-300 shadow-sm' 
+                  : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+              }`}
+              title="Toggle 3D Retro Arcade Cabinet Mode"
+            >
+              <Tv className="w-4 h-4" />
             </button>
 
             {/* Sound Toggle */}
@@ -756,6 +867,34 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
           setShowMultiplayerModal(false);
         }}
       />
+
+      {/* Save State Vault & Quick HUD */}
+      <SaveStateQuickHUD
+        isOpen={showSaveStateHUD}
+        onClose={() => setShowSaveStateHUD(false)}
+        gameId={game.id}
+        gameTitle={game.title}
+        currentScore={currentScore}
+        onRestoreState={(stateData) => {
+          if (stateData?.score !== undefined) {
+            setCurrentScore(stateData.score);
+          }
+        }}
+        onTriggerRewind={() => {
+          AchievementEngine.unlockTrophy('rewind_master');
+        }}
+      />
+
+      {/* 30-Second Instant Replay Exporter Modal */}
+      <ReplayExportModal
+        isOpen={showReplayModal}
+        onClose={() => setShowReplayModal(false)}
+        videoBlob={replayBlob}
+        gameTitle={game.title}
+      />
+
+      {/* Steam / PlayStation Style Achievement Notification Toast */}
+      <AchievementNotification />
     </div>
   );
 };
