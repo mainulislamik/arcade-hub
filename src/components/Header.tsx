@@ -22,7 +22,8 @@ import {
   Car, 
   Crosshair, 
   ShieldCheck,
-  Leaf
+  Leaf,
+  Wrench
 } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 import { GameItem, GameCategory } from '../types/game';
@@ -40,6 +41,7 @@ interface HeaderProps {
   onOpenStats: () => void;
   onOpenAchievements: () => void;
   onOpenDailyQuests?: () => void;
+  onOpenStudio?: () => void;
   onOpenDeveloperPortal?: () => void;
   onOpenAdminPanel?: () => void;
   soundEnabled: boolean;
@@ -69,6 +71,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenStats,
   onOpenAchievements,
   onOpenDailyQuests,
+  onOpenStudio,
   onOpenDeveloperPortal,
   onOpenAdminPanel,
   soundEnabled,
@@ -283,6 +286,22 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Trophy className="w-4 h-4" />
           </button>
+
+          {/* Level Studio / Map Maker */}
+          {onOpenStudio && (
+            <button
+              onClick={() => {
+                sounds.playClick();
+                HapticEngine.lightTick();
+                onOpenStudio();
+              }}
+              className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-cyan-400 border border-slate-800 transition-colors cursor-pointer flex items-center gap-1.5"
+              title="Arcadex Level Studio & Map Maker"
+            >
+              <Wrench className="w-4 h-4 text-cyan-400" />
+              <span className="hidden xl:inline text-xs font-bold text-cyan-300">Studio</span>
+            </button>
+          )}
 
           {/* Eco-Friendly Mode Toggle */}
           <button

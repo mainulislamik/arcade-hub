@@ -28,7 +28,8 @@ import {
   Smartphone,
   Monitor,
   Save,
-  Film
+  Film,
+  Bot
 } from 'lucide-react';
 import { GameItem } from '../types/game';
 import { sounds } from '../utils/soundEngine';
@@ -41,6 +42,7 @@ import { MultiplayerLobbyModal } from './multiplayer/MultiplayerLobbyModal';
 import { SaveStateQuickHUD } from './player/SaveStateQuickHUD';
 import { ReplayExportModal } from './player/ReplayExportModal';
 import { AchievementNotification } from './player/AchievementNotification';
+import { AiGamingCoachModal } from './player/AiGamingCoachModal';
 import { AchievementEngine } from '../utils/achievementEngine';
 import { ReplayRecorder } from '../utils/replayRecorder';
 import { SaveStateManager } from '../utils/saveStateManager';
@@ -97,6 +99,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
   const [showMultiplayerModal, setShowMultiplayerModal] = useState(false);
   const [showInterstitial, setShowInterstitial] = useState(false);
   const [showSaveStateHUD, setShowSaveStateHUD] = useState(false);
+  const [showAiCoachModal, setShowAiCoachModal] = useState(false);
   const [showReplayModal, setShowReplayModal] = useState(false);
   const [replayBlob, setReplayBlob] = useState<Blob | null>(null);
   const [activePeerEngine, setActivePeerEngine] = useState<WebRTCPeerEngine | null>(null);
@@ -510,6 +513,16 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
               <span>30s Clip</span>
             </button>
 
+            {/* AI Gaming Coach */}
+            <button
+              onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setShowAiCoachModal(true); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
+              title="Open Arcadex AI Gaming Coach & Strategies"
+            >
+              <Bot className="w-3.5 h-3.5" />
+              <span>AI Coach</span>
+            </button>
+
             {/* 3D Arcade Cabinet Mode Toggle */}
             <button
               onClick={() => { sounds.playClick(); setArcadeCabinetMode(!arcadeCabinetMode); }}
@@ -891,6 +904,14 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
         onClose={() => setShowReplayModal(false)}
         videoBlob={replayBlob}
         gameTitle={game.title}
+      />
+
+      {/* AI Gaming Coach Modal */}
+      <AiGamingCoachModal
+        isOpen={showAiCoachModal}
+        onClose={() => setShowAiCoachModal(false)}
+        game={game}
+        currentScore={currentScore}
       />
 
       {/* Steam / PlayStation Style Achievement Notification Toast */}

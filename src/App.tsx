@@ -15,6 +15,8 @@ import { LegalPagesModal } from './components/LegalPagesModal';
 import { DeveloperPortalModal } from './components/developer/DeveloperPortalModal';
 import { AdminDashboardModal } from './components/admin/AdminDashboardModal';
 import { DailyQuestsModal } from './components/gamification/DailyQuestsModal';
+import { ArcadexLevelStudioModal } from './components/studio/ArcadexLevelStudioModal';
+import { ChiptuneJukebox } from './components/player/ChiptuneJukebox';
 import { LanguageCode } from './utils/i18n';
 
 export const App: React.FC = () => {
@@ -71,6 +73,7 @@ export const App: React.FC = () => {
   const [activeLegalModal, setActiveLegalModal] = useState<'privacy' | 'terms' | 'dmca' | 'about' | 'contact' | null>(null);
   const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
   const [isDailyQuestsOpen, setIsDailyQuestsOpen] = useState(false);
+  const [isStudioOpen, setIsStudioOpen] = useState(false);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [isDeveloperPortalOpen, setIsDeveloperPortalOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
@@ -230,6 +233,7 @@ export const App: React.FC = () => {
         onOpenStats={() => setIsStatsOpen(true)}
         onOpenAchievements={() => setIsAchievementsOpen(true)}
         onOpenDailyQuests={() => setIsDailyQuestsOpen(true)}
+        onOpenStudio={() => setIsStudioOpen(true)}
         onOpenDeveloperPortal={() => setIsDeveloperPortalOpen(true)}
         onOpenAdminPanel={() => setIsAdminOpen(true)}
         soundEnabled={soundEnabled}
@@ -369,6 +373,17 @@ export const App: React.FC = () => {
           onClose={() => setIsDeveloperPortalOpen(false)}
         />
       )}
+
+      {/* Arcadex Visual Level Creator / Map Studio Modal */}
+      {isStudioOpen && (
+        <ArcadexLevelStudioModal
+          isOpen={isStudioOpen}
+          onClose={() => setIsStudioOpen(false)}
+        />
+      )}
+
+      {/* Floating Retro Synth Chiptune Radio */}
+      <ChiptuneJukebox />
     </div>
   );
 };
