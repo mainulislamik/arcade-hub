@@ -28,6 +28,7 @@ interface CrazyGamesGridProps {
   favorites: string[];
   onToggleFavorite: (gameId: string) => void;
   selectedTag?: string | null;
+  onOpenAdmin?: () => void;
 }
 
 export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
@@ -36,7 +37,8 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
   onSelectGame,
   favorites,
   onToggleFavorite,
-  selectedTag
+  selectedTag,
+  onOpenAdmin
 }) => {
   const [hoveredGameId, setHoveredGameId] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState<number>(36);
@@ -250,12 +252,38 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
       )}
 
       {/* Main Responsive Game Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
-        {displayedGames.map((game, index) => {
-          const isLarge = index === 0 && activeCategory !== 'all';
-          return renderGameCard(game, isLarge ? 'large' : 'normal');
-        })}
-      </div>
+      {displayedGames.length > 0 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+          {displayedGames.map((game, index) => {
+            const isLarge = index === 0 && activeCategory !== 'all';
+            return renderGameCard(game, isLarge ? 'large' : 'normal');
+          })}
+        </div>
+      ) : (
+        <div className="p-12 text-center bg-slate-900/60 rounded-3xl border border-dashed border-cyan-500/30 flex flex-col items-center justify-center gap-4 max-w-2xl mx-auto shadow-2xl">
+          <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <Gamepad2 className="w-8 h-8" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-lg font-black text-white">Vault is Ready for Your Original Games</h3>
+            <p className="text-xs text-slate-400 max-w-md">
+              Upload your downloaded Nokia Java (.JAR), Symbian (.SIS), GameBoy (.GBA), Flash (.SWF), or HTML5 (.ZIP) games via the IT Admin Gateway!
+            </p>
+          </div>
+          {onOpenAdmin && (
+            <button
+              onClick={() => {
+                sounds.playClick();
+                onOpenAdmin();
+              }}
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs shadow-lg shadow-cyan-500/25 flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer"
+            >
+              <Zap className="w-4 h-4" />
+              <span>Open Admin Panel & Upload Game</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Load More Trigger */}
       {displayedGames.length < filteredGames.length && (

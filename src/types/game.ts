@@ -5,7 +5,12 @@ export type GameEngineType =
   | 'java_j2me' 
   | 'retro_dos' 
   | 'wasm_emulator' 
-  | 'iframe_web';
+  | 'iframe_web'
+  | 'j2me_wasm'
+  | 'emulatorjs'
+  | 'ruffle_flash'
+  | 'symbian_sis'
+  | 'html5_zip';
 
 export interface GameFAQ {
   question: string;
@@ -67,6 +72,12 @@ export interface GameItem {
   // Universal Multi-Core Engine Extensions
   engineType?: GameEngineType;
   binaryUrl?: string;
+  romUrl?: string;
+  romFileName?: string;
+  romFormat?: 'jar' | 'sis' | 'gba' | 'nes' | 'snes' | 'swf' | 'zip' | 'html';
+  isCustomUpload?: boolean;
+  customRomKey?: string;
+  customRomData?: string;
   fileSizeMb?: number;
   emulatorConfig?: EmulatorConfig;
   licenseType?: string;

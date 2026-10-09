@@ -10,9 +10,11 @@ import { AchievementsModal } from './components/AchievementsModal';
 import { StatsDrawer } from './components/StatsDrawer';
 import { DeveloperPortalModal } from './components/developer/DeveloperPortalModal';
 import { DailyQuestsModal } from './components/gamification/DailyQuestsModal';
+import { AdminDashboardModal } from './components/admin/AdminDashboardModal';
 import { AdSenseBanner } from './components/ads/AdSenseBanner';
 import { sounds } from './utils/soundEngine';
 import { getFavorites, toggleFavorite as toggleFavStorage, getPlayerProfile, recordGamePlay } from './utils/storage';
+import { getCustomGames } from './utils/customGamesStorage';
 import { updatePageSEO } from './utils/seo';
 import { LanguageCode } from './utils/i18n';
 
@@ -37,23 +39,50 @@ export const App: React.FC = () => {
   const [favorites, setFavorites] = useState<string[]>(() => getFavorites());
   const [profile, setProfile] = useState<PlayerProfile>(() => getPlayerProfile());
 
+  // Dynamic Vault Games from IndexedDB / Storage
+  const [customGames, setCustomGames] = useState<GameItem[]>([]);
+
+  const refreshCustomGames = useCallback(async () => {
+    try {
+      const stored = await getCustomGames();
+      setCustomGames(stored);
+    } catch (e) {
+      console.warn('Failed to load custom vault games:', e);
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshCustomGames();
+  }, [refreshCustomGames]);
+
+  // Combined Live Catalog (Vault Uploads + Static Catalog)
+  const allGames = useMemo(() => {
+    return [...customGames, ...GAMES_CATALOG];
+  }, [customGames]);
+
   // Modal Dialogs
   const [activeLegalModal, setActiveLegalModal] = useState<'privacy' | 'terms' | 'dmca' | 'about' | 'contact' | null>(null);
   const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
   const [isDailyQuestsOpen, setIsDailyQuestsOpen] = useState(false);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [isDeveloperPortalOpen, setIsDeveloperPortalOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
 
-  // URL Routing Sync (Deep Linking for ?game=slug or ?category=action or ?legal=privacy)
+  // URL Routing Sync (Deep Linking for ?game=slug or ?category=action or ?admin=true or ?legal=privacy)
   useEffect(() => {
     const handleUrlChange = () => {
       const params = new URLSearchParams(window.location.search);
       const gameSlug = params.get('game');
       const catParam = params.get('category') as GameCategory | null;
       const legalParam = params.get('legal') as 'privacy' | 'terms' | 'dmca' | 'about' | 'contact' | null;
+      const adminParam = params.get('admin');
+
+      if (adminParam === 'true' || window.location.hash === '#admin') {
+        setIsAdminOpen(true);
+      }
 
       if (gameSlug) {
-        const found = GAMES_CATALOG.find((g) => g.slug === gameSlug || g.id === gameSlug);
+        const found = allGames.find((g) => g.slug === gameSlug || g.id === gameSlug);
         if (found) {
           setSelectedGame(found);
           updatePageSEO({
@@ -76,8 +105,8 @@ export const App: React.FC = () => {
         });
       } else if (!gameSlug) {
         updatePageSEO({
-          title: 'Arcadex - Free Online Games (CrazyGames Style)',
-          description: 'Play instant Stickman, Retro & Action browser games online for free. No download, no signup, 0% server load.',
+          title: 'Arcadex - Universal Original Game Vault & Player',
+          description: 'Play original Nokia Java, Symbian SIS, Retro GBA and Web games online for free with 0% server load.',
           canonical: 'http://localhost:3080/'
         });
       }
@@ -90,7 +119,7 @@ export const App: React.FC = () => {
     handleUrlChange();
     window.addEventListener('popstate', handleUrlChange);
     return () => window.removeEventListener('popstate', handleUrlChange);
-  }, []);
+  }, [allGames]);
 
   // Update URL on game select
   const handleSelectGame = useCallback((game: GameItem) => {
@@ -162,25 +191,26 @@ export const App: React.FC = () => {
 
   // Surprise Me / Random Game launcher
   const handlePlayRandom = useCallback(() => {
-    const randomIndex = Math.floor(Math.random() * GAMES_CATALOG.length);
-    const randomGame = GAMES_CATALOG[randomIndex];
+    if (allGames.length === 0) return;
+    const randomIndex = Math.floor(Math.random() * allGames.length);
+    const randomGame = allGames[randomIndex];
     handleSelectGame(randomGame);
-  }, [handleSelectGame]);
+  }, [allGames, handleSelectGame]);
 
   // Filtered games for homepage
   const displayedGames = useMemo(() => {
-    return GAMES_CATALOG.filter((g) => {
+    return allGames.filter((g) => {
       const matchesCategory = activeCategory === 'all' || g.category === activeCategory;
       const matchesTag = !selectedTag || g.tags.some((t) => t.toLowerCase() === selectedTag.toLowerCase());
       return matchesCategory && matchesTag;
     });
-  }, [activeCategory, selectedTag]);
+  }, [allGames, activeCategory, selectedTag]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
       {/* CrazyGames Top Header */}
       <Header
-        games={GAMES_CATALOG}
+        games={allGames}
         activeCategory={activeCategory}
         onSelectCategory={handleSelectCategory}
         onSelectGame={handleSelectGame}
@@ -189,6 +219,7 @@ export const App: React.FC = () => {
         onOpenAchievements={() => setIsAchievementsOpen(true)}
         onOpenDailyQuests={() => setIsDailyQuestsOpen(true)}
         onOpenDeveloperPortal={() => setIsDeveloperPortalOpen(true)}
+        onOpenAdminPanel={() => setIsAdminOpen(true)}
         soundEnabled={soundEnabled}
         onToggleSound={handleToggleSound}
         favoritesCount={favorites.length}
@@ -204,6 +235,7 @@ export const App: React.FC = () => {
           onSelectCategory={handleSelectCategory}
           onOpenLegal={(page) => setActiveLegalModal(page)}
           onOpenDeveloperPortal={() => setIsDeveloperPortalOpen(true)}
+          onOpenAdminPanel={() => setIsAdminOpen(true)}
           onSelectTag={handleSelectTag}
           onOpenRandom={handlePlayRandom}
           isCollapsed={isSidebarCollapsed}
@@ -225,7 +257,7 @@ export const App: React.FC = () => {
             <div className="p-3 sm:p-6 max-w-[1500px] mx-auto">
               <GameTheaterPage
                 game={selectedGame}
-                allGames={GAMES_CATALOG}
+                allGames={allGames}
                 onBackToLobby={handleBackToLobby}
                 onSelectGame={handleSelectGame}
                 isFavorite={favorites.includes(selectedGame.id)}
@@ -255,17 +287,29 @@ export const App: React.FC = () => {
               )}
 
               <CrazyGamesGrid
-                games={GAMES_CATALOG}
+                games={allGames}
                 onSelectGame={handleSelectGame}
                 activeCategory={activeCategory}
                 favorites={favorites}
                 onToggleFavorite={handleToggleFavorite}
                 selectedTag={selectedTag}
+                onOpenAdmin={() => setIsAdminOpen(true)}
               />
             </div>
           )}
         </main>
       </div>
+
+      {/* IT Admin Gateway & Game Uploader Modal (Auth: IT / imran%$#) */}
+      <AdminDashboardModal
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
+        onGameAddedOrUpdated={refreshCustomGames}
+        onPlayGame={(game: GameItem) => {
+          handleSelectGame(game);
+          setIsAdminOpen(false);
+        }}
+      />
 
       {/* Legal & Trust Pages Modal (Privacy, Terms, DMCA, About, Contact) */}
       <LegalPagesModal

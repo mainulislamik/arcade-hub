@@ -59,6 +59,7 @@ import { Subway3DGame } from '../games/Subway3DGame';
 import { CyberKnife3DGame } from '../games/CyberKnife3DGame';
 import { VoxelShooter3DGame } from '../games/VoxelShooter3DGame';
 import { UniversalProceduralCore } from './UniversalProceduralCore';
+import { UniversalWasmRunner } from './UniversalWasmRunner';
 
 interface SandboxedGamePlayerProps {
   game: GameItem;
@@ -291,7 +292,15 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
         {/* Active Game Runtime */}
         {isStreamingReady && (
           <div className="w-full h-full flex flex-col items-center justify-center">
-            {(!game.engineType || game.engineType === 'native_canvas') ? (
+            {game.isCustomUpload || ['j2me_wasm', 'emulatorjs', 'ruffle_flash', 'symbian_sis', 'html5_zip'].includes(game.engineType || '') ? (
+              <UniversalWasmRunner
+                game={game}
+                soundEnabled={soundEnabled}
+                onToggleSound={onToggleSound}
+                onScoreUpdate={onScoreUpdate}
+                onGameOver={onGameOver}
+              />
+            ) : (!game.engineType || game.engineType === 'native_canvas') ? (
               renderNativeGame()
             ) : (
               <div className="w-full h-full min-h-[560px] bg-black rounded-xl border border-slate-800 relative flex items-center justify-center overflow-hidden shadow-2xl">
