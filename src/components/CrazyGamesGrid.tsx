@@ -265,23 +265,11 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
             <Gamepad2 className="w-8 h-8" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-black text-white">Vault is Ready for Your Original Games</h3>
+            <h3 className="text-lg font-black text-white">No Games Found</h3>
             <p className="text-xs text-slate-400 max-w-md">
-              Upload your downloaded Nokia Java (.JAR), Symbian (.SIS), GameBoy (.GBA), Flash (.SWF), or HTML5 (.ZIP) games via the IT Admin Gateway!
+              There are currently no games in this category. Check back soon for new additions!
             </p>
           </div>
-          {onOpenAdmin && (
-            <button
-              onClick={() => {
-                sounds.playClick();
-                onOpenAdmin();
-              }}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs shadow-lg shadow-cyan-500/25 flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer"
-            >
-              <Zap className="w-4 h-4" />
-              <span>Open Admin Panel & Upload Game</span>
-            </button>
-          )}
         </div>
       )}
 

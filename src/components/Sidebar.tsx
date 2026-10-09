@@ -155,27 +155,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             )}
           </button>
-
-          {onOpenAdminPanel && (
-            <button
-              onClick={() => {
-                onOpenAdminPanel();
-                onCloseMobile();
-              }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 transition-all border border-cyan-500/30 shadow-sm cursor-pointer"
-              title={isCollapsed ? 'IT Admin Vault Gateway' : undefined}
-            >
-              <ShieldCheck className="w-5 h-5 text-cyan-400 shrink-0" />
-              {!isCollapsed && (
-                <div className="flex items-center justify-between w-full">
-                  <span className="truncate font-bold">Admin Vault</span>
-                  <span className="px-1.5 py-0.5 bg-cyan-500/20 text-cyan-300 rounded text-[9px] font-black uppercase">
-                    IT
-                  </span>
-                </div>
-              )}
-            </button>
-          )}
         </div>
 
         {/* Categories Section */}

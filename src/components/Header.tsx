@@ -241,21 +241,6 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Right: Actions, Gamification, Sound & Language */}
         <div className="flex items-center gap-1.5 sm:gap-2.5">
-          {/* Admin Gateway Access Button */}
-          {onOpenAdminPanel && (
-            <button
-              onClick={() => {
-                sounds.playClick();
-                onOpenAdminPanel();
-              }}
-              className="px-2.5 py-1.5 rounded-xl bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 text-cyan-300 text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
-              title="IT Admin Gateway & Game Uploader"
-            >
-              <ShieldCheck className="w-4 h-4 text-cyan-400" />
-              <span className="hidden md:inline">ADMIN</span>
-            </button>
-          )}
-
           {/* Daily Quests & Spin Button */}
           {onOpenDailyQuests && (
             <button
