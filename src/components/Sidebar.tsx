@@ -24,10 +24,11 @@ import {
   Zap,
   ShieldCheck
 } from 'lucide-react';
-import { GameCategory } from '../types/game';
+import { GameCategory, GameItem } from '../types/game';
 import { GAMES_CATALOG } from '../data/games';
 
 interface SidebarProps {
+  games?: GameItem[];
   currentCategory: GameCategory;
   onSelectCategory: (category: GameCategory) => void;
   onOpenLegal: (page: 'privacy' | 'terms' | 'dmca' | 'about' | 'contact') => void;
@@ -43,11 +44,6 @@ interface SidebarProps {
   onCloseMobile?: () => void;
 }
 
-const getCategoryCount = (catId: GameCategory) => {
-  if (catId === 'all') return GAMES_CATALOG.length;
-  return GAMES_CATALOG.filter(g => g.category === catId).length;
-};
-
 const POPULAR_TAGS = [
   '#3D-WebGL',
   '#Subway',
@@ -60,6 +56,7 @@ const POPULAR_TAGS = [
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({
+  games = [],
   currentCategory,
   onSelectCategory,
   onOpenLegal,
@@ -74,6 +71,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isMobileOpen = false,
   onCloseMobile = () => {}
 }) => {
+  const getCategoryCount = (catId: GameCategory) => {
+    if (catId === 'all') return games.length;
+    return games.filter(g => g.category === catId).length;
+  };
+
   const categories: { id: GameCategory; label: string; icon: React.ReactNode; count: number }[] = [
     { id: 'all', label: 'All Games', icon: <Gamepad2 className="w-5 h-5 text-cyan-400" />, count: getCategoryCount('all') },
     { id: 'action', label: 'Action & 3D', icon: <Swords className="w-5 h-5 text-rose-400" />, count: getCategoryCount('action') },
