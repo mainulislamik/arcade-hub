@@ -36,8 +36,8 @@ export async function storeRomBinary(key: string, blob: Blob): Promise<void> {
   });
 }
 
-// Retrieve ROM binary blob and create a temporary Object URL
-export async function getRomBlobUrl(key: string): Promise<string | null> {
+// Retrieve raw ROM Blob
+export async function getRomBinaryBlob(key: string): Promise<Blob | null> {
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_ROMS, 'readonly');
@@ -45,14 +45,41 @@ export async function getRomBlobUrl(key: string): Promise<string | null> {
     const req = store.get(key);
     req.onsuccess = () => {
       if (req.result && req.result.blob) {
-        const url = URL.createObjectURL(req.result.blob);
-        resolve(url);
+        resolve(req.result.blob);
       } else {
         resolve(null);
       }
     };
     req.onerror = () => reject(req.error);
   });
+}
+
+// Retrieve ROM binary ArrayBuffer
+export async function getRomArrayBuffer(key: string): Promise<ArrayBuffer | null> {
+  const blob = await getRomBinaryBlob(key);
+  if (!blob) return null;
+  return await blob.arrayBuffer();
+}
+
+// Retrieve ROM binary as Base64 Data URL
+export async function getRomBase64(key: string): Promise<string | null> {
+  const blob = await getRomBinaryBlob(key);
+  if (!blob) return null;
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+// Retrieve ROM binary blob and create a temporary Object URL
+export async function getRomBlobUrl(key: string): Promise<string | null> {
+  const blob = await getRomBinaryBlob(key);
+  if (blob) {
+    return URL.createObjectURL(blob);
+  }
+  return null;
 }
 
 // Save or Update Custom Game Metadata
@@ -71,7 +98,10 @@ export async function saveCustomGame(game: GameItem, fileBlob?: Blob): Promise<G
     const tx = db.transaction(STORE_GAMES, 'readwrite');
     const store = tx.objectStore(STORE_GAMES);
     const req = store.put(game);
-    req.onsuccess = () => resolve(game);
+    req.onsuccess = () => {
+      window.dispatchEvent(new CustomEvent('arcadex:games_updated', { detail: game }));
+      resolve(game);
+    };
     req.onerror = () => reject(req.error);
   });
 }
@@ -106,7 +136,10 @@ export async function deleteCustomGame(gameId: string, customRomKey?: string): P
       romStore.delete(customRomKey);
     }
 
-    tx.oncomplete = () => resolve();
+    tx.oncomplete = () => {
+      window.dispatchEvent(new CustomEvent('arcadex:games_updated', { detail: { id: gameId, deleted: true } }));
+      resolve();
+    };
     tx.onerror = () => reject(tx.error);
   });
 }

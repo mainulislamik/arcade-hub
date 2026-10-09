@@ -1,41 +1,35 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { GameItem, GameCategory, PlayerProfile } from './types/game';
 import { GAMES_CATALOG } from './data/games';
+import { getPlayerProfile, getFavorites, toggleFavorite as toggleFavStorage } from './utils/storage';
+import { getCustomGames } from './utils/customGamesStorage';
+import { sounds } from './utils/soundEngine';
+import { updatePageSEO } from './utils/seo';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { CrazyGamesGrid } from './components/CrazyGamesGrid';
 import { GameTheaterPage } from './components/GameTheaterPage';
-import { LegalPagesModal } from './components/LegalPagesModal';
 import { AchievementsModal } from './components/AchievementsModal';
 import { StatsDrawer } from './components/StatsDrawer';
+import { LegalPagesModal } from './components/LegalPagesModal';
 import { DeveloperPortalModal } from './components/developer/DeveloperPortalModal';
-import { DailyQuestsModal } from './components/gamification/DailyQuestsModal';
 import { AdminDashboardModal } from './components/admin/AdminDashboardModal';
-import { AdSenseBanner } from './components/ads/AdSenseBanner';
-import { sounds } from './utils/soundEngine';
-import { getFavorites, toggleFavorite as toggleFavStorage, getPlayerProfile, recordGamePlay } from './utils/storage';
-import { getCustomGames } from './utils/customGamesStorage';
-import { updatePageSEO } from './utils/seo';
+import { DailyQuestsModal } from './components/gamification/DailyQuestsModal';
 import { LanguageCode } from './utils/i18n';
 
 export const App: React.FC = () => {
-  // Navigation State
-  const [selectedGame, setSelectedGame] = useState<GameItem | null>(null);
+  // Navigation & Category Filtering State
   const [activeCategory, setActiveCategory] = useState<GameCategory>('all');
+  const [selectedGame, setSelectedGame] = useState<GameItem | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
   const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>(() => {
     return (localStorage.getItem('arcadex_lang') as LanguageCode) || 'en';
   });
 
-  const handleSelectLanguage = (lang: LanguageCode) => {
-    setCurrentLanguage(lang);
-    localStorage.setItem('arcadex_lang', lang);
-  };
-
-  // Audio & User state
-  const [soundEnabled, setSoundEnabled] = useState(true);
+  // Player & System Preferences
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [favorites, setFavorites] = useState<string[]>(() => getFavorites());
   const [profile, setProfile] = useState<PlayerProfile>(() => getPlayerProfile());
 
@@ -51,8 +45,21 @@ export const App: React.FC = () => {
     }
   }, []);
 
+  // Initial Load & Event Listeners
   useEffect(() => {
     refreshCustomGames();
+
+    const handleGamesUpdate = () => {
+      refreshCustomGames();
+    };
+
+    window.addEventListener('arcadex:games_updated', handleGamesUpdate);
+    window.addEventListener('storage', handleGamesUpdate);
+
+    return () => {
+      window.removeEventListener('arcadex:games_updated', handleGamesUpdate);
+      window.removeEventListener('storage', handleGamesUpdate);
+    };
   }, [refreshCustomGames]);
 
   // Combined Live Catalog (Vault Uploads + Static Catalog)
@@ -96,7 +103,7 @@ export const App: React.FC = () => {
         setSelectedGame(null);
       }
 
-      if (catParam && ['all', 'action', 'puzzle', 'retro', 'arcade', 'strategy', 'word'].includes(catParam)) {
+      if (catParam && ['all', 'action', 'puzzle', 'retro', 'arcade', 'strategy', 'word', 'driving', 'shooting', 'favorites'].includes(catParam)) {
         setActiveCategory(catParam);
         updatePageSEO({
           title: `Free ${catParam.toUpperCase()} Games Online - Arcadex`,
@@ -124,9 +131,11 @@ export const App: React.FC = () => {
   // Update URL on game select
   const handleSelectGame = useCallback((game: GameItem) => {
     setSelectedGame(game);
+    setIsAdminOpen(false);
     const url = new URL(window.location.href);
     url.searchParams.set('game', game.slug);
     url.searchParams.delete('category');
+    url.searchParams.delete('admin');
     window.history.pushState({}, '', url.toString());
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -142,12 +151,13 @@ export const App: React.FC = () => {
     setSelectedGame(null);
     const url = new URL(window.location.href);
     url.searchParams.delete('game');
+    url.searchParams.delete('admin');
     window.history.pushState({}, '', url.toString());
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     updatePageSEO({
-      title: 'Arcadex - Free Online Games (CrazyGames Style)',
-      description: 'Play instant Stickman, Retro & Action browser games online for free. No download, no signup, 0% server load.',
+      title: 'Arcadex - Universal Original Game Vault & Player',
+      description: 'Play original Nokia Java, Symbian SIS, Retro GBA and Web games online for free with 0% server load.',
       canonical: 'http://localhost:3080/'
     });
   }, []);
@@ -159,6 +169,7 @@ export const App: React.FC = () => {
     setSelectedTag(null);
     const url = new URL(window.location.href);
     url.searchParams.delete('game');
+    url.searchParams.delete('admin');
     if (cat === 'all') {
       url.searchParams.delete('category');
     } else {
@@ -173,6 +184,10 @@ export const App: React.FC = () => {
     setSelectedGame(null);
     setSelectedTag(tag);
     setActiveCategory('all');
+    const url = new URL(window.location.href);
+    url.searchParams.delete('game');
+    url.searchParams.delete('admin');
+    window.history.pushState({}, '', url.toString());
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
@@ -197,14 +212,11 @@ export const App: React.FC = () => {
     handleSelectGame(randomGame);
   }, [allGames, handleSelectGame]);
 
-  // Filtered games for homepage
-  const displayedGames = useMemo(() => {
-    return allGames.filter((g) => {
-      const matchesCategory = activeCategory === 'all' || g.category === activeCategory;
-      const matchesTag = !selectedTag || g.tags.some((t) => t.toLowerCase() === selectedTag.toLowerCase());
-      return matchesCategory && matchesTag;
-    });
-  }, [allGames, activeCategory, selectedTag]);
+  // Language Change
+  const handleSelectLanguage = (lang: LanguageCode) => {
+    setCurrentLanguage(lang);
+    localStorage.setItem('arcadex_lang', lang);
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
@@ -229,8 +241,9 @@ export const App: React.FC = () => {
       />
 
       <div className="flex-1 flex">
-        {/* Left Sticky Sidebar Navigation */}
+        {/* Left Sticky Sidebar Navigation with Live Games Count */}
         <Sidebar
+          games={allGames}
           currentCategory={activeCategory}
           onSelectCategory={handleSelectCategory}
           onOpenLegal={(page) => setActiveLegalModal(page)}
@@ -279,7 +292,7 @@ export const App: React.FC = () => {
                   </div>
                   <button
                     onClick={() => setSelectedTag(null)}
-                    className="text-xs font-bold text-cyan-400 hover:text-cyan-300 cursor-pointer"
+                    className="text-xs text-slate-400 hover:text-white px-2 py-1 bg-slate-900 rounded-lg cursor-pointer"
                   >
                     Clear Filter
                   </button>
@@ -300,37 +313,22 @@ export const App: React.FC = () => {
         </main>
       </div>
 
-      {/* IT Admin Gateway & Game Uploader Modal (Auth: IT / imran%$#) */}
-      <AdminDashboardModal
-        isOpen={isAdminOpen}
-        onClose={() => setIsAdminOpen(false)}
-        onGameAddedOrUpdated={refreshCustomGames}
-        onPlayGame={(game: GameItem) => {
-          handleSelectGame(game);
-          setIsAdminOpen(false);
-        }}
-      />
-
-      {/* Legal & Trust Pages Modal (Privacy, Terms, DMCA, About, Contact) */}
-      <LegalPagesModal
-        isOpen={activeLegalModal !== null}
-        pageType={activeLegalModal || 'privacy'}
-        onClose={() => setActiveLegalModal(null)}
-        onSwitchPage={(p) => setActiveLegalModal(p)}
-      />
-
-      {/* Achievements Modal */}
-      <AchievementsModal
-        isOpen={isAchievementsOpen}
-        onClose={() => setIsAchievementsOpen(false)}
-        achievements={profile.achievements}
-      />
-
-      {/* Daily Quests & Lucky Spin Wheel Modal */}
-      <DailyQuestsModal
-        isOpen={isDailyQuestsOpen}
-        onClose={() => setIsDailyQuestsOpen(false)}
-      />
+      {/* Admin Dashboard Modal */}
+      {isAdminOpen && (
+        <AdminDashboardModal
+          isOpen={isAdminOpen}
+          onClose={() => {
+            setIsAdminOpen(false);
+            const url = new URL(window.location.href);
+            url.searchParams.delete('admin');
+            window.history.pushState({}, '', url.toString());
+          }}
+          onGameAddedOrUpdated={refreshCustomGames}
+          onPlayGame={(game: GameItem) => {
+            handleSelectGame(game);
+          }}
+        />
+      )}
 
       {/* Stats Drawer */}
       <StatsDrawer
@@ -339,11 +337,38 @@ export const App: React.FC = () => {
         profile={profile}
       />
 
-      {/* Developer Portal Modal */}
-      <DeveloperPortalModal
-        isOpen={isDeveloperPortalOpen}
-        onClose={() => setIsDeveloperPortalOpen(false)}
+      {/* Achievements Modal */}
+      {isAchievementsOpen && (
+        <AchievementsModal
+          isOpen={isAchievementsOpen}
+          onClose={() => setIsAchievementsOpen(false)}
+          achievements={profile.achievements}
+        />
+      )}
+
+      {/* Daily Quests Modal */}
+      {isDailyQuestsOpen && (
+        <DailyQuestsModal
+          isOpen={isDailyQuestsOpen}
+          onClose={() => setIsDailyQuestsOpen(false)}
+        />
+      )}
+
+      {/* Legal & Trust Pages Modal */}
+      <LegalPagesModal
+        isOpen={activeLegalModal !== null}
+        pageType={activeLegalModal || 'privacy'}
+        onClose={() => setActiveLegalModal(null)}
+        onSwitchPage={(p) => setActiveLegalModal(p)}
       />
+
+      {/* Developer Portal Modal */}
+      {isDeveloperPortalOpen && (
+        <DeveloperPortalModal
+          isOpen={isDeveloperPortalOpen}
+          onClose={() => setIsDeveloperPortalOpen(false)}
+        />
+      )}
     </div>
   );
 };
