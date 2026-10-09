@@ -67,6 +67,7 @@ interface SandboxedGamePlayerProps {
   onToggleSound: () => void;
   onGameOver?: (score: number) => void;
   onScoreUpdate?: (score: number) => void;
+  aspectRatio?: string;
 }
 
 export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
@@ -74,7 +75,8 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
   soundEnabled,
   onToggleSound,
   onGameOver,
-  onScoreUpdate
+  onScoreUpdate,
+  aspectRatio = 'auto'
 }) => {
   const [downloadProgress, setDownloadProgress] = useState<number>(0);
   const [isStreamingReady, setIsStreamingReady] = useState<boolean>(false);
@@ -299,6 +301,7 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
                 onToggleSound={onToggleSound}
                 onScoreUpdate={onScoreUpdate}
                 onGameOver={onGameOver}
+                aspectRatio={aspectRatio}
               />
             ) : (!game.engineType || game.engineType === 'native_canvas') ? (
               renderNativeGame()

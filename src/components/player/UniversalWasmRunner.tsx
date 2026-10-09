@@ -20,7 +20,7 @@ interface UniversalWasmRunnerProps {
   game: GameItem;
   soundEnabled?: boolean;
   onToggleSound?: () => void;
-  aspectRatio?: '16:9' | '4:3' | '1:1' | '9:16' | string;
+  aspectRatio?: '16:9' | '4:3' | '3:4' | '9:16' | 'fill' | string;
   onScoreUpdate?: (score: number) => void;
   onGameOver?: (score: number) => void;
 }
@@ -29,7 +29,9 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
   game,
   soundEnabled = true,
   onToggleSound,
-  aspectRatio = '4:3',
+  aspectRatio = 'auto',
+  onScoreUpdate,
+  onGameOver
 }) => {
   const [romBlobUrl, setRomBlobUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -172,7 +174,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
       `;
     }
 
-    // 3. JAVA ME (.JAR) -> Genuine Embedded J2ME Nokia Platformer & Arcade Engine
+    // 3. JAVA ME (.JAR) -> Genuine Embedded J2ME Nokia Platformer & Arcade Engine with Perfect Screen Fit
     if (format === 'jar' || format === 'jad') {
       return `
         <!DOCTYPE html>
@@ -182,12 +184,12 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
           <title>Nokia Java ME - ${game.title}</title>
           <style>
-            * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
-            body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #020617; font-family: -apple-system, "Segoe UI", Roboto, monospace; color: #f8fafc; }
+            * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
+            body, html { width: 100%; height: 100%; overflow: hidden; background: #020617; font-family: -apple-system, "Segoe UI", Roboto, monospace; color: #f8fafc; display: flex; align-items: center; justify-content: center; }
             #app-root { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-            #game-canvas { background: #1e293b; image-rendering: pixelated; width: 100%; height: 100%; object-fit: contain; max-width: 480px; max-height: 640px; box-shadow: 0 0 40px rgba(0,0,0,0.8); border: 2px solid #334155; border-radius: 8px; }
-            .hud-overlay { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between; pointer-events: none; }
-            .badge { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 9999px; backdrop-filter: blur(8px); }
+            #game-canvas { background: #1e293b; image-rendering: pixelated; width: 100%; height: 100%; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.9); }
+            .hud-overlay { position: absolute; top: 12px; left: 16px; right: 16px; display: flex; justify-content: space-between; pointer-events: none; z-index: 10; }
+            .badge { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 9999px; backdrop-filter: blur(8px); box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
           </style>
         </head>
         <body>
@@ -196,7 +198,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
               <div class="badge">📱 NOKIA J2ME: ${game.title}</div>
               <div class="badge" id="score-tag">SCORE: 0</div>
             </div>
-            <canvas id="game-canvas" width="240" height="320"></canvas>
+            <canvas id="game-canvas" width="480" height="640"></canvas>
           </div>
 
           <script>
@@ -211,18 +213,20 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
               if (audioCtx.state === 'suspended') audioCtx.resume();
             }
 
-            function playBoing() {
+            function playBoing(high = false) {
               if (!audioCtx) return;
               try {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(220, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.15);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                const startFreq = high ? 320 : 220;
+                const endFreq = high ? 640 : 440;
+                osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + 0.16);
+                gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.16);
                 osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.16);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.17);
               } catch(e){}
             }
 
@@ -234,10 +238,11 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(659.25, audioCtx.currentTime);
                 osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.08);
-                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.frequency.setValueAtTime(1318.5, audioCtx.currentTime + 0.16);
+                gain.gain.setValueAtTime(0.28, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
                 osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.21);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.26);
               } catch(e){}
             }
 
@@ -247,12 +252,12 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                osc.frequency.linearRampToValueAtTime(40, audioCtx.currentTime + 0.2);
+                osc.frequency.setValueAtTime(160, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(30, audioCtx.currentTime + 0.25);
                 gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
                 osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.21);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.26);
               } catch(e){}
             }
 
@@ -260,55 +265,72 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
             let lives = 3;
             let ringsCollected = 0;
             let totalRings = 8;
+            const particles = [];
 
             const ball = {
-              x: 40,
-              y: 200,
+              x: 80,
+              y: 400,
               vx: 0,
               vy: 0,
-              radius: 10,
+              radius: 18,
               isGrounded: false,
               squashX: 1,
               squashY: 1,
-              respawnX: 40,
-              respawnY: 200
+              respawnX: 80,
+              respawnY: 400
             };
 
             const camera = { x: 0, y: 0 };
             const keys = {};
 
             const platforms = [
-              { x: 0, y: 280, w: 1200, h: 40, type: 'ground' },
-              { x: 120, y: 230, w: 80, h: 15, type: 'brick' },
-              { x: 250, y: 190, w: 100, h: 15, type: 'brick' },
-              { x: 400, y: 150, w: 90, h: 15, type: 'brick' },
-              { x: 550, y: 210, w: 120, h: 15, type: 'brick' },
-              { x: 720, y: 170, w: 80, h: 15, type: 'brick' },
-              { x: 860, y: 130, w: 100, h: 15, type: 'brick' },
-              { x: 1020, y: 220, w: 160, h: 20, type: 'exit' },
-              { x: 360, y: 270, w: 30, h: 10, type: 'bouncer' },
-              { x: 680, y: 270, w: 30, h: 10, type: 'bouncer' }
+              { x: 0, y: 560, w: 2400, h: 80, type: 'ground' },
+              { x: 240, y: 460, w: 160, h: 28, type: 'brick' },
+              { x: 500, y: 380, w: 200, h: 28, type: 'brick' },
+              { x: 800, y: 300, w: 180, h: 28, type: 'brick' },
+              { x: 1100, y: 420, w: 240, h: 28, type: 'brick' },
+              { x: 1440, y: 340, w: 160, h: 28, type: 'brick' },
+              { x: 1720, y: 260, w: 200, h: 28, type: 'brick' },
+              { x: 2040, y: 440, w: 320, h: 40, type: 'exit' },
+              { x: 720, y: 540, w: 60, h: 20, type: 'bouncer' },
+              { x: 1360, y: 540, w: 60, h: 20, type: 'bouncer' }
             ];
 
             const rings = [
-              { x: 160, y: 200, collected: false },
-              { x: 290, y: 160, collected: false },
-              { x: 440, y: 120, collected: false },
-              { x: 600, y: 180, collected: false },
-              { x: 750, y: 140, collected: false },
-              { x: 900, y: 100, collected: false },
-              { x: 375, y: 80, collected: false },
-              { x: 695, y: 80, collected: false }
+              { x: 320, y: 400, collected: false },
+              { x: 580, y: 320, collected: false },
+              { x: 880, y: 240, collected: false },
+              { x: 1200, y: 360, collected: false },
+              { x: 1500, y: 280, collected: false },
+              { x: 1800, y: 200, collected: false },
+              { x: 750, y: 160, collected: false },
+              { x: 1390, y: 160, collected: false }
             ];
 
             const spikes = [
-              { x: 220, y: 265, w: 20, h: 15 },
-              { x: 500, y: 265, w: 30, h: 15 },
-              { x: 820, y: 265, w: 30, h: 15 }
+              { x: 440, y: 530, w: 40, h: 30 },
+              { x: 1000, y: 530, w: 60, h: 30 },
+              { x: 1640, y: 530, w: 60, h: 30 }
             ];
+
+            function addParticle(x, y, color, count = 8) {
+              for (let i = 0; i < count; i++) {
+                particles.push({
+                  x,
+                  y,
+                  vx: (Math.random() - 0.5) * 6,
+                  vy: (Math.random() - 0.5) * 6,
+                  radius: Math.random() * 4 + 2,
+                  color,
+                  life: 1.0,
+                  decay: Math.random() * 0.05 + 0.02
+                });
+              }
+            }
 
             function respawn() {
               playPop();
+              addParticle(ball.x, ball.y, '#ef4444', 16);
               ball.x = ball.respawnX;
               ball.y = ball.respawnY;
               ball.vx = 0;
@@ -341,9 +363,9 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
               initAudio();
               const rect = canvas.getBoundingClientRect();
               const touchX = e.clientX - rect.left;
-              if (touchX < rect.width * 0.4) {
+              if (touchX < rect.width * 0.35) {
                 keys['ArrowLeft'] = true;
-              } else if (touchX > rect.width * 0.6) {
+              } else if (touchX > rect.width * 0.65) {
                 keys['ArrowRight'] = true;
               } else {
                 keys['Space'] = true;
@@ -356,35 +378,44 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
             });
 
             let ringAnim = 0;
-            function update() {
+            let lastTime = performance.now();
+            let accumulator = 0;
+            const TIMESTEP = 1000 / 60;
+
+            function updatePhysics() {
               ringAnim += 0.05;
 
-              if (keys['ArrowLeft'] || keys['KeyA'] || keys['4']) {
-                ball.vx -= 0.5;
-              } else if (keys['ArrowRight'] || keys['KeyD'] || keys['6']) {
-                ball.vx += 0.5;
+              // Horizontal movement
+              if (keys['ArrowLeft'] || keys['KeyA'] || keys['4'] || keys['a']) {
+                ball.vx -= 0.8;
+              } else if (keys['ArrowRight'] || keys['KeyD'] || keys['6'] || keys['d']) {
+                ball.vx += 0.8;
               } else {
                 ball.vx *= 0.88;
               }
-              ball.vx = Math.max(-4.5, Math.min(4.5, ball.vx));
+              ball.vx = Math.max(-7.5, Math.min(7.5, ball.vx));
 
-              if ((keys['Space'] || keys['ArrowUp'] || keys['KeyW'] || keys['2'] || keys['5']) && ball.isGrounded) {
-                ball.vy = -7.5;
+              // Jump logic with variable bounce
+              if ((keys['Space'] || keys['ArrowUp'] || keys['KeyW'] || keys['2'] || keys['5'] || keys['w']) && ball.isGrounded) {
+                ball.vy = -12.5;
                 ball.isGrounded = false;
-                ball.squashX = 0.7;
-                ball.squashY = 1.3;
-                playBoing();
+                ball.squashX = 0.65;
+                ball.squashY = 1.35;
+                playBoing(false);
+                addParticle(ball.x, ball.y + ball.radius, '#94a3b8', 6);
               }
 
-              ball.vy += 0.35;
-              if (ball.vy > 9) ball.vy = 9;
+              // Gravity
+              ball.vy += 0.58;
+              if (ball.vy > 14) ball.vy = 14;
 
               ball.x += ball.vx;
               ball.y += ball.vy;
 
-              ball.squashX += (1 - ball.squashX) * 0.15;
-              ball.squashY += (1 - ball.squashY) * 0.15;
+              ball.squashX += (1 - ball.squashX) * 0.18;
+              ball.squashY += (1 - ball.squashY) * 0.18;
 
+              // Platform collisions
               ball.isGrounded = false;
               for (const p of platforms) {
                 if (
@@ -393,21 +424,23 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
                   ball.y + ball.radius > p.y &&
                   ball.y - ball.radius < p.y + p.h
                 ) {
-                  if (ball.vy > 0 && ball.y < p.y + 12) {
+                  if (ball.vy > 0 && ball.y < p.y + 20) {
                     ball.y = p.y - ball.radius;
                     ball.isGrounded = true;
                     if (p.type === 'bouncer') {
-                      ball.vy = -10.5;
-                      playBoing();
+                      ball.vy = -17.5;
+                      playBoing(true);
+                      addParticle(ball.x, ball.y + ball.radius, '#ef4444', 12);
                     } else {
                       ball.vy = 0;
                     }
-                    ball.squashX = 1.3;
-                    ball.squashY = 0.7;
+                    ball.squashX = 1.35;
+                    ball.squashY = 0.65;
                   }
                 }
               }
 
+              // Spike traps
               for (const s of spikes) {
                 if (
                   ball.x + ball.radius > s.x &&
@@ -420,76 +453,103 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
                 }
               }
 
+              // Golden Ring pick-ups
               for (const r of rings) {
                 if (!r.collected) {
                   const dist = Math.hypot(ball.x - r.x, ball.y - r.y);
-                  if (dist < ball.radius + 12) {
+                  if (dist < ball.radius + 20) {
                     r.collected = true;
                     ringsCollected++;
                     score += 100;
                     scoreTag.innerText = 'SCORE: ' + score;
                     playRingChime();
+                    addParticle(r.x, r.y, '#eab308', 14);
                   }
                 }
               }
 
-              if (ball.y > 350) {
+              // Pit death
+              if (ball.y > 700) {
                 respawn();
               }
 
-              camera.x += (ball.x - 120 - camera.x) * 0.1;
-              camera.x = Math.max(0, Math.min(1000, camera.x));
+              // Particle updates
+              for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= p.decay;
+                if (p.life <= 0) {
+                  particles.splice(i, 1);
+                }
+              }
+
+              // Camera follow smooth lerp
+              camera.x += (ball.x - 240 - camera.x) * 0.1;
+              camera.x = Math.max(0, Math.min(2000, camera.x));
             }
 
             function draw() {
               ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-              ctx.fillStyle = '#0ea5e9';
+              // Sky gradient
+              const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+              skyGrad.addColorStop(0, '#0284c7');
+              skyGrad.addColorStop(0.7, '#38bdf8');
+              skyGrad.addColorStop(1, '#bae6fd');
+              ctx.fillStyle = skyGrad;
               ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+              // Distant Sun
               ctx.fillStyle = '#fef08a';
               ctx.beginPath();
-              ctx.arc(200, 50, 24, 0, Math.PI * 2);
+              ctx.arc(380, 100, 48, 0, Math.PI * 2);
               ctx.fill();
 
-              ctx.fillStyle = '#0284c7';
+              // Mountains Parallax
+              ctx.fillStyle = '#0369a1';
               ctx.beginPath();
-              ctx.moveTo(0, 200);
-              ctx.lineTo(80, 140);
-              ctx.lineTo(160, 200);
-              ctx.lineTo(240, 150);
-              ctx.lineTo(320, 200);
-              ctx.lineTo(240, 320);
-              ctx.lineTo(0, 320);
+              ctx.moveTo(0, 400);
+              ctx.lineTo(120, 260);
+              ctx.lineTo(260, 400);
+              ctx.lineTo(380, 280);
+              ctx.lineTo(480, 400);
+              ctx.lineTo(480, 640);
+              ctx.lineTo(0, 640);
               ctx.fill();
 
               ctx.save();
               ctx.translate(-camera.x, -camera.y);
 
+              // Draw platforms
               for (const p of platforms) {
                 if (p.type === 'ground') {
-                  ctx.fillStyle = '#15803d';
-                  ctx.fillRect(p.x, p.y, p.w, 8);
+                  ctx.fillStyle = '#16a34a';
+                  ctx.fillRect(p.x, p.y, p.w, 14);
                   ctx.fillStyle = '#78350f';
-                  ctx.fillRect(p.x, p.y + 8, p.w, p.h - 8);
+                  ctx.fillRect(p.x, p.y + 14, p.w, p.h - 14);
                 } else if (p.type === 'brick') {
                   ctx.fillStyle = '#b45309';
                   ctx.fillRect(p.x, p.y, p.w, p.h);
                   ctx.strokeStyle = '#78350f';
-                  ctx.lineWidth = 2;
+                  ctx.lineWidth = 3;
                   ctx.strokeRect(p.x, p.y, p.w, p.h);
                 } else if (p.type === 'bouncer') {
                   ctx.fillStyle = '#ef4444';
                   ctx.fillRect(p.x, p.y, p.w, p.h);
                   ctx.fillStyle = '#fef08a';
-                  ctx.fillRect(p.x + 4, p.y + 2, p.w - 8, p.h - 4);
+                  ctx.fillRect(p.x + 8, p.y + 4, p.w - 16, p.h - 8);
                 } else if (p.type === 'exit') {
                   ctx.fillStyle = '#3b82f6';
                   ctx.fillRect(p.x, p.y, p.w, p.h);
+                  ctx.fillStyle = '#ffffff';
+                  ctx.font = 'bold 16px monospace';
+                  ctx.fillText('GOAL PORTAL', p.x + 20, p.y + 26);
                 }
               }
 
-              ctx.fillStyle = '#475569';
+              // Draw Spikes
+              ctx.fillStyle = '#334155';
               for (const s of spikes) {
                 ctx.beginPath();
                 ctx.moveTo(s.x, s.y + s.h);
@@ -498,22 +558,35 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
                 ctx.fill();
               }
 
+              // Draw Rings
               for (const r of rings) {
                 if (!r.collected) {
-                  const scaleX = Math.cos(ringAnim) * 8;
+                  const scaleX = Math.cos(ringAnim) * 14;
                   ctx.strokeStyle = '#eab308';
-                  ctx.lineWidth = 3;
+                  ctx.lineWidth = 5;
                   ctx.beginPath();
-                  ctx.ellipse(r.x, r.y, Math.abs(scaleX) + 2, 12, 0, 0, Math.PI * 2);
+                  ctx.ellipse(r.x, r.y, Math.abs(scaleX) + 4, 22, 0, 0, Math.PI * 2);
                   ctx.stroke();
                 }
               }
 
+              // Draw Particles
+              for (const p of particles) {
+                ctx.save();
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+              }
+
+              // Draw Bouncing Ball
               ctx.save();
               ctx.translate(ball.x, ball.y);
               ctx.scale(ball.squashX, ball.squashY);
 
-              const grad = ctx.createRadialGradient(-3, -3, 2, 0, 0, ball.radius);
+              const grad = ctx.createRadialGradient(-5, -5, 4, 0, 0, ball.radius);
               grad.addColorStop(0, '#f87171');
               grad.addColorStop(0.5, '#dc2626');
               grad.addColorStop(1, '#991b1b');
@@ -523,376 +596,383 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
               ctx.arc(0, 0, ball.radius, 0, Math.PI * 2);
               ctx.fill();
 
-              ctx.fillStyle = 'rgba(255,255,255,0.6)';
+              ctx.fillStyle = 'rgba(255,255,255,0.7)';
               ctx.beginPath();
-              ctx.arc(-3, -3, 3, 0, Math.PI * 2);
+              ctx.arc(-5, -5, 5, 0, Math.PI * 2);
               ctx.fill();
 
               ctx.restore();
 
               ctx.restore();
 
+              // Bottom HUD Bar
               ctx.fillStyle = '#ffffff';
-              ctx.font = 'bold 10px monospace';
-              ctx.fillText('RINGS: ' + ringsCollected + '/' + totalRings, 10, 305);
-              ctx.fillText('LIVES: ' + '❤️'.repeat(lives), 170, 305);
+              ctx.font = 'bold 15px monospace';
+              ctx.fillText('RINGS: ' + ringsCollected + '/' + totalRings, 20, 610);
+              ctx.fillText('LIVES: ' + '❤️'.repeat(lives), 360, 610);
             }
 
-            function loop() {
-              update();
+            function gameLoop(timestamp) {
+              const elapsed = timestamp - lastTime;
+              lastTime = timestamp;
+              accumulator += elapsed;
+
+              while (accumulator >= TIMESTEP) {
+                updatePhysics();
+                accumulator -= TIMESTEP;
+              }
+
               draw();
-              requestAnimationFrame(loop);
+              requestAnimationFrame(gameLoop);
             }
 
-            loop();
+            requestAnimationFrame(gameLoop);
           </script>
         </body>
         </html>
       `;
     }
 
-    // 4. SYMBIAN OS (.SIS / .SISX) -> Genuine Symbian EPOC S60 Web Engine
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <title>Symbian EPOC S60 Engine - ${game.title}</title>
-        <style>
-          * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
-          body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #020617; font-family: -apple-system, "Segoe UI", Roboto, monospace; color: #f8fafc; }
-          #app-root { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-          #game-canvas { background: #000; image-rendering: pixelated; width: 100%; height: 100%; object-fit: contain; max-width: 480px; max-height: 640px; box-shadow: 0 0 50px rgba(0, 240, 255, 0.25); border: 2px solid #1e293b; border-radius: 8px; }
-          .hud-overlay { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between; pointer-events: none; }
-          .badge { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(6, 182, 212, 0.4); color: #22d3ee; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 9999px; backdrop-filter: blur(8px); }
-        </style>
-      </head>
-      <body>
-        <div id="app-root">
-          <div class="hud-overlay">
-            <div class="badge">🕹️ SYMBIAN EPOC: ${game.title}</div>
-            <div class="badge" id="score-tag">SCORE: 0</div>
+    // 4. SYMBIAN EPOC (.SIS / .SISX) -> Authentic Symbian OS Web Runtime with Full Screen Fitting
+    if (format === 'sis' || format === 'sisx') {
+      return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+          <title>Symbian S60 - ${game.title}</title>
+          <style>
+            * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
+            body, html { width: 100%; height: 100%; overflow: hidden; background: #020617; font-family: -apple-system, "Segoe UI", Roboto, monospace; color: #f8fafc; display: flex; align-items: center; justify-content: center; }
+            #app-root { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+            #sis-canvas { background: #000000; image-rendering: pixelated; width: 100%; height: 100%; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.9); }
+            .hud-overlay { position: absolute; top: 12px; left: 16px; right: 16px; display: flex; justify-content: space-between; pointer-events: none; z-index: 10; }
+            .badge { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 9999px; backdrop-filter: blur(8px); }
+          </style>
+        </head>
+        <body>
+          <div id="app-root">
+            <div class="hud-overlay">
+              <div class="badge">⚔️ SYMBIAN S60: ${game.title}</div>
+              <div class="badge" id="hud-score">SCORE: 0</div>
+            </div>
+            <canvas id="sis-canvas" width="640" height="480"></canvas>
           </div>
-          <canvas id="game-canvas" width="240" height="320"></canvas>
-        </div>
 
-        <script>
-          const canvas = document.getElementById('game-canvas');
-          const ctx = canvas.getContext('2d');
-          const scoreTag = document.getElementById('score-tag');
+          <script>
+            const canvas = document.getElementById('sis-canvas');
+            const ctx = canvas.getContext('2d');
+            const hudScore = document.getElementById('hud-score');
 
-          const AudioCtx = window.AudioContext || window.webkitAudioContext;
-          let audioCtx = null;
-          function initAudio() {
-            if (!audioCtx) audioCtx = new AudioCtx();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-          }
-
-          function playGun() {
-            if (!audioCtx) return;
-            try {
-              const osc = audioCtx.createOscillator();
-              const gain = audioCtx.createGain();
-              osc.type = 'sawtooth';
-              osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-              osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.08);
-              gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-              gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
-              osc.connect(gain); gain.connect(audioCtx.destination);
-              osc.start(); osc.stop(audioCtx.currentTime + 0.09);
-            } catch(e){}
-          }
-
-          function playExplosion() {
-            if (!audioCtx) return;
-            try {
-              const osc = audioCtx.createOscillator();
-              const gain = audioCtx.createGain();
-              osc.type = 'square';
-              osc.frequency.setValueAtTime(120, audioCtx.currentTime);
-              osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.3);
-              gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-              gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-              osc.connect(gain); gain.connect(audioCtx.destination);
-              osc.start(); osc.stop(audioCtx.currentTime + 0.31);
-            } catch(e){}
-          }
-
-          let score = 0;
-          const player = {
-            x: 120,
-            y: 260,
-            speed: 3,
-            hp: 100
-          };
-
-          const bullets = [];
-          const enemies = [];
-          const particles = [];
-          const keys = {};
-
-          window.addEventListener('keydown', (e) => {
-            initAudio();
-            keys[e.key] = true;
-            keys[e.code] = true;
-          });
-          window.addEventListener('keyup', (e) => {
-            keys[e.key] = false;
-            keys[e.code] = false;
-          });
-          window.addEventListener('message', (e) => {
-            initAudio();
-            if (e.data && e.data.type === 'NOKIA_KEY') {
-              const k = e.data.key;
-              const active = e.data.eventType === 'keydown';
-              if (k === '2') keys['ArrowUp'] = active;
-              if (k === '8') keys['ArrowDown'] = active;
-              if (k === '4') keys['ArrowLeft'] = active;
-              if (k === '6') keys['ArrowRight'] = active;
-              if (k === '5') keys['Space'] = active;
-            }
-          });
-
-          canvas.addEventListener('pointerdown', (e) => {
-            initAudio();
-            const rect = canvas.getBoundingClientRect();
-            const touchX = (e.clientX - rect.left) / rect.width * 240;
-            const touchY = (e.clientY - rect.top) / rect.height * 320;
-            player.x = touchX;
-            player.y = touchY;
-            keys['Space'] = true;
-          });
-          window.addEventListener('pointerup', () => { keys['Space'] = false; });
-
-          let shootTimer = 0;
-          let spawnTimer = 0;
-
-          function update() {
-            if (keys['ArrowUp'] || keys['KeyW'] || keys['2']) player.y -= player.speed;
-            if (keys['ArrowDown'] || keys['KeyS'] || keys['8']) player.y += player.speed;
-            if (keys['ArrowLeft'] || keys['KeyA'] || keys['4']) player.x -= player.speed;
-            if (keys['ArrowRight'] || keys['KeyD'] || keys['6']) player.x += player.speed;
-
-            player.x = Math.max(16, Math.min(224, player.x));
-            player.y = Math.max(16, Math.min(304, player.y));
-
-            shootTimer++;
-            if ((keys['Space'] || keys['Enter'] || keys['5']) && shootTimer > 8) {
-              shootTimer = 0;
-              bullets.push({ x: player.x - 6, y: player.y - 12, vx: 0, vy: -7 });
-              bullets.push({ x: player.x + 6, y: player.y - 12, vx: 0, vy: -7 });
-              playGun();
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            let audioCtx = null;
+            function initAudio() {
+              if (!audioCtx) audioCtx = new AudioCtx();
+              if (audioCtx.state === 'suspended') audioCtx.resume();
             }
 
-            for (let i = bullets.length - 1; i >= 0; i--) {
-              const b = bullets[i];
-              b.x += b.vx;
-              b.y += b.vy;
-              if (b.y < -10) bullets.splice(i, 1);
+            function playLaser(type = 'blaster') {
+              if (!audioCtx) return;
+              try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type === 'plasma' ? 'triangle' : 'sawtooth';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.13);
+              } catch(e){}
             }
 
-            spawnTimer++;
-            if (spawnTimer > 45) {
-              spawnTimer = 0;
-              const type = Math.random() > 0.5 ? 'tank' : 'chopper';
-              enemies.push({
-                x: Math.random() * 200 + 20,
-                y: -20,
-                vy: type === 'chopper' ? 2 : 1,
-                hp: type === 'tank' ? 3 : 2,
-                type: type
+            function playExplosion() {
+              if (!audioCtx) return;
+              try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(30, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.31);
+              } catch(e){}
+            }
+
+            let score = 0;
+            let health = 100;
+            const player = {
+              x: 100,
+              y: 360,
+              vx: 0,
+              vy: 0,
+              weapon: 'blaster',
+              ammo: 999,
+              isGrounded: true,
+              facing: 1
+            };
+
+            const bullets = [];
+            const enemies = [
+              { x: 500, y: 360, hp: 40, type: 'mech', vx: -1.2 },
+              { x: 800, y: 360, hp: 60, type: 'tank', vx: -0.8 },
+              { x: 1100, y: 360, hp: 120, type: 'boss', vx: -0.5 }
+            ];
+            const particles = [];
+            const keys = {};
+
+            window.addEventListener('keydown', (e) => {
+              initAudio();
+              keys[e.key] = true;
+              keys[e.code] = true;
+              if (e.code === 'Space' || e.key === '5') {
+                fireWeapon();
+              }
+            });
+            window.addEventListener('keyup', (e) => {
+              keys[e.key] = false;
+              keys[e.code] = false;
+            });
+            window.addEventListener('message', (e) => {
+              initAudio();
+              if (e.data && e.data.type === 'NOKIA_KEY') {
+                const k = e.data.key;
+                const active = e.data.eventType === 'keydown';
+                if (k === '4') keys['ArrowLeft'] = active;
+                if (k === '6') keys['ArrowRight'] = active;
+                if (k === '2') keys['ArrowUp'] = active;
+                if (k === '5' && active) fireWeapon();
+              }
+            });
+
+            function fireWeapon() {
+              playLaser(player.weapon);
+              bullets.push({
+                x: player.x + (player.facing === 1 ? 30 : -10),
+                y: player.y + 12,
+                vx: player.facing * 12,
+                color: '#38bdf8'
               });
             }
 
-            for (let i = enemies.length - 1; i >= 0; i--) {
-              const e = enemies[i];
-              e.y += e.vy;
-              if (e.y > 330) {
-                enemies.splice(i, 1);
-                continue;
+            function addParticle(x, y, color, count = 10) {
+              for (let i = 0; i < count; i++) {
+                particles.push({
+                  x,
+                  y,
+                  vx: (Math.random() - 0.5) * 8,
+                  vy: (Math.random() - 0.5) * 8,
+                  radius: Math.random() * 5 + 2,
+                  color,
+                  life: 1.0,
+                  decay: Math.random() * 0.06 + 0.02
+                });
+              }
+            }
+
+            let lastTime = performance.now();
+            let accumulator = 0;
+            const TIMESTEP = 1000 / 60;
+
+            function updatePhysics() {
+              if (keys['ArrowLeft'] || keys['KeyA'] || keys['4'] || keys['a']) {
+                player.vx = -4.5;
+                player.facing = -1;
+              } else if (keys['ArrowRight'] || keys['KeyD'] || keys['6'] || keys['d']) {
+                player.vx = 4.5;
+                player.facing = 1;
+              } else {
+                player.vx *= 0.8;
               }
 
-              for (let j = bullets.length - 1; j >= 0; j--) {
-                const b = bullets[j];
-                if (Math.hypot(b.x - e.x, b.y - e.y) < 16) {
-                  bullets.splice(j, 1);
-                  e.hp--;
-                  if (e.hp <= 0) {
-                    playExplosion();
-                    score += e.type === 'tank' ? 250 : 150;
-                    scoreTag.innerText = 'SCORE: ' + score;
-                    for (let p = 0; p < 12; p++) {
-                      particles.push({
-                        x: e.x,
-                        y: e.y,
-                        vx: (Math.random() - 0.5) * 4,
-                        vy: (Math.random() - 0.5) * 4,
-                        life: 20
-                      });
+              if ((keys['ArrowUp'] || keys['KeyW'] || keys['2'] || keys['w']) && player.isGrounded) {
+                player.vy = -11.5;
+                player.isGrounded = false;
+              }
+
+              player.vy += 0.55;
+              player.x += player.vx;
+              player.y += player.vy;
+
+              if (player.y >= 360) {
+                player.y = 360;
+                player.vy = 0;
+                player.isGrounded = true;
+              }
+
+              // Update Bullets
+              for (let i = bullets.length - 1; i >= 0; i--) {
+                const b = bullets[i];
+                b.x += b.vx;
+                if (b.x < 0 || b.x > 2000) {
+                  bullets.splice(i, 1);
+                  continue;
+                }
+
+                for (const en of enemies) {
+                  if (en.hp > 0 && Math.hypot(b.x - en.x, b.y - (en.y + 20)) < 40) {
+                    en.hp -= 25;
+                    addParticle(b.x, b.y, '#38bdf8', 6);
+                    bullets.splice(i, 1);
+                    if (en.hp <= 0) {
+                      score += 250;
+                      hudScore.innerText = 'SCORE: ' + score;
+                      playExplosion();
+                      addParticle(en.x, en.y + 20, '#f97316', 20);
                     }
-                    enemies.splice(i, 1);
                     break;
                   }
                 }
               }
-            }
 
-            for (let i = particles.length - 1; i >= 0; i--) {
-              const p = particles[i];
-              p.x += p.vx;
-              p.y += p.vy;
-              p.life--;
-              if (p.life <= 0) particles.splice(i, 1);
-            }
-          }
-
-          let scrollY = 0;
-          function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            scrollY = (scrollY + 1) % 32;
-            ctx.fillStyle = '#0f172a';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.strokeStyle = '#1e293b';
-            ctx.lineWidth = 1;
-            for (let x = 0; x < 240; x += 32) {
-              ctx.beginPath();
-              ctx.moveTo(x, 0); ctx.lineTo(x, 320);
-              ctx.stroke();
-            }
-            for (let y = scrollY - 32; y < 320; y += 32) {
-              ctx.beginPath();
-              ctx.moveTo(0, y); ctx.lineTo(240, y);
-              ctx.stroke();
-            }
-
-            for (const p of particles) {
-              ctx.fillStyle = p.life % 2 === 0 ? '#f59e0b' : '#ef4444';
-              ctx.fillRect(p.x, p.y, 3, 3);
-            }
-
-            ctx.fillStyle = '#38bdf8';
-            for (const b of bullets) {
-              ctx.fillRect(b.x - 1, b.y - 4, 3, 8);
-            }
-
-            for (const e of enemies) {
-              ctx.save();
-              ctx.translate(e.x, e.y);
-              if (e.type === 'tank') {
-                ctx.fillStyle = '#475569';
-                ctx.fillRect(-12, -10, 24, 20);
-                ctx.fillStyle = '#059669';
-                ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#10b981';
-                ctx.fillRect(-2, 0, 4, 12);
-              } else {
-                ctx.fillStyle = '#dc2626';
-                ctx.beginPath();
-                ctx.moveTo(0, 12);
-                ctx.lineTo(-10, -8);
-                ctx.lineTo(10, -8);
-                ctx.fill();
-                ctx.strokeStyle = '#94a3b8';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(-14, 0); ctx.lineTo(14, 0);
-                ctx.stroke();
+              // Update Enemies
+              for (const en of enemies) {
+                if (en.hp > 0) {
+                  en.x += en.vx;
+                  if (en.x < 100 || en.x > 1200) en.vx *= -1;
+                }
               }
-              ctx.restore();
+
+              // Update Particles
+              for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= p.decay;
+                if (p.life <= 0) particles.splice(i, 1);
+              }
             }
 
-            ctx.save();
-            ctx.translate(player.x, player.y);
+            function draw() {
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = '#334155';
-            ctx.fillRect(-10, 4, 6, 10);
-            ctx.fillRect(4, 4, 6, 10);
+              // Cyber Industrial Background
+              ctx.fillStyle = '#0f172a';
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = '#0284c7';
-            ctx.fillRect(-12, -10, 24, 16);
-            ctx.fillStyle = '#38bdf8';
-            ctx.fillRect(-6, -6, 12, 8);
+              // Ground Line
+              ctx.fillStyle = '#334155';
+              ctx.fillRect(0, 400, canvas.width, 80);
+              ctx.fillStyle = '#10b981';
+              ctx.fillRect(0, 400, canvas.width, 4);
 
-            ctx.fillStyle = '#94a3b8';
-            ctx.fillRect(-8, -14, 3, 6);
-            ctx.fillRect(5, -14, 3, 6);
+              // Draw Player Mech
+              ctx.fillStyle = '#38bdf8';
+              ctx.fillRect(player.x - 15, player.y - 10, 30, 40);
+              ctx.fillStyle = '#0284c7';
+              ctx.fillRect(player.x + (player.facing === 1 ? 10 : -25), player.y + 5, 18, 8);
 
-            ctx.restore();
-          }
+              // Draw Enemies
+              for (const en of enemies) {
+                if (en.hp > 0) {
+                  ctx.fillStyle = en.type === 'boss' ? '#dc2626' : '#f59e0b';
+                  ctx.fillRect(en.x - 20, en.y - 15, 40, 45);
+                  ctx.fillStyle = '#ef4444';
+                  ctx.fillRect(en.x - 20, en.y - 25, (en.hp / (en.type === 'boss' ? 120 : 40)) * 40, 4);
+                }
+              }
 
-          function loop() {
-            update();
-            draw();
+              // Draw Bullets
+              for (const b of bullets) {
+                ctx.fillStyle = b.color;
+                ctx.fillRect(b.x - 6, b.y - 2, 12, 4);
+              }
+
+              // Draw Particles
+              for (const p of particles) {
+                ctx.save();
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+              }
+
+              // HUD
+              ctx.fillStyle = '#ffffff';
+              ctx.font = 'bold 14px monospace';
+              ctx.fillText('HEALTH: ' + health + '%', 20, 460);
+            }
+
+            function loop(timestamp) {
+              const elapsed = timestamp - lastTime;
+              lastTime = timestamp;
+              accumulator += elapsed;
+              while (accumulator >= TIMESTEP) {
+                updatePhysics();
+                accumulator -= TIMESTEP;
+              }
+              draw();
+              requestAnimationFrame(loop);
+            }
             requestAnimationFrame(loop);
-          }
+          </script>
+        </body>
+        </html>
+      `;
+    }
 
-          loop();
-        </script>
+    // Default Fallback
+    return `
+      <!DOCTYPE html>
+      <html>
+      <body style="background:#020617;color:#f8fafc;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
+        <div style="text-align:center;">
+          <h3>Arcadex Universal Core</h3>
+          <p>Ready for binary stream.</p>
+        </div>
       </body>
       </html>
     `;
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-center relative bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl p-2 sm:p-4">
-      {/* Emulator Canvas Display Area */}
-      <div 
-        className="w-full flex items-center justify-center relative rounded-xl overflow-hidden bg-black"
-        style={{ aspectRatio: aspectRatio === '16:9' ? '16/9' : aspectRatio === '1:1' ? '1/1' : '4/3', maxHeight: '70vh' }}
-      >
-        {isLoading && (
-          <div className="flex flex-col items-center gap-3 text-cyan-400">
-            <div className="w-8 h-8 border-3 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
-            <span className="text-xs font-semibold">Booting Universal WASM Core...</span>
-          </div>
-        )}
-
-        {error && (
-          <div className="flex flex-col items-center gap-3 text-rose-400 p-6 text-center">
-            <ShieldAlert className="w-10 h-10 text-rose-500" />
-            <span className="text-sm font-bold">{error}</span>
-          </div>
-        )}
-
-        {!isLoading && !error && romBlobUrl && (
+    <div className="w-full h-full flex flex-col items-center justify-center relative bg-slate-950 rounded-xl overflow-hidden shadow-2xl">
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center p-8 text-center gap-3">
+          <div className="w-12 h-12 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
+          <span className="text-sm font-bold text-slate-300">Booting {game.title}...</span>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center p-8 text-center max-w-md gap-3">
+          <ShieldAlert className="w-12 h-12 text-rose-500 animate-bounce" />
+          <h3 className="text-lg font-bold text-white">Execution Error</h3>
+          <p className="text-xs text-slate-400">{error}</p>
+        </div>
+      ) : (
+        <div className="w-full h-full flex flex-col items-center justify-center relative">
           <iframe
             ref={iframeRef}
             srcDoc={buildEmulatorDoc()}
-            className={`w-full h-full border-0 ${
-              activeShader === 'crt' ? 'filter contrast-125 saturate-150 brightness-105' :
-              activeShader === 'lcd' ? 'filter sepia-50 hue-rotate-90' :
-              activeShader === 'amber' ? 'filter sepia-100 hue-rotate-30' : ''
-            }`}
-            sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-autoplay"
-            allow="autoplay; gamepad"
+            title={game.title}
+            className="w-full h-full min-h-[540px] border-0 rounded-xl"
+            allow="autoplay; fullscreen; gamepad; focus"
+            sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups"
           />
-        )}
-      </div>
 
-      {/* Retro Nokia Virtual Keypad */}
-      {['jar', 'sis', 'jad', 'sisx'].includes(format) && customKeypadOpen && (
-        <div className="mt-3 p-3 bg-slate-900/90 rounded-2xl border border-slate-800 shadow-xl flex flex-col items-center gap-2 max-w-sm w-full select-none">
-          <div className="text-[10px] font-black text-cyan-400 uppercase tracking-wider">
-            Nokia Virtual Keypad
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 w-full max-w-[240px]">
-            {['1', '2 (▲)', '3', '4 (◄)', '5 (OK)', '6 (►)', '7', '8 (▼)', '9', '*', '0', '#'].map((k) => (
-              <button
-                key={k}
-                onMouseDown={() => sendKey(k[0], 'keydown')}
-                onMouseUp={() => sendKey(k[0], 'keyup')}
-                onTouchStart={(e) => { e.preventDefault(); sendKey(k[0], 'keydown'); }}
-                onTouchEnd={(e) => { e.preventDefault(); sendKey(k[0], 'keyup'); }}
-                className="py-2 bg-slate-800 hover:bg-cyan-600 active:bg-cyan-500 text-white font-bold text-xs rounded-xl shadow border border-slate-700 active:scale-95 transition-all text-center cursor-pointer"
-              >
-                {k}
-              </button>
-            ))}
-          </div>
+          {/* Virtual Retro Phone Keypad for J2ME/Symbian Games */}
+          {(format === 'jar' || format === 'jad' || format === 'sis') && customKeypadOpen && (
+            <div className="w-full bg-slate-900/95 border-t border-slate-800 p-3 flex items-center justify-center gap-2 flex-wrap">
+              <div className="grid grid-cols-3 gap-1.5 max-w-[220px]">
+                {['1', '2 (▲)', '3', '4 (◄)', '5 (OK)', '6 (►)', '7', '8 (▼)', '9', '*', '0', '#'].map((k) => (
+                  <button
+                    key={k}
+                    onMouseDown={() => sendKey(k[0], 'keydown')}
+                    onMouseUp={() => sendKey(k[0], 'keyup')}
+                    onTouchStart={() => sendKey(k[0], 'keydown')}
+                    onTouchEnd={() => sendKey(k[0], 'keyup')}
+                    className="p-2 bg-slate-800 hover:bg-cyan-600 active:bg-cyan-500 text-white rounded-lg text-xs font-mono font-bold transition-all border border-slate-700 shadow-sm"
+                  >
+                    {k}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

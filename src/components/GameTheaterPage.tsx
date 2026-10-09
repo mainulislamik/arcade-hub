@@ -82,7 +82,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
   
   // Advanced features state
   const [ambientGlowEnabled, setAmbientGlowEnabled] = useState(true);
-  const [aspectRatio, setAspectRatio] = useState<'auto' | '16:9' | '4:3' | '9:16'>('auto');
+  const [aspectRatio, setAspectRatio] = useState<'auto' | '16:9' | '4:3' | '3:4' | '9:16' | 'fill'>('auto');
   const [shaderPreset, setShaderPreset] = useState<ShaderPreset>('none');
   const [showMultiplayerModal, setShowMultiplayerModal] = useState(false);
   const [showInterstitial, setShowInterstitial] = useState(false);
@@ -178,13 +178,25 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
     .filter(g => g.id !== game.id)
     .slice(0, 6);
 
-  // Aspect ratio class mapper
+  // Aspect ratio class mapper with responsive height & auto-fit
   const getAspectRatioContainerClass = () => {
     switch (aspectRatio) {
-      case '16:9': return 'w-full aspect-[16/9] max-h-[85vh]';
-      case '4:3': return 'w-full max-w-[850px] aspect-[4/3] max-h-[85vh] mx-auto';
-      case '9:16': return 'w-full max-w-[440px] aspect-[9/16] max-h-[85vh] mx-auto';
-      default: return 'w-full min-h-[500px] h-[72vh] max-h-[820px]';
+      case '16:9': return 'w-full aspect-[16/9] max-h-[88vh]';
+      case '4:3': return 'w-full max-w-[960px] aspect-[4/3] max-h-[88vh] mx-auto';
+      case '3:4': return 'w-full max-w-[620px] aspect-[3/4] max-h-[88vh] mx-auto';
+      case '9:16': return 'w-full max-w-[480px] aspect-[9/16] max-h-[88vh] mx-auto';
+      case 'fill': return 'w-full h-[82vh] max-h-[920px]';
+      default: {
+        // Auto detection based on platform / game properties
+        const fmt = (game.romFormat || game.platform || '').toLowerCase();
+        if (fmt === 'jar' || fmt === 'sis' || game.aspectRatio === '9:16' || game.aspectRatio === '3:4') {
+          return 'w-full max-w-[640px] aspect-[3/4] max-h-[88vh] mx-auto';
+        }
+        if (['gba', 'nes', 'snes', 'gb', 'arcade', 'retro'].includes(fmt) || game.aspectRatio === '4:3') {
+          return 'w-full max-w-[960px] aspect-[4/3] max-h-[88vh] mx-auto';
+        }
+        return 'w-full min-h-[540px] h-[78vh] max-h-[880px]';
+      }
     }
   };
 
@@ -462,6 +474,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
                 game={game}
                 soundEnabled={soundEnabled}
                 onToggleSound={onToggleSound}
+                aspectRatio={aspectRatio}
                 onScoreUpdate={(s) => {
                   setCurrentScore(s);
                   recordQuestAction('score', s);
