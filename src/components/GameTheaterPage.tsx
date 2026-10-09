@@ -39,6 +39,12 @@ import { MultiplayerLobbyModal } from './multiplayer/MultiplayerLobbyModal';
 import { WebRTCPeerEngine } from '../utils/webrtcMultiplayer';
 import { TRANSLATIONS, LanguageCode } from '../utils/i18n';
 import { recordQuestAction } from '../utils/gamification';
+import { useGamepad } from '../hooks/useGamepad';
+import { GamepadHUD } from './player/GamepadHUD';
+import { AdSenseBanner } from './ads/AdSenseBanner';
+import { GameInterstitialAd } from './ads/GameInterstitialAd';
+import { GameSEO } from './seo/GameSEO';
+import { recordGameScore, recordPlayDuration } from '../utils/gameStateSync';
 
 interface GameTheaterPageProps {
   game: GameItem;
@@ -79,16 +85,26 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
   const [aspectRatio, setAspectRatio] = useState<'auto' | '16:9' | '4:3' | '9:16'>('auto');
   const [shaderPreset, setShaderPreset] = useState<ShaderPreset>('none');
   const [showMultiplayerModal, setShowMultiplayerModal] = useState(false);
+  const [showInterstitial, setShowInterstitial] = useState(false);
   const [activePeerEngine, setActivePeerEngine] = useState<WebRTCPeerEngine | null>(null);
   const [peerRole, setPeerRole] = useState<'host' | 'guest' | null>(null);
   const [snapshotTaken, setSnapshotTaken] = useState(false);
 
   const theaterContainerRef = useRef<HTMLDivElement>(null);
+  const gamepad = useGamepad();
 
-  // Scroll to top and record daily quest play action
+  // Scroll to top, record daily quest play action & session timer
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     recordQuestAction('play', 1);
+
+    const startTime = Date.now();
+    return () => {
+      const durationSeconds = Math.round((Date.now() - startTime) / 1000);
+      if (durationSeconds > 5) {
+        recordPlayDuration(game.id, durationSeconds);
+      }
+    };
   }, [game.id]);
 
   const handleVote = (type: 'like' | 'dislike') => {
@@ -174,20 +190,35 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 transition-all duration-300">
-      {/* Breadcrumb Navigation */}
-      <nav className="flex items-center gap-2 text-xs text-slate-500 mb-4 font-medium">
-        <button 
-          onClick={onBackToLobby}
-          className="hover:text-indigo-600 flex items-center gap-1 transition-colors"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          Arcadex
-        </button>
-        <ChevronRight className="w-3 h-3 text-slate-400" />
-        <span className="capitalize text-slate-600 font-semibold">{game.category}</span>
-        <ChevronRight className="w-3 h-3 text-slate-400" />
-        <span className="text-slate-900 font-bold truncate max-w-[200px]">{game.title}</span>
-      </nav>
+      {/* Deep SEO Schema.org & Meta Tags */}
+      <GameSEO game={game} />
+
+      {/* Optional Interstitial Break Ad */}
+      <GameInterstitialAd 
+        isOpen={showInterstitial} 
+        onClose={() => setShowInterstitial(false)} 
+        title={`${game.title} · Reward Break`} 
+      />
+
+      {/* Breadcrumb Navigation & Gamepad HUD */}
+      <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+        <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+          <button 
+            onClick={onBackToLobby}
+            className="hover:text-indigo-600 transition-colors flex items-center gap-1 font-bold text-slate-700"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Arcadex
+          </button>
+          <ChevronRight className="w-3 h-3 text-slate-400" />
+          <span className="capitalize text-slate-600 font-semibold">{game.category}</span>
+          <ChevronRight className="w-3 h-3 text-slate-400" />
+          <span className="text-slate-900 font-bold truncate max-w-[200px]">{game.title}</span>
+        </nav>
+        
+        {/* Gamepad Active Badge */}
+        <GamepadHUD gamepad={gamepad} />
+      </div>
 
       {/* Main Theater Card Container */}
       <div className={`transition-all duration-300 ${isTheaterExpanded ? 'max-w-none' : 'max-w-6xl mx-auto'}`}>
@@ -438,6 +469,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
                 onGameOver={(s) => {
                   setCurrentScore(s);
                   recordGamePlay(game.id, s);
+                  recordGameScore(game.id, s);
                   recordQuestAction('score', s);
                 }}
               />
@@ -450,14 +482,9 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
           <SpeedrunTimer gameId={game.id} gameTitle={game.title} isGameActive={true} />
         </div>
 
-        {/* Policy-Safe Leaderboard Ad Placement Placeholder */}
-        <div className="my-6 p-4 rounded-2xl bg-slate-100 border border-slate-200 text-center flex flex-col items-center justify-center min-h-[90px]">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
-            SPONSORED ADVERTISEMENT
-          </span>
-          <div className="text-xs text-slate-500 font-medium">
-            Google AdSense Responsive Leaderboard (728x90 / 970x250 High CTR Slot)
-          </div>
+        {/* Google AdSense Responsive High-CTR Leaderboard Slot */}
+        <div className="my-6">
+          <AdSenseBanner slotId="1001001001" format="horizontal" />
         </div>
 
         {/* 2-Column Main Section: Rich SEO Guide & Related Games */}
@@ -695,6 +722,11 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Sidebar AdSense High CTR Rectangle Banner */}
+            <div className="pt-2">
+              <AdSenseBanner slotId="2002002002" format="rectangle" />
             </div>
           </div>
         </div>

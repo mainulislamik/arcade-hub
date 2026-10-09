@@ -10,6 +10,7 @@ import { AchievementsModal } from './components/AchievementsModal';
 import { StatsDrawer } from './components/StatsDrawer';
 import { DeveloperPortalModal } from './components/developer/DeveloperPortalModal';
 import { DailyQuestsModal } from './components/gamification/DailyQuestsModal';
+import { AdSenseBanner } from './components/ads/AdSenseBanner';
 import { sounds } from './utils/soundEngine';
 import { getFavorites, toggleFavorite as toggleFavStorage, getPlayerProfile, recordGamePlay } from './utils/storage';
 import { updatePageSEO } from './utils/seo';

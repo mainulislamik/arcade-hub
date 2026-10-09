@@ -580,6 +580,110 @@ games = [
     "controls": {
       "mouse": ["Click column to drop chip"]
     }
+  },
+  {
+    "id": "duckhunt",
+    "title": "Duck Hunt 8-Bit",
+    "slug": "duckhunt",
+    "category": "shooting",
+    "tags": ["shooting", "retro", "arcade", "gun", "duck", "8bit"],
+    "description": "Authentic 8-bit Duck Hunt arcade with original audio, sprites, and clay shooting.",
+    "longDescription": "The classic NES Duck Hunt game faithfully recreated in JavaScript with original sound effects, flying duck physics, laughing dog, and precision mouse/touch aiming.",
+    "difficulty": "Medium",
+    "rating": 4.9,
+    "plays": 68400,
+    "likes": 6120,
+    "featured": True,
+    "badge": "Arcade Legend",
+    "cover": "/assets/covers/duckhunt.jpg",
+    "coverImage": "/assets/covers/duckhunt.jpg",
+    "thumbnailUrl": "/assets/covers/duckhunt.jpg",
+    "aspectRatio": "4:3",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/duckhunt/index.html",
+    "licenseType": "MIT Open Source",
+    "developer": "Matt Surabian",
+    "controls": {
+      "mouse": ["Click to shoot ducks"],
+      "touch": ["Tap to shoot"]
+    }
+  },
+  {
+    "id": "breaklock",
+    "title": "Breaklock Cyber",
+    "slug": "breaklock",
+    "category": "puzzle",
+    "tags": ["puzzle", "cyber", "security", "pattern", "brain", "mastermind"],
+    "description": "A hybrid of Mastermind and Android pattern lock. Decode the secret cyber key!",
+    "longDescription": "Breaklock is an open-source cyber puzzle created by maxwellito. Connect dots on the lock screen to guess the correct password pattern with visual feedback clues.",
+    "difficulty": "Hard",
+    "rating": 4.8,
+    "plays": 39400,
+    "likes": 3520,
+    "badge": "Cyber Mind",
+    "cover": "/assets/covers/breaklock.jpg",
+    "coverImage": "/assets/covers/breaklock.jpg",
+    "thumbnailUrl": "/assets/covers/breaklock.jpg",
+    "aspectRatio": "1:1",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/breaklock/index.html",
+    "licenseType": "MIT Open Source",
+    "developer": "maxwellito",
+    "controls": {
+      "mouse": ["Drag between dots to draw lock pattern"],
+      "touch": ["Swipe between dots"]
+    }
+  },
+  {
+    "id": "asteroids",
+    "title": "Asteroids 1979",
+    "slug": "asteroids",
+    "category": "arcade",
+    "tags": ["arcade", "vector", "space", "retro", "classic", "asteroids"],
+    "description": "The vector space shooter legend. Blast asteroids and alien flying saucers!",
+    "longDescription": "The original vector-style Asteroids space shooter in HTML5 Canvas. Rotate your triangular spaceship, thrust through deep space, shoot splitting asteroids, and survive UFOs.",
+    "difficulty": "Medium",
+    "rating": 4.8,
+    "plays": 48200,
+    "likes": 4210,
+    "badge": "Vector 1979",
+    "cover": "/assets/covers/asteroids.jpg",
+    "coverImage": "/assets/covers/asteroids.jpg",
+    "thumbnailUrl": "/assets/covers/asteroids.jpg",
+    "aspectRatio": "4:3",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/asteroids/index.html",
+    "licenseType": "GPL Open Source",
+    "developer": "Doug McInnes",
+    "controls": {
+      "keyboard": ["Left/Right Arrow: Rotate", "Up Arrow: Thrust", "Space: Fire Laser"]
+    }
+  },
+  {
+    "id": "memory-game",
+    "title": "Memory Matrix Match",
+    "slug": "memory-game",
+    "category": "puzzle",
+    "tags": ["puzzle", "memory", "brain", "cards", "casual"],
+    "description": "Card flip brain reflex training and visual memory matching challenge.",
+    "longDescription": "Test and train your visual memory by flipping card tiles to find matching pairs in minimum moves and fastest time with rewarding star ratings.",
+    "difficulty": "Easy",
+    "rating": 4.7,
+    "plays": 31200,
+    "likes": 2780,
+    "badge": "Brain Gym",
+    "cover": "/assets/covers/memory-game.jpg",
+    "coverImage": "/assets/covers/memory-game.jpg",
+    "thumbnailUrl": "/assets/covers/memory-game.jpg",
+    "aspectRatio": "1:1",
+    "engineType": "iframe_web",
+    "binaryUrl": "/games/memory-game/index.html",
+    "licenseType": "MIT Open Source",
+    "developer": "Sandra Israel",
+    "controls": {
+      "mouse": ["Click cards to flip and match pairs"],
+      "touch": ["Tap cards"]
+    }
   }
 ]
 
