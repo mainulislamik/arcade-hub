@@ -29,7 +29,8 @@ import {
   Monitor,
   Save,
   Film,
-  Bot
+  Bot,
+  Timer
 } from 'lucide-react';
 import { GameItem } from '../types/game';
 import { sounds } from '../utils/soundEngine';
@@ -43,6 +44,8 @@ import { SaveStateQuickHUD } from './player/SaveStateQuickHUD';
 import { ReplayExportModal } from './player/ReplayExportModal';
 import { AchievementNotification } from './player/AchievementNotification';
 import { AiGamingCoachModal } from './player/AiGamingCoachModal';
+import { SpeedrunLeaderboardModal } from './player/SpeedrunLeaderboardModal';
+import { GamepadRemapperModal } from './player/GamepadRemapperModal';
 import { AchievementEngine } from '../utils/achievementEngine';
 import { ReplayRecorder } from '../utils/replayRecorder';
 import { SaveStateManager } from '../utils/saveStateManager';
@@ -100,6 +103,8 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
   const [showInterstitial, setShowInterstitial] = useState(false);
   const [showSaveStateHUD, setShowSaveStateHUD] = useState(false);
   const [showAiCoachModal, setShowAiCoachModal] = useState(false);
+  const [showSpeedrunModal, setShowSpeedrunModal] = useState(false);
+  const [showGamepadModal, setShowGamepadModal] = useState(false);
   const [showReplayModal, setShowReplayModal] = useState(false);
   const [replayBlob, setReplayBlob] = useState<Blob | null>(null);
   const [activePeerEngine, setActivePeerEngine] = useState<WebRTCPeerEngine | null>(null);
@@ -523,6 +528,25 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
               <span>AI Coach</span>
             </button>
 
+            {/* Speedrun Hall of Fame */}
+            <button
+              onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setShowSpeedrunModal(true); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
+              title="Speedrun Leaderboard & Ghost Times"
+            >
+              <Timer className="w-3.5 h-3.5" />
+              <span>Speedrun</span>
+            </button>
+
+            {/* Gamepad Calibrator */}
+            <button
+              onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setShowGamepadModal(true); }}
+              className="p-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-colors"
+              title="Gamepad Studio, Deadzones & Button Remapper"
+            >
+              <Gamepad2 className="w-4 h-4" />
+            </button>
+
             {/* 3D Arcade Cabinet Mode Toggle */}
             <button
               onClick={() => { sounds.playClick(); setArcadeCabinetMode(!arcadeCabinetMode); }}
@@ -912,6 +936,19 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
         onClose={() => setShowAiCoachModal(false)}
         game={game}
         currentScore={currentScore}
+      />
+
+      {/* Speedrun Leaderboard Modal */}
+      <SpeedrunLeaderboardModal
+        isOpen={showSpeedrunModal}
+        onClose={() => setShowSpeedrunModal(false)}
+        game={game}
+      />
+
+      {/* Gamepad Remapper & Calibrator Modal */}
+      <GamepadRemapperModal
+        isOpen={showGamepadModal}
+        onClose={() => setShowGamepadModal(false)}
       />
 
       {/* Steam / PlayStation Style Achievement Notification Toast */}

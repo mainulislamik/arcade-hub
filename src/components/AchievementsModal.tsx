@@ -1,127 +1,193 @@
-import React from 'react';
-import { Achievement } from '../types/game';
-import { X, Trophy, Sparkles, CheckCircle2, Lock, Flame, Award } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { 
+  Trophy, 
+  Sparkles, 
+  CheckCircle2, 
+  Lock, 
+  X, 
+  Award, 
+  Crown,
+  Medal,
+  Star,
+  Flame,
+  Zap,
+  Filter
+} from 'lucide-react';
+import { AchievementEngine, Trophy as TrophyItem } from '../utils/achievementEngine';
 import { sounds } from '../utils/soundEngine';
+import { HapticEngine } from '../utils/hapticEngine';
 
 interface AchievementsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  achievements: Achievement[];
+  achievements?: any[];
 }
 
 export const AchievementsModal: React.FC<AchievementsModalProps> = ({
   isOpen,
-  onClose,
-  achievements,
+  onClose
 }) => {
+  const [trophies, setTrophies] = useState<TrophyItem[]>([]);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'unlocked' | 'locked'>('all');
+
+  useEffect(() => {
+    if (isOpen) {
+      setTrophies(AchievementEngine.getAllTrophies());
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
-  const unlockedCount = achievements.filter((a) => a.unlocked).length;
-  const totalCount = achievements.length;
-  const progressPercent = Math.round((unlockedCount / totalCount) * 100);
+  const unlockedCount = trophies.filter(t => t.unlocked).length;
+  const totalCount = trophies.length;
+  const totalPoints = trophies.filter(t => t.unlocked).reduce((sum, t) => sum + t.points, 0);
+  const maxPoints = trophies.reduce((sum, t) => sum + t.points, 0);
+  const progressPercent = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
+
+  const filteredTrophies = trophies.filter(t => {
+    if (activeFilter === 'unlocked') return t.unlocked;
+    if (activeFilter === 'locked') return !t.unlocked;
+    return true;
+  });
+
+  const getTierBadge = (tier: string) => {
+    switch (tier) {
+      case 'platinum':
+        return { label: 'PLATINUM', color: 'from-cyan-400 to-indigo-400 text-slate-950 border-cyan-300' };
+      case 'gold':
+        return { label: 'GOLD', color: 'from-amber-400 to-yellow-500 text-slate-950 border-amber-300' };
+      case 'silver':
+        return { label: 'SILVER', color: 'from-slate-200 to-slate-400 text-slate-900 border-slate-200' };
+      default:
+        return { label: 'BRONZE', color: 'from-amber-700 to-amber-900 text-amber-100 border-amber-600' };
+    }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        onClick={() => {
-          sounds.playClick();
-          onClose();
-        }}
-        className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"
-      />
-
-      {/* Modal Dialog */}
-      <div className="relative w-full max-w-2xl bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        {/* Modal Header */}
-        <div className="p-6 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white flex items-center justify-between">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-md animate-fade-in">
+      <div className="bg-slate-900 border border-amber-500/40 rounded-3xl w-full max-w-2xl shadow-2xl flex flex-col overflow-hidden shadow-amber-950/50 max-h-[90vh]">
+        {/* Header */}
+        <div className="p-5 bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 text-white flex items-center justify-between shadow-lg">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-white/20 backdrop-blur-md rounded-2xl border border-white/20">
-              <Trophy className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 shadow-inner">
+              <Trophy className="w-6 h-6 text-white animate-pulse" />
             </div>
             <div>
-              <h3 className="text-xl font-black tracking-tight">Trophy Vault & Badges</h3>
-              <p className="text-xs text-amber-100 font-medium">
-                Unlock achievements as you play games across Arcadex
-              </p>
+              <h2 className="text-lg font-black tracking-tight flex items-center gap-2">
+                TROPHY VAULT & GAMERSCORE
+                <Crown className="w-4 h-4 text-amber-300" />
+              </h2>
+              <p className="text-xs text-amber-100 font-medium">Unlock badges & achievements across all 37 Arcadex games</p>
             </div>
           </div>
-
           <button
-            onClick={() => {
-              sounds.playClick();
-              onClose();
-            }}
-            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition"
+            onClick={() => { sounds.playClick(); onClose(); }}
+            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Progress Strip */}
-        <div className="px-6 py-4 bg-amber-50/60 border-b border-amber-100 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Award className="w-4 h-4 text-amber-600" />
-            <span className="text-xs font-bold text-slate-800">
-              Completion: {unlockedCount} of {totalCount} Badges ({progressPercent}%)
-            </span>
+        {/* Gamerscore Summary Header */}
+        <div className="p-5 bg-slate-950/80 border-b border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center gap-2">
+              <Sparkles className="w-5 h-5" />
+              <div>
+                <span className="text-[10px] font-bold uppercase text-slate-400 block">Total Gamerscore</span>
+                <span className="text-xl font-black text-amber-300 font-mono">{totalPoints} / {maxPoints} GS</span>
+              </div>
+            </div>
+            <div>
+              <span className="text-[10px] font-bold uppercase text-slate-400 block">Trophies Unlocked</span>
+              <span className="text-lg font-black text-white">{unlockedCount} of {totalCount} ({progressPercent}%)</span>
+            </div>
           </div>
 
-          <div className="w-36 bg-amber-200/80 rounded-full h-2.5 overflow-hidden">
-            <div
-              className="bg-amber-600 h-full rounded-full transition-all duration-500"
+          {/* Progress Bar */}
+          <div className="w-full sm:w-48 bg-slate-800 rounded-full h-3 overflow-hidden border border-slate-700">
+            <div 
+              className="bg-gradient-to-r from-amber-500 to-yellow-400 h-full transition-all duration-500"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
         </div>
 
-        {/* Achievements Grid */}
-        <div className="p-6 overflow-y-auto space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {achievements.map((ach) => (
+        {/* Filter Tabs */}
+        <div className="flex border-b border-slate-800 bg-slate-950/40">
+          {(['all', 'unlocked', 'locked'] as const).map(f => (
+            <button
+              key={f}
+              onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setActiveFilter(f); }}
+              className={`flex-1 py-2.5 text-xs font-bold text-center border-b-2 transition-all capitalize cursor-pointer ${
+                activeFilter === f
+                  ? 'border-amber-400 text-amber-300 bg-amber-500/10'
+                  : 'border-transparent text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {f === 'all' ? `All Trophies (${totalCount})` : f === 'unlocked' ? `Unlocked (${unlockedCount})` : `Locked (${totalCount - unlockedCount})`}
+            </button>
+          ))}
+        </div>
+
+        {/* Trophies Grid */}
+        <div className="p-4 space-y-2.5 overflow-y-auto flex-1 max-h-96">
+          {filteredTrophies.map(trophy => {
+            const tierInfo = getTierBadge(trophy.tier);
+
+            return (
               <div
-                key={ach.id}
-                className={`p-4 rounded-2xl border transition-all flex items-start gap-3.5 ${
-                  ach.unlocked
-                    ? 'bg-amber-50/40 border-amber-200 shadow-sm'
-                    : 'bg-slate-50 border-slate-200 opacity-60'
+                key={trophy.id}
+                className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 transition-all ${
+                  trophy.unlocked
+                    ? 'bg-slate-950/80 border-slate-700 hover:border-amber-500/40'
+                    : 'bg-slate-950/30 border-slate-900 opacity-60'
                 }`}
               >
-                <div
-                  className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0 shadow-sm ${
-                    ach.unlocked
-                      ? 'bg-amber-100 border border-amber-300'
-                      : 'bg-slate-200 border border-slate-300 grayscale'
-                  }`}
-                >
-                  {ach.icon}
-                </div>
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className={`w-11 h-11 rounded-2xl flex items-center justify-center font-black text-lg shrink-0 border ${
+                    trophy.unlocked
+                      ? 'bg-gradient-to-br from-amber-500/20 to-orange-500/20 border-amber-500/50 text-amber-300 shadow-md shadow-amber-950/40'
+                      : 'bg-slate-900 border-slate-800 text-slate-600'
+                  }`}>
+                    {trophy.unlocked ? <Trophy className="w-5 h-5 text-amber-400" /> : <Lock className="w-4 h-4 text-slate-600" />}
+                  </div>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-1 mb-0.5">
-                    <h4 className="text-xs font-bold text-slate-900 truncate">{ach.title}</h4>
-                    {ach.unlocked ? (
-                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200 flex items-center gap-0.5">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                        Unlocked
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-sm font-black text-white truncate">{trophy.title}</h4>
+                      <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-md bg-gradient-to-r ${tierInfo.color} border`}>
+                        {tierInfo.label}
                       </span>
-                    ) : (
-                      <span className="text-[10px] font-bold text-slate-400 flex items-center gap-0.5">
-                        <Lock className="w-3 h-3" />
-                        Locked
+                    </div>
+                    <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">{trophy.description}</p>
+                    {trophy.unlockedAt && (
+                      <span className="text-[10px] text-amber-400/80 font-medium block mt-1">
+                        Unlocked on {new Date(trophy.unlockedAt).toLocaleDateString()}
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-slate-600 leading-snug">{ach.description}</p>
+                </div>
+
+                <div className="text-right shrink-0">
+                  <span className="text-xs font-mono font-black text-amber-400 bg-amber-950/40 border border-amber-500/30 px-2 py-1 rounded-lg">
+                    +{trophy.points} GS
+                  </span>
                 </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-slate-50 border-t border-slate-100 text-center text-xs text-slate-500">
-          Achievements unlock automatically in real-time as you score high points!
+        <div className="p-4 bg-slate-950 border-t border-slate-800 flex items-center justify-between">
+          <span className="text-xs text-slate-500">Auto-saved to local browser vault</span>
+          <button
+            onClick={() => { sounds.playClick(); onClose(); }}
+            className="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition-all shadow-md shadow-amber-900/40 cursor-pointer"
+          >
+            Close Vault
+          </button>
         </div>
       </div>
     </div>

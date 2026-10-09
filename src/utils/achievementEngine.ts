@@ -9,6 +9,7 @@ export interface Trophy {
   description: string;
   category: 'action' | 'retro' | 'speed' | 'score' | 'master';
   tier: 'bronze' | 'silver' | 'gold' | 'platinum';
+  points: number;
   icon: string;
   unlocked: boolean;
   unlockedAt?: number;
@@ -21,6 +22,7 @@ const TROPHY_DEFINITIONS: Omit<Trophy, 'unlocked' | 'unlockedAt'>[] = [
     description: 'Launch and play your first game on Arcadex.',
     category: 'retro',
     tier: 'bronze',
+    points: 50,
     icon: '🎮'
   },
   {
@@ -29,6 +31,7 @@ const TROPHY_DEFINITIONS: Omit<Trophy, 'unlocked' | 'unlockedAt'>[] = [
     description: 'Score over 1,000 points in Nokia Bounce or Java platformers.',
     category: 'score',
     tier: 'silver',
+    points: 100,
     icon: '🔴'
   },
   {
@@ -37,6 +40,7 @@ const TROPHY_DEFINITIONS: Omit<Trophy, 'unlocked' | 'unlockedAt'>[] = [
     description: 'Use the 10-Second Rewind to save yourself from disaster.',
     category: 'master',
     tier: 'silver',
+    points: 100,
     icon: '⏳'
   },
   {
@@ -45,6 +49,7 @@ const TROPHY_DEFINITIONS: Omit<Trophy, 'unlocked' | 'unlockedAt'>[] = [
     description: 'Play a game for more than 5 minutes continuously.',
     category: 'speed',
     tier: 'gold',
+    points: 250,
     icon: '⚡'
   },
   {
@@ -53,6 +58,7 @@ const TROPHY_DEFINITIONS: Omit<Trophy, 'unlocked' | 'unlockedAt'>[] = [
     description: 'Host or join a WebRTC P2P Multiplayer room.',
     category: 'action',
     tier: 'gold',
+    points: 250,
     icon: '⚔️'
   },
   {
@@ -61,6 +67,7 @@ const TROPHY_DEFINITIONS: Omit<Trophy, 'unlocked' | 'unlockedAt'>[] = [
     description: 'Upload and run a custom ROM or SIS file into the Vault.',
     category: 'master',
     tier: 'platinum',
+    points: 500,
     icon: '👑'
   }
 ];
@@ -77,6 +84,10 @@ export class AchievementEngine {
       unlocked: !!unlockedMap[def.id],
       unlockedAt: unlockedMap[def.id]
     }));
+  }
+
+  static getAllTrophies(): Trophy[] {
+    return this.getTrophies();
   }
 
   static unlockTrophy(id: string): Trophy | null {

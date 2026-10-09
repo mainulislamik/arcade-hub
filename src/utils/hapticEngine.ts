@@ -45,6 +45,10 @@ export class HapticEngine {
     } catch {}
   }
 
+  static heavyRumble() {
+    this.heavyCrash();
+  }
+
   /**
    * Checkpoint & Level Clear Fanfare Rhythm
    */
