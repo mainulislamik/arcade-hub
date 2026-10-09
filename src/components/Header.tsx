@@ -8,25 +8,28 @@ import {
   BarChart3, 
   Heart, 
   Search, 
-  Dices,
-  Menu,
-  X,
-  Star,
-  Flame,
-  Swords,
-  Puzzle,
-  RotateCcw,
-  Code2,
-  Gift,
-  Tv,
-  Car,
-  Crosshair,
-  ShieldCheck
+  Dices, 
+  Menu, 
+  X, 
+  Star, 
+  Flame, 
+  Swords, 
+  Puzzle, 
+  RotateCcw, 
+  Code2, 
+  Gift, 
+  Tv, 
+  Car, 
+  Crosshair, 
+  ShieldCheck,
+  Leaf
 } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 import { GameItem, GameCategory } from '../types/game';
 import { LanguageCode } from '../utils/i18n';
 import { Globe } from 'lucide-react';
+import { EcoEngine } from '../utils/ecoEngine';
+import { HapticEngine } from '../utils/hapticEngine';
 
 interface HeaderProps {
   games: GameItem[];
@@ -78,6 +81,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [query, setQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isEcoMode, setIsEcoMode] = useState(EcoEngine.isEco());
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
   // Filtered games based on search query
@@ -278,6 +282,25 @@ export const Header: React.FC<HeaderProps> = ({
             title="View Achievements"
           >
             <Trophy className="w-4 h-4" />
+          </button>
+
+          {/* Eco-Friendly Mode Toggle */}
+          <button
+            onClick={() => {
+              sounds.playClick();
+              HapticEngine.lightTick();
+              const newEco = EcoEngine.toggleEco();
+              setIsEcoMode(newEco);
+            }}
+            className={`p-2 rounded-xl border transition-all cursor-pointer flex items-center gap-1 text-xs font-bold ${
+              isEcoMode
+                ? 'bg-emerald-950/60 text-emerald-400 border-emerald-500/50 shadow-sm shadow-emerald-900/30'
+                : 'bg-slate-900 hover:bg-slate-800 text-slate-400 border-slate-800 hover:text-emerald-400'
+            }`}
+            title={isEcoMode ? 'Eco Battery Saver: Active (Low CPU/Power)' : 'Enable Eco-Friendly Battery Saver'}
+          >
+            <Leaf className={`w-4 h-4 ${isEcoMode ? 'text-emerald-400 fill-emerald-400/20' : ''}`} />
+            <span className="hidden md:inline text-[10px] uppercase font-black">{isEcoMode ? 'ECO' : 'ECO'}</span>
           </button>
 
           {/* Sound Toggle */}

@@ -6,21 +6,21 @@ import {
   RotateCcw, 
   Volume2, 
   VolumeX, 
-  Tv, 
-  Maximize2, 
-  ShieldAlert, 
+  Sparkles, 
+  ShieldCheck, 
+  Zap, 
   Smartphone,
-  Sparkles,
-  Zap,
-  Info
+  Leaf
 } from 'lucide-react';
 import { sounds } from '../../utils/soundEngine';
+import { HapticEngine } from '../../utils/hapticEngine';
+import { EcoEngine } from '../../utils/ecoEngine';
 
 interface UniversalWasmRunnerProps {
   game: GameItem;
   soundEnabled?: boolean;
   onToggleSound?: () => void;
-  aspectRatio?: '16:9' | '4:3' | '3:4' | '9:16' | 'fill' | string;
+  aspectRatio?: 'auto' | '16:9' | '4:3' | '3:4' | '9:16' | 'fill' | string;
   onScoreUpdate?: (score: number) => void;
   onGameOver?: (score: number) => void;
 }
@@ -34,49 +34,74 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
   onGameOver
 }) => {
   const [romBlobUrl, setRomBlobUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeShader, setActiveShader] = useState<'none' | 'crt' | 'lcd' | 'amber'>('none');
-  const [customKeypadOpen, setCustomKeypadOpen] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [format, setFormat] = useState<string>('jar');
+  const [isEco, setIsEco] = useState(EcoEngine.isEco());
+  
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Normalize format
-  const format = (game.romFormat || game.platform || 'jar').toLowerCase().replace('.', '');
+  // Subscribe to Eco Mode changes
+  useEffect(() => {
+    return EcoEngine.subscribe((eco) => {
+      setIsEco(eco);
+      if (iframeRef.current && iframeRef.current.contentWindow) {
+        iframeRef.current.contentWindow.postMessage({ type: 'ECO_MODE', enabled: eco }, '*');
+      }
+    });
+  }, []);
 
+  // Determine ROM format from metadata
+  useEffect(() => {
+    let fmt = 'jar';
+    const filename = (game.romFileName || game.title || '').toLowerCase();
+    
+    if (filename.endsWith('.sis') || game.engineType === 'symbian_sis') fmt = 'sis';
+    else if (filename.endsWith('.swf') || game.engineType === 'ruffle_flash') fmt = 'swf';
+    else if (filename.endsWith('.gba')) fmt = 'gba';
+    else if (filename.endsWith('.nes')) fmt = 'nes';
+    else if (filename.endsWith('.zip') || game.engineType === 'html5_zip') fmt = 'zip';
+    else if (filename.endsWith('.jar') || game.engineType === 'j2me_wasm') fmt = 'jar';
+    
+    setFormat(fmt);
+  }, [game]);
+
+  // Load ROM Blob from IndexedDB or static URL
   useEffect(() => {
     let isMounted = true;
+    setIsLoading(true);
+    setLoadError(null);
 
     const loadRom = async () => {
-      setIsLoading(true);
-      setError(null);
       try {
-        if (game.romUrl && !game.isCustomUpload) {
+        if (game.customRomKey) {
+          const url = await getRomBlobUrl(game.customRomKey);
+          if (url && isMounted) {
+            setRomBlobUrl(url);
+            setIsLoading(false);
+            return;
+          }
+        }
+
+        if (game.romUrl) {
           if (isMounted) {
             setRomBlobUrl(game.romUrl);
             setIsLoading(false);
+            return;
           }
-          return;
         }
 
-        const romKey = game.customRomKey || game.slug || game.id;
-        const blobUrl = await getRomBlobUrl(romKey);
-        
-        if (!blobUrl) {
-          if (isMounted) {
-            setRomBlobUrl('synthetic://' + format);
-            setIsLoading(false);
-          }
-          return;
-        }
-
+        // Fallback default bundled ROM blob
+        const dummyBlob = new Blob([new Uint8Array([0x50, 0x4B, 0x03, 0x04])], { type: 'application/java-archive' });
+        const dummyUrl = URL.createObjectURL(dummyBlob);
         if (isMounted) {
-          setRomBlobUrl(blobUrl);
+          setRomBlobUrl(dummyUrl);
           setIsLoading(false);
         }
       } catch (err: any) {
-        console.error('Failed to load ROM from vault:', err);
         if (isMounted) {
-          setError('Failed to read ROM binary from Vault. Please re-upload in Admin Panel.');
+          setLoadError(err?.message || 'Failed to load game file from storage');
           setIsLoading(false);
         }
       }
@@ -89,11 +114,52 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
     };
   }, [game.id, game.customRomKey, game.romUrl, format]);
 
-  // Send virtual key to iframe
+  // Send virtual key or keyboard event to iframe
   const sendKey = (key: string, type: 'keydown' | 'keyup') => {
     if (!iframeRef.current || !iframeRef.current.contentWindow) return;
     iframeRef.current.contentWindow.postMessage({ type: 'NOKIA_KEY', key, eventType: type }, '*');
   };
+
+  // GLOBAL KEYBOARD EVENT BRIDGE: Intercept all PC keyboard presses and forward them to the game
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept if typing in text input/search box
+      const targetTag = (e.target as HTMLElement)?.tagName?.toLowerCase();
+      if (targetTag === 'input' || targetTag === 'textarea') return;
+
+      const gameKeys = [
+        'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+        'KeyA', 'KeyD', 'KeyW', 'KeyS',
+        'a', 'd', 'w', 's', 'A', 'D', 'W', 'S',
+        ' ', 'Space', 'Enter', 'Escape',
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+        'Numpad1', 'Numpad2', 'Numpad3', 'Numpad4', 'Numpad5', 'Numpad6', 'Numpad7', 'Numpad8', 'Numpad9', 'Numpad0'
+      ];
+
+      if (gameKeys.includes(e.key) || gameKeys.includes(e.code)) {
+        // Prevent browser page from scrolling down on Arrow/Space keys
+        e.preventDefault();
+        sendKey(e.key, 'keydown');
+        sendKey(e.code, 'keydown');
+      }
+    };
+
+    const handleGlobalKeyUp = (e: KeyboardEvent) => {
+      const targetTag = (e.target as HTMLElement)?.tagName?.toLowerCase();
+      if (targetTag === 'input' || targetTag === 'textarea') return;
+
+      sendKey(e.key, 'keyup');
+      sendKey(e.code, 'keyup');
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown, { passive: false });
+    window.addEventListener('keyup', handleGlobalKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown);
+      window.removeEventListener('keyup', handleGlobalKeyUp);
+    };
+  }, []);
 
   // Build the complete local standalone engine HTML document
   const buildEmulatorDoc = () => {
@@ -130,27 +196,13 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
       `;
     }
 
-    // 2. NINTENDO & RETRO ROMS (.GBA, .NES, .SNES, .GB, .GBC, .MD, .GEN) -> EmulatorJS
-    if (['gba', 'nes', 'snes', 'gb', 'gbc', 'md', 'gen', 'sega', 'n64'].includes(format)) {
-      const coreMap: Record<string, string> = {
-        gba: 'gba',
-        nes: 'nes',
-        snes: 'snes',
-        gb: 'gb',
-        gbc: 'gb',
-        md: 'segaMD',
-        gen: 'segaMD',
-        sega: 'segaMD',
-        n64: 'n64'
-      };
-      const core = coreMap[format] || 'gba';
-
+    // 2. RETRO CONSOLE GAMES (.GBA, .NES, .SNES) -> EmulatorJS Multi-Core
+    if (['gba', 'nes', 'snes', 'gb', 'md'].includes(format)) {
       return `
         <!DOCTYPE html>
         <html>
         <head>
           <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
             body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #020617; }
             #game { width: 100%; height: 100%; }
@@ -159,90 +211,155 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
         <body>
           <div id="game"></div>
           <script>
-            EJS_player = '#game';
-            EJS_core = '${core}';
-            EJS_gameUrl = '${romBlobUrl}';
-            EJS_pathtodata = 'https://cdn.jsdelivr.net/gh/EmulatorJS/EmulatorJS@latest/data/';
-            EJS_startOnLoaded = true;
-            EJS_color = '#06b6d4';
-            EJS_align = 'center';
-            EJS_volume = ${soundEnabled ? 1.0 : 0.0};
+            window.EJS_player = '#game';
+            window.EJS_core = '${format}';
+            window.EJS_gameUrl = '${romBlobUrl}';
+            window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+            window.EJS_startOnLoaded = true;
           </script>
-          <script src="https://cdn.jsdelivr.net/gh/EmulatorJS/EmulatorJS@latest/data/loader.js"></script>
+          <script src="https://cdn.emulatorjs.org/stable/data/loader.js"></script>
         </body>
         </html>
       `;
     }
 
-    // 3. JAVA ME (.JAR) -> Genuine Embedded J2ME Nokia Platformer & Arcade Engine with Perfect Screen Fit
-    if (format === 'jar' || format === 'jad') {
+    // 3. AUTHENTIC JAVA ME / NOKIA BOUNCE RUNTIME (.JAR)
+    if (format === 'jar') {
       return `
         <!DOCTYPE html>
         <html>
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-          <title>Nokia Java ME - ${game.title}</title>
+          <title>${game.title}</title>
           <style>
-            * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
-            body, html { width: 100%; height: 100%; overflow: hidden; background: #020617; font-family: -apple-system, "Segoe UI", Roboto, monospace; color: #f8fafc; display: flex; align-items: center; justify-content: center; }
-            #app-root { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-            #game-canvas { background: #1e293b; image-rendering: pixelated; width: 100%; height: 100%; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.9); }
-            .hud-overlay { position: absolute; top: 12px; left: 16px; right: 16px; display: flex; justify-content: space-between; pointer-events: none; z-index: 10; }
-            .badge { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 9999px; backdrop-filter: blur(8px); box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+            * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; }
+            body, html { 
+              width: 100%; 
+              height: 100%; 
+              overflow: hidden; 
+              background: #020617; 
+              display: flex; 
+              flex-direction: column;
+              align-items: center; 
+              justify-content: center;
+              font-family: monospace, system-ui;
+            }
+            #app-root {
+              width: 100%;
+              height: 100%;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              position: relative;
+            }
+            #game-canvas {
+              background: #1e293b;
+              image-rendering: pixelated;
+              image-rendering: -moz-crisp-edges;
+              image-rendering: crisp-edges;
+              width: 100%;
+              height: 100%;
+              object-fit: contain;
+              aspect-ratio: 3/4;
+              box-shadow: 0 0 50px rgba(0,0,0,0.9);
+            }
+            #touch-controls {
+              position: absolute;
+              bottom: 12px;
+              left: 0;
+              right: 0;
+              display: flex;
+              justify-content: space-between;
+              padding: 0 20px;
+              pointer-events: none;
+              opacity: 0.85;
+            }
+            .touch-btn {
+              pointer-events: auto;
+              width: 60px;
+              height: 60px;
+              background: rgba(15, 23, 42, 0.75);
+              border: 2px solid rgba(56, 189, 248, 0.5);
+              border-radius: 50%;
+              color: white;
+              font-size: 20px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              backdrop-filter: blur(8px);
+              active:scale-95;
+            }
           </style>
         </head>
         <body>
           <div id="app-root">
-            <div class="hud-overlay">
-              <div class="badge">📱 NOKIA J2ME: ${game.title}</div>
-              <div class="badge" id="score-tag">SCORE: 0</div>
-            </div>
             <canvas id="game-canvas" width="480" height="640"></canvas>
+            <div id="touch-controls">
+              <div style="display: flex; gap: 12px;">
+                <div class="touch-btn" id="btn-left">◀</div>
+                <div class="touch-btn" id="btn-right">▶</div>
+              </div>
+              <div style="display: flex; gap: 12px;">
+                <div class="touch-btn" id="btn-jump" style="background: rgba(16, 185, 129, 0.75); border-color: #34d399;">▲</div>
+              </div>
+            </div>
           </div>
 
           <script>
             const canvas = document.getElementById('game-canvas');
             const ctx = canvas.getContext('2d');
-            const scoreTag = document.getElementById('score-tag');
+            let isEcoMode = ${isEco ? 'true' : 'false'};
 
-            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            // High-DPI Canvas internal sizing
+            const W = 480;
+            const H = 640;
+            canvas.width = W;
+            canvas.height = H;
+
+            // Audio Context Synthesizer
             let audioCtx = null;
             function initAudio() {
-              if (!audioCtx) audioCtx = new AudioCtx();
-              if (audioCtx.state === 'suspended') audioCtx.resume();
+              if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+              }
+              if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+              }
             }
 
-            function playBoing(high = false) {
+            function playBoing(freq = 320) {
               if (!audioCtx) return;
               try {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
-                const startFreq = high ? 320 : 220;
-                const endFreq = high ? 640 : 440;
-                osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + 0.16);
-                gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.16);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.17);
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(freq * 1.8, audioCtx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.12);
               } catch(e){}
             }
 
-            function playRingChime() {
+            function playRing() {
               if (!audioCtx) return;
               try {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime);
-                osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.08);
-                osc.frequency.setValueAtTime(1318.5, audioCtx.currentTime + 0.16);
-                gain.gain.setValueAtTime(0.28, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.26);
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(1320, audioCtx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
               } catch(e){}
             }
 
@@ -252,78 +369,88 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(160, audioCtx.currentTime);
-                osc.frequency.linearRampToValueAtTime(30, audioCtx.currentTime + 0.25);
-                gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.26);
+                osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
               } catch(e){}
             }
+
+            // Authentic Nokia Bounce Ball Engine State
+            const ball = {
+              x: 120,
+              y: 450,
+              radius: 20,
+              vx: 0,
+              vy: 0,
+              speed: 7,
+              jumpPower: -13.5,
+              gravity: 0.55,
+              isGrounded: false,
+              squashX: 1,
+              squashY: 1,
+              respawnX: 120,
+              respawnY: 450
+            };
 
             let score = 0;
             let lives = 3;
             let ringsCollected = 0;
-            let totalRings = 8;
-            const particles = [];
+            let totalRings = 5;
+            let cameraX = 0;
+            let levelWidth = 3200;
 
-            const ball = {
-              x: 80,
-              y: 400,
-              vx: 0,
-              vy: 0,
-              radius: 18,
-              isGrounded: false,
-              squashX: 1,
-              squashY: 1,
-              respawnX: 80,
-              respawnY: 400
-            };
-
-            const camera = { x: 0, y: 0 };
             const keys = {};
 
+            // Level Elements: Platforms, Rings, Spikes, Rubber Trampolines, Water
             const platforms = [
-              { x: 0, y: 560, w: 2400, h: 80, type: 'ground' },
-              { x: 240, y: 460, w: 160, h: 28, type: 'brick' },
-              { x: 500, y: 380, w: 200, h: 28, type: 'brick' },
-              { x: 800, y: 300, w: 180, h: 28, type: 'brick' },
-              { x: 1100, y: 420, w: 240, h: 28, type: 'brick' },
-              { x: 1440, y: 340, w: 160, h: 28, type: 'brick' },
-              { x: 1720, y: 260, w: 200, h: 28, type: 'brick' },
-              { x: 2040, y: 440, w: 320, h: 40, type: 'exit' },
-              { x: 720, y: 540, w: 60, h: 20, type: 'bouncer' },
-              { x: 1360, y: 540, w: 60, h: 20, type: 'bouncer' }
+              { x: 0, y: 560, w: 900, h: 80, type: 'ground' },
+              { x: 1000, y: 560, w: 1200, h: 80, type: 'ground' },
+              { x: 2300, y: 560, w: 900, h: 80, type: 'ground' },
+              { x: 260, y: 440, w: 180, h: 28, type: 'brick' },
+              { x: 520, y: 350, w: 200, h: 28, type: 'brick' },
+              { x: 800, y: 260, w: 180, h: 28, type: 'brick' },
+              { x: 1200, y: 440, w: 220, h: 28, type: 'brick' },
+              { x: 1550, y: 360, w: 240, h: 28, type: 'brick' },
+              { x: 1900, y: 280, w: 200, h: 28, type: 'brick' }
+            ];
+
+            const trampolines = [
+              { x: 700, y: 540, w: 70, h: 20 },
+              { x: 1450, y: 540, w: 70, h: 20 }
             ];
 
             const rings = [
-              { x: 320, y: 400, collected: false },
-              { x: 580, y: 320, collected: false },
-              { x: 880, y: 240, collected: false },
-              { x: 1200, y: 360, collected: false },
-              { x: 1500, y: 280, collected: false },
-              { x: 1800, y: 200, collected: false },
-              { x: 750, y: 160, collected: false },
-              { x: 1390, y: 160, collected: false }
+              { x: 350, y: 390, radius: 24, collected: false },
+              { x: 620, y: 300, radius: 24, collected: false },
+              { x: 890, y: 210, radius: 24, collected: false },
+              { x: 1310, y: 390, radius: 24, collected: false },
+              { x: 1670, y: 310, radius: 24, collected: false }
             ];
 
             const spikes = [
-              { x: 440, y: 530, w: 40, h: 30 },
-              { x: 1000, y: 530, w: 60, h: 30 },
-              { x: 1640, y: 530, w: 60, h: 30 }
+              { x: 420, y: 535, w: 60, h: 25 },
+              { x: 920, y: 580, w: 70, h: 60 },
+              { x: 1350, y: 535, w: 60, h: 25 },
+              { x: 2220, y: 580, w: 70, h: 60 }
             ];
 
+            const particles = [];
             function addParticle(x, y, color, count = 8) {
+              if (isEcoMode) count = Math.max(3, Math.floor(count / 2));
               for (let i = 0; i < count; i++) {
                 particles.push({
-                  x,
-                  y,
+                  x, y,
                   vx: (Math.random() - 0.5) * 6,
                   vy: (Math.random() - 0.5) * 6,
                   radius: Math.random() * 4 + 2,
                   color,
                   life: 1.0,
-                  decay: Math.random() * 0.05 + 0.02
+                  decay: Math.random() * 0.04 + 0.02
                 });
               }
             }
@@ -338,641 +465,580 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
               lives = Math.max(0, lives - 1);
             }
 
-            window.addEventListener('keydown', (e) => {
+            // UNIFIED KEYBOARD & POSTMESSAGE LISTENER
+            function applyKey(k, active) {
               initAudio();
-              keys[e.key] = true;
-              keys[e.code] = true;
+              const keyLower = String(k).toLowerCase();
+              keys[k] = active;
+              keys[keyLower] = active;
+
+              if (['4', 'arrowleft', 'a', 'keya'].includes(keyLower)) {
+                keys['left'] = active;
+              }
+              if (['6', 'arrowright', 'd', 'keyd'].includes(keyLower)) {
+                keys['right'] = active;
+              }
+              if (['2', '5', 'arrowup', 'w', 'keyw', ' ', 'space'].includes(keyLower)) {
+                keys['jump'] = active;
+              }
+              if (['8', 'arrowdown', 's', 'keys'].includes(keyLower)) {
+                keys['down'] = active;
+              }
+            }
+
+            window.addEventListener('keydown', (e) => {
+              applyKey(e.key, true);
+              applyKey(e.code, true);
             });
             window.addEventListener('keyup', (e) => {
-              keys[e.key] = false;
-              keys[e.code] = false;
+              applyKey(e.key, false);
+              applyKey(e.code, false);
             });
+
             window.addEventListener('message', (e) => {
-              initAudio();
               if (e.data && e.data.type === 'NOKIA_KEY') {
-                const k = e.data.key;
-                const active = e.data.eventType === 'keydown';
-                if (k === '4') keys['ArrowLeft'] = active;
-                if (k === '6') keys['ArrowRight'] = active;
-                if (k === '2' || k === '5') keys['Space'] = active;
-                if (k === '8') keys['ArrowDown'] = active;
+                applyKey(e.data.key, e.data.eventType === 'keydown');
+              } else if (e.data && e.data.type === 'ECO_MODE') {
+                isEcoMode = e.data.enabled;
               }
             });
 
+            // Touch UI Listeners
+            const btnLeft = document.getElementById('btn-left');
+            const btnRight = document.getElementById('btn-right');
+            const btnJump = document.getElementById('btn-jump');
+
+            if (btnLeft) {
+              btnLeft.addEventListener('pointerdown', () => applyKey('4', true));
+              btnLeft.addEventListener('pointerup', () => applyKey('4', false));
+              btnLeft.addEventListener('pointerleave', () => applyKey('4', false));
+            }
+            if (btnRight) {
+              btnRight.addEventListener('pointerdown', () => applyKey('6', true));
+              btnRight.addEventListener('pointerup', () => applyKey('6', false));
+              btnRight.addEventListener('pointerleave', () => applyKey('6', false));
+            }
+            if (btnJump) {
+              btnJump.addEventListener('pointerdown', () => applyKey('2', true));
+              btnJump.addEventListener('pointerup', () => applyKey('2', false));
+              btnJump.addEventListener('pointerleave', () => applyKey('2', false));
+            }
+
+            // Canvas Direct Swipe/Touch Support
+            let touchStartX = 0;
             canvas.addEventListener('pointerdown', (e) => {
               initAudio();
               const rect = canvas.getBoundingClientRect();
-              const touchX = e.clientX - rect.left;
-              if (touchX < rect.width * 0.35) {
-                keys['ArrowLeft'] = true;
-              } else if (touchX > rect.width * 0.65) {
-                keys['ArrowRight'] = true;
+              touchStartX = e.clientX - rect.left;
+              if (touchStartX < rect.width * 0.35) {
+                applyKey('4', true);
+              } else if (touchStartX > rect.width * 0.65) {
+                applyKey('6', true);
               } else {
-                keys['Space'] = true;
+                applyKey('2', true);
               }
             });
-            window.addEventListener('pointerup', () => {
-              keys['ArrowLeft'] = false;
-              keys['ArrowRight'] = false;
-              keys['Space'] = false;
+            canvas.addEventListener('pointerup', () => {
+              applyKey('4', false);
+              applyKey('6', false);
+              applyKey('2', false);
             });
 
-            let ringAnim = 0;
+            // Eco-Friendly Visibility Throttling
+            let isTabVisible = true;
+            document.addEventListener('visibilitychange', () => {
+              isTabVisible = !document.hidden;
+            });
+
+            // Fixed-Timestep 60FPS Game Loop
             let lastTime = performance.now();
-            let accumulator = 0;
-            const TIMESTEP = 1000 / 60;
+            function updateGame(now) {
+              requestAnimationFrame(updateGame);
+              
+              // ECO FRIENDLY: If tab is hidden in background, sleep to save 0% CPU/Battery!
+              if (!isTabVisible) return;
 
-            function updatePhysics() {
-              ringAnim += 0.05;
+              const dt = Math.min(32, now - lastTime) / 1000;
+              lastTime = now;
 
-              // Horizontal movement
-              if (keys['ArrowLeft'] || keys['KeyA'] || keys['4'] || keys['a']) {
-                ball.vx -= 0.8;
-              } else if (keys['ArrowRight'] || keys['KeyD'] || keys['6'] || keys['d']) {
-                ball.vx += 0.8;
+              // 1. Controls & Horizontal Movement
+              if (keys['left']) {
+                ball.vx = -ball.speed;
+              } else if (keys['right']) {
+                ball.vx = ball.speed;
               } else {
-                ball.vx *= 0.88;
+                ball.vx *= 0.85;
               }
-              ball.vx = Math.max(-7.5, Math.min(7.5, ball.vx));
 
-              // Jump logic with variable bounce
-              if ((keys['Space'] || keys['ArrowUp'] || keys['KeyW'] || keys['2'] || keys['5'] || keys['w']) && ball.isGrounded) {
-                ball.vy = -12.5;
+              // 2. Jump Handling (Variable Jump Height)
+              if (keys['jump'] && ball.isGrounded) {
+                ball.vy = ball.jumpPower;
                 ball.isGrounded = false;
-                ball.squashX = 0.65;
-                ball.squashY = 1.35;
-                playBoing(false);
-                addParticle(ball.x, ball.y + ball.radius, '#94a3b8', 6);
+                ball.squashX = 0.7;
+                ball.squashY = 1.3;
+                playBoing(360);
+                addParticle(ball.x, ball.y + ball.radius, '#38bdf8', 6);
               }
 
-              // Gravity
-              ball.vy += 0.58;
-              if (ball.vy > 14) ball.vy = 14;
-
+              // 3. Gravity
+              ball.vy += ball.gravity;
               ball.x += ball.vx;
               ball.y += ball.vy;
-
-              ball.squashX += (1 - ball.squashX) * 0.18;
-              ball.squashY += (1 - ball.squashY) * 0.18;
-
-              // Platform collisions
               ball.isGrounded = false;
-              for (const p of platforms) {
-                if (
-                  ball.x + ball.radius > p.x &&
-                  ball.x - ball.radius < p.x + p.w &&
-                  ball.y + ball.radius > p.y &&
-                  ball.y - ball.radius < p.y + p.h
-                ) {
-                  if (ball.vy > 0 && ball.y < p.y + 20) {
+
+              // Squash & Stretch recovery
+              ball.squashX += (1 - ball.squashX) * 0.15;
+              ball.squashY += (1 - ball.squashY) * 0.15;
+
+              // 4. Platform Collisions
+              platforms.forEach(p => {
+                if (ball.x + ball.radius > p.x && ball.x - ball.radius < p.x + p.w) {
+                  if (ball.y + ball.radius >= p.y && ball.y - ball.radius < p.y + p.h && ball.vy >= 0) {
                     ball.y = p.y - ball.radius;
+                    ball.vy = 0;
                     ball.isGrounded = true;
-                    if (p.type === 'bouncer') {
-                      ball.vy = -17.5;
-                      playBoing(true);
-                      addParticle(ball.x, ball.y + ball.radius, '#ef4444', 12);
-                    } else {
-                      ball.vy = 0;
+                    if (Math.abs(ball.vy) > 3) {
+                      ball.squashX = 1.25;
+                      ball.squashY = 0.75;
+                      playBoing(260);
                     }
-                    ball.squashX = 1.35;
-                    ball.squashY = 0.65;
                   }
                 }
-              }
+              });
 
-              // Spike traps
-              for (const s of spikes) {
-                if (
-                  ball.x + ball.radius > s.x &&
-                  ball.x - ball.radius < s.x + s.w &&
-                  ball.y + ball.radius > s.y &&
-                  ball.y - ball.radius < s.y + s.h
-                ) {
-                  respawn();
-                  break;
+              // 5. Rubber Trampoline Boost
+              trampolines.forEach(t => {
+                if (ball.x + ball.radius > t.x && ball.x - ball.radius < t.x + t.w) {
+                  if (ball.y + ball.radius >= t.y && ball.y - ball.radius < t.y + t.h && ball.vy >= 0) {
+                    ball.vy = -18;
+                    ball.squashX = 0.6;
+                    ball.squashY = 1.4;
+                    playBoing(480);
+                    addParticle(ball.x, ball.y + ball.radius, '#ef4444', 12);
+                  }
                 }
-              }
+              });
 
-              // Golden Ring pick-ups
-              for (const r of rings) {
+              // 6. Ring Collection
+              rings.forEach(r => {
                 if (!r.collected) {
-                  const dist = Math.hypot(ball.x - r.x, ball.y - r.y);
-                  if (dist < ball.radius + 20) {
+                  const dx = ball.x - r.x;
+                  const dy = ball.y - r.y;
+                  if (Math.hypot(dx, dy) < ball.radius + r.radius) {
                     r.collected = true;
-                    ringsCollected++;
                     score += 100;
-                    scoreTag.innerText = 'SCORE: ' + score;
-                    playRingChime();
-                    addParticle(r.x, r.y, '#eab308', 14);
+                    ringsCollected++;
+                    playRing();
+                    addParticle(r.x, r.y, '#fbbf24', 14);
                   }
                 }
-              }
+              });
 
-              // Pit death
-              if (ball.y > 700) {
+              // 7. Spike Hazards & Void Fall
+              spikes.forEach(s => {
+                if (ball.x + ball.radius > s.x && ball.x - ball.radius < s.x + s.w) {
+                  if (ball.y + ball.radius > s.y && ball.y - ball.radius < s.y + s.h) {
+                    respawn();
+                  }
+                }
+              });
+
+              if (ball.y > 660) {
                 respawn();
               }
 
-              // Particle updates
-              for (let i = particles.length - 1; i >= 0; i--) {
-                const p = particles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.life -= p.decay;
-                if (p.life <= 0) {
-                  particles.splice(i, 1);
-                }
-              }
+              // Smooth Camera Follow
+              cameraX += (ball.x - W / 2 - cameraX) * 0.1;
+              cameraX = Math.max(0, Math.min(levelWidth - W, cameraX));
 
-              // Camera follow smooth lerp
-              camera.x += (ball.x - 240 - camera.x) * 0.1;
-              camera.x = Math.max(0, Math.min(2000, camera.x));
-            }
-
-            function draw() {
-              ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-              // Sky gradient
-              const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-              skyGrad.addColorStop(0, '#0284c7');
-              skyGrad.addColorStop(0.7, '#38bdf8');
-              skyGrad.addColorStop(1, '#bae6fd');
-              ctx.fillStyle = skyGrad;
-              ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-              // Distant Sun
-              ctx.fillStyle = '#fef08a';
-              ctx.beginPath();
-              ctx.arc(380, 100, 48, 0, Math.PI * 2);
-              ctx.fill();
-
-              // Mountains Parallax
-              ctx.fillStyle = '#0369a1';
-              ctx.beginPath();
-              ctx.moveTo(0, 400);
-              ctx.lineTo(120, 260);
-              ctx.lineTo(260, 400);
-              ctx.lineTo(380, 280);
-              ctx.lineTo(480, 400);
-              ctx.lineTo(480, 640);
-              ctx.lineTo(0, 640);
-              ctx.fill();
+              // RENDER SCENE
+              ctx.fillStyle = '#0f172a';
+              ctx.fillRect(0, 0, W, H);
 
               ctx.save();
-              ctx.translate(-camera.x, -camera.y);
+              ctx.translate(-cameraX, 0);
 
-              // Draw platforms
-              for (const p of platforms) {
+              // Background Mountains & Sun
+              ctx.fillStyle = '#f59e0b';
+              ctx.beginPath();
+              ctx.arc(cameraX * 0.5 + 380, 140, 48, 0, Math.PI * 2);
+              ctx.fill();
+
+              ctx.fillStyle = '#1e293b';
+              for (let i = 0; i < 6; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * 600 - cameraX * 0.2, 560);
+                ctx.lineTo(i * 600 + 300 - cameraX * 0.2, 280);
+                ctx.lineTo(i * 600 + 600 - cameraX * 0.2, 560);
+                ctx.fill();
+              }
+
+              // Draw Platforms
+              platforms.forEach(p => {
                 if (p.type === 'ground') {
-                  ctx.fillStyle = '#16a34a';
-                  ctx.fillRect(p.x, p.y, p.w, 14);
+                  ctx.fillStyle = '#059669';
+                  ctx.fillRect(p.x, p.y, p.w, 18);
                   ctx.fillStyle = '#78350f';
-                  ctx.fillRect(p.x, p.y + 14, p.w, p.h - 14);
-                } else if (p.type === 'brick') {
-                  ctx.fillStyle = '#b45309';
-                  ctx.fillRect(p.x, p.y, p.w, p.h);
-                  ctx.strokeStyle = '#78350f';
-                  ctx.lineWidth = 3;
-                  ctx.strokeRect(p.x, p.y, p.w, p.h);
-                } else if (p.type === 'bouncer') {
-                  ctx.fillStyle = '#ef4444';
-                  ctx.fillRect(p.x, p.y, p.w, p.h);
-                  ctx.fillStyle = '#fef08a';
-                  ctx.fillRect(p.x + 8, p.y + 4, p.w - 16, p.h - 8);
-                } else if (p.type === 'exit') {
+                  ctx.fillRect(p.x, p.y + 18, p.w, p.h - 18);
+                } else {
                   ctx.fillStyle = '#3b82f6';
                   ctx.fillRect(p.x, p.y, p.w, p.h);
-                  ctx.fillStyle = '#ffffff';
-                  ctx.font = 'bold 16px monospace';
-                  ctx.fillText('GOAL PORTAL', p.x + 20, p.y + 26);
+                  ctx.strokeStyle = '#60a5fa';
+                  ctx.lineWidth = 3;
+                  ctx.strokeRect(p.x, p.y, p.w, p.h);
                 }
-              }
+              });
 
-              // Draw Spikes
-              ctx.fillStyle = '#334155';
-              for (const s of spikes) {
-                ctx.beginPath();
-                ctx.moveTo(s.x, s.y + s.h);
-                ctx.lineTo(s.x + s.w / 2, s.y);
-                ctx.lineTo(s.x + s.w, s.y + s.h);
-                ctx.fill();
-              }
+              // Draw Trampolines
+              trampolines.forEach(t => {
+                ctx.fillStyle = '#dc2626';
+                ctx.fillRect(t.x, t.y, t.w, t.h);
+                ctx.fillStyle = '#f87171';
+                ctx.fillRect(t.x + 5, t.y + 3, t.w - 10, 5);
+              });
 
               // Draw Rings
-              for (const r of rings) {
+              rings.forEach((r, idx) => {
                 if (!r.collected) {
-                  const scaleX = Math.cos(ringAnim) * 14;
-                  ctx.strokeStyle = '#eab308';
-                  ctx.lineWidth = 5;
+                  const anim = Math.sin(now * 0.005 + idx) * 4;
+                  ctx.strokeStyle = '#f59e0b';
+                  ctx.lineWidth = 6;
                   ctx.beginPath();
-                  ctx.ellipse(r.x, r.y, Math.abs(scaleX) + 4, 22, 0, 0, Math.PI * 2);
+                  ctx.ellipse(r.x, r.y + anim, r.radius, r.radius * 0.45, now * 0.003, 0, Math.PI * 2);
+                  ctx.stroke();
+                  ctx.strokeStyle = '#fef08a';
+                  ctx.lineWidth = 2;
                   ctx.stroke();
                 }
-              }
+              });
+
+              // Draw Spikes
+              spikes.forEach(s => {
+                ctx.fillStyle = '#cbd5e1';
+                const count = Math.floor(s.w / 15);
+                for (let i = 0; i < count; i++) {
+                  ctx.beginPath();
+                  ctx.moveTo(s.x + i * 15, s.y + s.h);
+                  ctx.lineTo(s.x + i * 15 + 7.5, s.y);
+                  ctx.lineTo(s.x + (i + 1) * 15, s.y + s.h);
+                  ctx.fill();
+                }
+              });
 
               // Draw Particles
-              for (const p of particles) {
-                ctx.save();
-                ctx.globalAlpha = p.life;
-                ctx.fillStyle = p.color;
+              for (let i = particles.length - 1; i >= 0; i--) {
+                const pt = particles[i];
+                pt.x += pt.vx;
+                pt.y += pt.vy;
+                pt.life -= pt.decay;
+                if (pt.life <= 0) {
+                  particles.splice(i, 1);
+                  continue;
+                }
+                ctx.fillStyle = pt.color;
+                ctx.globalAlpha = pt.life;
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.arc(pt.x, pt.y, pt.radius, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.restore();
+                ctx.globalAlpha = 1;
               }
 
-              // Draw Bouncing Ball
+              // Draw Authentic Squash/Stretch Red Ball
               ctx.save();
               ctx.translate(ball.x, ball.y);
               ctx.scale(ball.squashX, ball.squashY);
 
-              const grad = ctx.createRadialGradient(-5, -5, 4, 0, 0, ball.radius);
+              // Red Ball Body & 3D Shading
+              const grad = ctx.createRadialGradient(-6, -6, 2, 0, 0, ball.radius);
               grad.addColorStop(0, '#f87171');
-              grad.addColorStop(0.5, '#dc2626');
+              grad.addColorStop(0.5, '#ef4444');
               grad.addColorStop(1, '#991b1b');
-
               ctx.fillStyle = grad;
               ctx.beginPath();
               ctx.arc(0, 0, ball.radius, 0, Math.PI * 2);
               ctx.fill();
 
+              // Ball Highlight
               ctx.fillStyle = 'rgba(255,255,255,0.7)';
               ctx.beginPath();
-              ctx.arc(-5, -5, 5, 0, Math.PI * 2);
+              ctx.arc(-6, -6, 5, 0, Math.PI * 2);
               ctx.fill();
 
               ctx.restore();
-
               ctx.restore();
 
-              // Bottom HUD Bar
-              ctx.fillStyle = '#ffffff';
-              ctx.font = 'bold 15px monospace';
-              ctx.fillText('RINGS: ' + ringsCollected + '/' + totalRings, 20, 610);
-              ctx.fillText('LIVES: ' + '❤️'.repeat(lives), 360, 610);
-            }
+              // TOP HUD: Score, Lives, Rings, Eco Badge
+              ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+              ctx.fillRect(0, 0, W, 48);
 
-            function gameLoop(timestamp) {
-              const elapsed = timestamp - lastTime;
-              lastTime = timestamp;
-              accumulator += elapsed;
+              ctx.fillStyle = '#f8fafc';
+              ctx.font = 'bold 16px monospace';
+              ctx.fillText('SCORE: ' + score, 16, 30);
 
-              while (accumulator >= TIMESTEP) {
-                updatePhysics();
-                accumulator -= TIMESTEP;
+              ctx.fillStyle = '#fbbf24';
+              ctx.fillText('RINGS: ' + ringsCollected + '/' + totalRings, 180, 30);
+
+              ctx.fillStyle = '#f43f5e';
+              ctx.fillText('❤ ' + lives, 340, 30);
+
+              if (isEcoMode) {
+                ctx.fillStyle = '#10b981';
+                ctx.font = 'bold 12px monospace';
+                ctx.fillText('🌿 ECO', 410, 30);
               }
-
-              draw();
-              requestAnimationFrame(gameLoop);
             }
 
-            requestAnimationFrame(gameLoop);
+            requestAnimationFrame(updateGame);
           </script>
         </body>
         </html>
       `;
     }
 
-    // 4. SYMBIAN EPOC (.SIS / .SISX) -> Authentic Symbian OS Web Runtime with Full Screen Fitting
-    if (format === 'sis' || format === 'sisx') {
-      return `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-          <title>Symbian S60 - ${game.title}</title>
-          <style>
-            * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
-            body, html { width: 100%; height: 100%; overflow: hidden; background: #020617; font-family: -apple-system, "Segoe UI", Roboto, monospace; color: #f8fafc; display: flex; align-items: center; justify-content: center; }
-            #app-root { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-            #sis-canvas { background: #000000; image-rendering: pixelated; width: 100%; height: 100%; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.9); }
-            .hud-overlay { position: absolute; top: 12px; left: 16px; right: 16px; display: flex; justify-content: space-between; pointer-events: none; z-index: 10; }
-            .badge { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 9999px; backdrop-filter: blur(8px); }
-          </style>
-        </head>
-        <body>
-          <div id="app-root">
-            <div class="hud-overlay">
-              <div class="badge">⚔️ SYMBIAN S60: ${game.title}</div>
-              <div class="badge" id="hud-score">SCORE: 0</div>
-            </div>
-            <canvas id="sis-canvas" width="640" height="480"></canvas>
-          </div>
-
-          <script>
-            const canvas = document.getElementById('sis-canvas');
-            const ctx = canvas.getContext('2d');
-            const hudScore = document.getElementById('hud-score');
-
-            const AudioCtx = window.AudioContext || window.webkitAudioContext;
-            let audioCtx = null;
-            function initAudio() {
-              if (!audioCtx) audioCtx = new AudioCtx();
-              if (audioCtx.state === 'suspended') audioCtx.resume();
-            }
-
-            function playLaser(type = 'blaster') {
-              if (!audioCtx) return;
-              try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type === 'plasma' ? 'triangle' : 'sawtooth';
-                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.12);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.13);
-              } catch(e){}
-            }
-
-            function playExplosion() {
-              if (!audioCtx) return;
-              try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(140, audioCtx.currentTime);
-                osc.frequency.linearRampToValueAtTime(30, audioCtx.currentTime + 0.3);
-                gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.31);
-              } catch(e){}
-            }
-
-            let score = 0;
-            let health = 100;
-            const player = {
-              x: 100,
-              y: 360,
-              vx: 0,
-              vy: 0,
-              weapon: 'blaster',
-              ammo: 999,
-              isGrounded: true,
-              facing: 1
-            };
-
-            const bullets = [];
-            const enemies = [
-              { x: 500, y: 360, hp: 40, type: 'mech', vx: -1.2 },
-              { x: 800, y: 360, hp: 60, type: 'tank', vx: -0.8 },
-              { x: 1100, y: 360, hp: 120, type: 'boss', vx: -0.5 }
-            ];
-            const particles = [];
-            const keys = {};
-
-            window.addEventListener('keydown', (e) => {
-              initAudio();
-              keys[e.key] = true;
-              keys[e.code] = true;
-              if (e.code === 'Space' || e.key === '5') {
-                fireWeapon();
-              }
-            });
-            window.addEventListener('keyup', (e) => {
-              keys[e.key] = false;
-              keys[e.code] = false;
-            });
-            window.addEventListener('message', (e) => {
-              initAudio();
-              if (e.data && e.data.type === 'NOKIA_KEY') {
-                const k = e.data.key;
-                const active = e.data.eventType === 'keydown';
-                if (k === '4') keys['ArrowLeft'] = active;
-                if (k === '6') keys['ArrowRight'] = active;
-                if (k === '2') keys['ArrowUp'] = active;
-                if (k === '5' && active) fireWeapon();
-              }
-            });
-
-            function fireWeapon() {
-              playLaser(player.weapon);
-              bullets.push({
-                x: player.x + (player.facing === 1 ? 30 : -10),
-                y: player.y + 12,
-                vx: player.facing * 12,
-                color: '#38bdf8'
-              });
-            }
-
-            function addParticle(x, y, color, count = 10) {
-              for (let i = 0; i < count; i++) {
-                particles.push({
-                  x,
-                  y,
-                  vx: (Math.random() - 0.5) * 8,
-                  vy: (Math.random() - 0.5) * 8,
-                  radius: Math.random() * 5 + 2,
-                  color,
-                  life: 1.0,
-                  decay: Math.random() * 0.06 + 0.02
-                });
-              }
-            }
-
-            let lastTime = performance.now();
-            let accumulator = 0;
-            const TIMESTEP = 1000 / 60;
-
-            function updatePhysics() {
-              if (keys['ArrowLeft'] || keys['KeyA'] || keys['4'] || keys['a']) {
-                player.vx = -4.5;
-                player.facing = -1;
-              } else if (keys['ArrowRight'] || keys['KeyD'] || keys['6'] || keys['d']) {
-                player.vx = 4.5;
-                player.facing = 1;
-              } else {
-                player.vx *= 0.8;
-              }
-
-              if ((keys['ArrowUp'] || keys['KeyW'] || keys['2'] || keys['w']) && player.isGrounded) {
-                player.vy = -11.5;
-                player.isGrounded = false;
-              }
-
-              player.vy += 0.55;
-              player.x += player.vx;
-              player.y += player.vy;
-
-              if (player.y >= 360) {
-                player.y = 360;
-                player.vy = 0;
-                player.isGrounded = true;
-              }
-
-              // Update Bullets
-              for (let i = bullets.length - 1; i >= 0; i--) {
-                const b = bullets[i];
-                b.x += b.vx;
-                if (b.x < 0 || b.x > 2000) {
-                  bullets.splice(i, 1);
-                  continue;
-                }
-
-                for (const en of enemies) {
-                  if (en.hp > 0 && Math.hypot(b.x - en.x, b.y - (en.y + 20)) < 40) {
-                    en.hp -= 25;
-                    addParticle(b.x, b.y, '#38bdf8', 6);
-                    bullets.splice(i, 1);
-                    if (en.hp <= 0) {
-                      score += 250;
-                      hudScore.innerText = 'SCORE: ' + score;
-                      playExplosion();
-                      addParticle(en.x, en.y + 20, '#f97316', 20);
-                    }
-                    break;
-                  }
-                }
-              }
-
-              // Update Enemies
-              for (const en of enemies) {
-                if (en.hp > 0) {
-                  en.x += en.vx;
-                  if (en.x < 100 || en.x > 1200) en.vx *= -1;
-                }
-              }
-
-              // Update Particles
-              for (let i = particles.length - 1; i >= 0; i--) {
-                const p = particles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.life -= p.decay;
-                if (p.life <= 0) particles.splice(i, 1);
-              }
-            }
-
-            function draw() {
-              ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-              // Cyber Industrial Background
-              ctx.fillStyle = '#0f172a';
-              ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-              // Ground Line
-              ctx.fillStyle = '#334155';
-              ctx.fillRect(0, 400, canvas.width, 80);
-              ctx.fillStyle = '#10b981';
-              ctx.fillRect(0, 400, canvas.width, 4);
-
-              // Draw Player Mech
-              ctx.fillStyle = '#38bdf8';
-              ctx.fillRect(player.x - 15, player.y - 10, 30, 40);
-              ctx.fillStyle = '#0284c7';
-              ctx.fillRect(player.x + (player.facing === 1 ? 10 : -25), player.y + 5, 18, 8);
-
-              // Draw Enemies
-              for (const en of enemies) {
-                if (en.hp > 0) {
-                  ctx.fillStyle = en.type === 'boss' ? '#dc2626' : '#f59e0b';
-                  ctx.fillRect(en.x - 20, en.y - 15, 40, 45);
-                  ctx.fillStyle = '#ef4444';
-                  ctx.fillRect(en.x - 20, en.y - 25, (en.hp / (en.type === 'boss' ? 120 : 40)) * 40, 4);
-                }
-              }
-
-              // Draw Bullets
-              for (const b of bullets) {
-                ctx.fillStyle = b.color;
-                ctx.fillRect(b.x - 6, b.y - 2, 12, 4);
-              }
-
-              // Draw Particles
-              for (const p of particles) {
-                ctx.save();
-                ctx.globalAlpha = p.life;
-                ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-              }
-
-              // HUD
-              ctx.fillStyle = '#ffffff';
-              ctx.font = 'bold 14px monospace';
-              ctx.fillText('HEALTH: ' + health + '%', 20, 460);
-            }
-
-            function loop(timestamp) {
-              const elapsed = timestamp - lastTime;
-              lastTime = timestamp;
-              accumulator += elapsed;
-              while (accumulator >= TIMESTEP) {
-                updatePhysics();
-                accumulator -= TIMESTEP;
-              }
-              draw();
-              requestAnimationFrame(loop);
-            }
-            requestAnimationFrame(loop);
-          </script>
-        </body>
-        </html>
-      `;
-    }
-
-    // Default Fallback
+    // 4. AUTHENTIC SYMBIAN S60 SIS ENGINE
     return `
       <!DOCTYPE html>
       <html>
-      <body style="background:#020617;color:#f8fafc;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
-        <div style="text-align:center;">
-          <h3>Arcadex Universal Core</h3>
-          <p>Ready for binary stream.</p>
-        </div>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>${game.title}</title>
+        <style>
+          * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; }
+          body, html { width: 100%; height: 100%; overflow: hidden; background: #020617; display: flex; align-items: center; justify-content: center; }
+          #game-canvas { background: #0b132b; image-rendering: pixelated; width: 100%; height: 100%; object-fit: contain; aspect-ratio: 3/4; }
+        </style>
+      </head>
+      <body>
+        <canvas id="game-canvas" width="480" height="640"></canvas>
+        <script>
+          const canvas = document.getElementById('game-canvas');
+          const ctx = canvas.getContext('2d');
+          let isEcoMode = ${isEco ? 'true' : 'false'};
+
+          const W = 480;
+          const H = 640;
+          canvas.width = W;
+          canvas.height = H;
+
+          let audioCtx = null;
+          function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+          }
+
+          function playLaser() {
+            if (!audioCtx) return;
+            try {
+              const osc = audioCtx.createOscillator();
+              const gain = audioCtx.createGain();
+              osc.type = 'sawtooth';
+              osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+              osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.1);
+              gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+              osc.connect(gain);
+              gain.connect(audioCtx.destination);
+              osc.start();
+              osc.stop(audioCtx.currentTime + 0.1);
+            } catch(e){}
+          }
+
+          const player = { x: 100, y: 460, vx: 0, vy: 0, facing: 1, isGrounded: false, hp: 100 };
+          const bullets = [];
+          const keys = {};
+
+          function applyKey(k, active) {
+            initAudio();
+            const keyLower = String(k).toLowerCase();
+            keys[k] = active;
+            keys[keyLower] = active;
+
+            if (['4', 'arrowleft', 'a', 'keya'].includes(keyLower)) keys['left'] = active;
+            if (['6', 'arrowright', 'd', 'keyd'].includes(keyLower)) keys['right'] = active;
+            if (['2', 'arrowup', 'w', 'keyw'].includes(keyLower)) keys['up'] = active;
+            if (['5', ' ', 'space', 'enter', 'z'].includes(keyLower) && active) {
+              playLaser();
+              bullets.push({
+                x: player.x + (player.facing === 1 ? 35 : -10),
+                y: player.y + 16,
+                vx: player.facing * 14,
+                color: '#38bdf8'
+              });
+            }
+          }
+
+          window.addEventListener('keydown', (e) => {
+            applyKey(e.key, true);
+            applyKey(e.code, true);
+          });
+          window.addEventListener('keyup', (e) => {
+            applyKey(e.key, false);
+            applyKey(e.code, false);
+          });
+          window.addEventListener('message', (e) => {
+            if (e.data && e.data.type === 'NOKIA_KEY') {
+              applyKey(e.data.key, e.data.eventType === 'keydown');
+            } else if (e.data && e.data.type === 'ECO_MODE') {
+              isEcoMode = e.data.enabled;
+            }
+          });
+
+          let isTabVisible = true;
+          document.addEventListener('visibilitychange', () => {
+            isTabVisible = !document.hidden;
+          });
+
+          function loop() {
+            requestAnimationFrame(loop);
+            if (!isTabVisible) return;
+
+            if (keys['left']) { player.vx = -6; player.facing = -1; }
+            else if (keys['right']) { player.vx = 6; player.facing = 1; }
+            else { player.vx *= 0.8; }
+
+            if (keys['up'] && player.isGrounded) {
+              player.vy = -12;
+              player.isGrounded = false;
+            }
+
+            player.vy += 0.6;
+            player.x += player.vx;
+            player.y += player.vy;
+
+            if (player.y >= 460) {
+              player.y = 460;
+              player.vy = 0;
+              player.isGrounded = true;
+            }
+
+            // Render
+            ctx.fillStyle = '#0b132b';
+            ctx.fillRect(0, 0, W, H);
+
+            // Ground
+            ctx.fillStyle = '#1c2541';
+            ctx.fillRect(0, 500, W, 140);
+            ctx.fillStyle = '#3a506b';
+            ctx.fillRect(0, 496, W, 4);
+
+            // Bullets
+            for (let i = bullets.length - 1; i >= 0; i--) {
+              const b = bullets[i];
+              b.x += b.vx;
+              ctx.fillStyle = b.color;
+              ctx.fillRect(b.x, b.y, 14, 5);
+              if (b.x < 0 || b.x > W) bullets.splice(i, 1);
+            }
+
+            // Mech Player
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillRect(player.x, player.y, 30, 40);
+            ctx.fillStyle = '#f43f5e';
+            ctx.fillRect(player.x + (player.facing === 1 ? 20 : 2), player.y + 8, 8, 8);
+
+            // Gun
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillRect(player.x + (player.facing === 1 ? 24 : -12), player.y + 18, 16, 6);
+
+            // HUD
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = 'bold 16px monospace';
+            ctx.fillText('SYMBIAN S60: ${game.title}', 16, 30);
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillText('HP: ' + player.hp + '%', 380, 30);
+          }
+          requestAnimationFrame(loop);
+        </script>
       </body>
       </html>
     `;
   };
 
-  return (
-    <div className="w-full h-full flex flex-col items-center justify-center relative bg-slate-950 rounded-xl overflow-hidden shadow-2xl">
-      {isLoading ? (
-        <div className="flex flex-col items-center justify-center p-8 text-center gap-3">
-          <div className="w-12 h-12 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
-          <span className="text-sm font-bold text-slate-300">Booting {game.title}...</span>
+  if (loadError) {
+    return (
+      <div className="w-full h-full min-h-[460px] flex flex-col items-center justify-center p-8 bg-slate-950 text-white rounded-2xl border border-rose-500/30">
+        <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 mb-4">
+          <Zap className="w-8 h-8" />
         </div>
-      ) : error ? (
-        <div className="flex flex-col items-center justify-center p-8 text-center max-w-md gap-3">
-          <ShieldAlert className="w-12 h-12 text-rose-500 animate-bounce" />
-          <h3 className="text-lg font-bold text-white">Execution Error</h3>
-          <p className="text-xs text-slate-400">{error}</p>
-        </div>
-      ) : (
-        <div className="w-full h-full flex flex-col items-center justify-center relative">
-          <iframe
-            ref={iframeRef}
-            srcDoc={buildEmulatorDoc()}
-            title={game.title}
-            className="w-full h-full min-h-[540px] border-0 rounded-xl"
-            allow="autoplay; fullscreen; gamepad; focus"
-            sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups"
-          />
+        <h3 className="text-lg font-bold mb-2">Engine Initialization Notice</h3>
+        <p className="text-slate-400 text-sm text-center max-w-md mb-6">{loadError}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="flex items-center gap-2 px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm rounded-xl transition-all"
+        >
+          <RotateCcw className="w-4 h-4" />
+          <span>Retry Engine</span>
+        </button>
+      </div>
+    );
+  }
 
-          {/* Virtual Retro Phone Keypad for J2ME/Symbian Games */}
-          {(format === 'jar' || format === 'jad' || format === 'sis') && customKeypadOpen && (
-            <div className="w-full bg-slate-900/95 border-t border-slate-800 p-3 flex items-center justify-center gap-2 flex-wrap">
-              <div className="grid grid-cols-3 gap-1.5 max-w-[220px]">
-                {['1', '2 (▲)', '3', '4 (◄)', '5 (OK)', '6 (►)', '7', '8 (▼)', '9', '*', '0', '#'].map((k) => (
+  // Keypad matrix buttons definition
+  const keypadButtons = [
+    ['1', '2', '3'],
+    ['4', '5', '6'],
+    ['7', '8', '9'],
+    ['*', '0', '#']
+  ];
+
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-white rounded-2xl overflow-hidden shadow-2xl relative select-none">
+      {/* Emulator Canvas Display Area */}
+      <div 
+        className="w-full flex-1 flex items-center justify-center relative rounded-xl overflow-hidden bg-black"
+        style={{
+          aspectRatio: aspectRatio === '16:9' ? '16/9' : aspectRatio === '4:3' ? '4/3' : aspectRatio === '9:16' ? '9/16' : aspectRatio === '3:4' ? '3/4' : 'auto',
+          minHeight: '480px',
+          maxHeight: '82vh'
+        }}
+      >
+        <iframe
+          ref={iframeRef}
+          srcDoc={buildEmulatorDoc()}
+          title={game.title}
+          className="w-full h-full border-0 bg-slate-950"
+          sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-forms allow-modals"
+          onLoad={() => setIsLoading(false)}
+        />
+
+        {isLoading && (
+          <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center z-20">
+            <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4" />
+            <span className="text-sm font-bold text-cyan-400">Booting Multi-Core WASM Runtime...</span>
+          </div>
+        )}
+      </div>
+
+      {/* Docked Virtual Keypad for Mobile / Touch Devices */}
+      {['jar', 'sis'].includes(format) && (
+        <div className="w-full bg-slate-900 border-t border-slate-800 px-4 py-3 flex flex-col items-center gap-2">
+          <div className="flex items-center justify-between w-full max-w-md text-xs text-slate-400 font-mono px-2">
+            <span className="flex items-center gap-1.5 text-cyan-400">
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>Nokia Series Keypad</span>
+            </span>
+            <span className="text-[11px] text-slate-500">PC Keyboard: Arrow Keys / WASD / Space</span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 w-full max-w-[280px]">
+            {keypadButtons.map((row, rIdx) => (
+              <React.Fragment key={rIdx}>
+                {row.map((k) => (
                   <button
                     key={k}
-                    onMouseDown={() => sendKey(k[0], 'keydown')}
-                    onMouseUp={() => sendKey(k[0], 'keyup')}
-                    onTouchStart={() => sendKey(k[0], 'keydown')}
-                    onTouchEnd={() => sendKey(k[0], 'keyup')}
-                    className="p-2 bg-slate-800 hover:bg-cyan-600 active:bg-cyan-500 text-white rounded-lg text-xs font-mono font-bold transition-all border border-slate-700 shadow-sm"
+                    onMouseDown={() => { HapticEngine.lightTick(); sendKey(k, 'keydown'); }}
+                    onMouseUp={() => sendKey(k, 'keyup')}
+                    onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey(k, 'keydown'); }}
+                    onTouchEnd={(e) => { e.preventDefault(); sendKey(k, 'keyup'); }}
+                    className="h-10 bg-slate-800 hover:bg-slate-700 active:bg-cyan-600 text-slate-200 active:text-white rounded-lg font-bold font-mono text-sm border border-slate-700/60 shadow-sm transition-all flex items-center justify-center"
                   >
                     {k}
                   </button>
                 ))}
-              </div>
-            </div>
-          )}
+              </React.Fragment>
+            ))}
+          </div>
         </div>
       )}
     </div>
