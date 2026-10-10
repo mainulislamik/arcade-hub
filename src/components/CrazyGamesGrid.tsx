@@ -16,7 +16,8 @@ import {
   ArrowRight,
   TrendingUp,
   Gamepad2,
-  Tv
+  Tv,
+  UploadCloud
 } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 import { GameCardPreview } from './cards/GameCardPreview';
@@ -29,6 +30,7 @@ interface CrazyGamesGridProps {
   onToggleFavorite: (gameId: string) => void;
   selectedTag?: string | null;
   onOpenAdmin?: () => void;
+  onOpenLocalRomModal?: () => void;
 }
 
 export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
@@ -38,7 +40,8 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
   favorites,
   onToggleFavorite,
   selectedTag,
-  onOpenAdmin
+  onOpenAdmin,
+  onOpenLocalRomModal
 }) => {
   const [hoveredGameId, setHoveredGameId] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState<number>(36);
@@ -248,6 +251,35 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Client-Side BYOG Emulator Dropzone Banner */}
+      {onOpenLocalRomModal && (
+        <div className="mb-6 rounded-2xl bg-gradient-to-r from-slate-900 via-cyan-950/40 to-slate-900 border border-cyan-500/30 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl backdrop-blur-md">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shrink-0">
+              <UploadCloud className="w-6 h-6 animate-pulse" />
+            </div>
+            <div>
+              <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
+                Play Any ROM on Your Device <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase font-mono">100% Client-Side</span>
+              </h3>
+              <p className="text-xs text-slate-400">
+                Drag & Drop your own <strong className="text-slate-200">.JAR, .SIS, .GBA, .NES, .SNES, .MD, .SWF</strong> files to run instantly in browser. Zero server upload.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              sounds.playPowerup();
+              onOpenLocalRomModal();
+            }}
+            className="shrink-0 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-cyan-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            <UploadCloud className="w-4 h-4" />
+            <span>DROP & PLAY ROM</span>
+          </button>
         </div>
       )}
 

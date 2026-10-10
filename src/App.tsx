@@ -16,6 +16,7 @@ import { DeveloperPortalModal } from './components/developer/DeveloperPortalModa
 import { AdminDashboardModal } from './components/admin/AdminDashboardModal';
 import { DailyQuestsModal } from './components/gamification/DailyQuestsModal';
 import { ArcadexLevelStudioModal } from './components/studio/ArcadexLevelStudioModal';
+import { ClientLocalRomModal } from './components/player/ClientLocalRomModal';
 import { ChiptuneJukebox } from './components/player/ChiptuneJukebox';
 import { LanguageCode } from './utils/i18n';
 
@@ -77,6 +78,7 @@ export const App: React.FC = () => {
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [isDeveloperPortalOpen, setIsDeveloperPortalOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isLocalRomModalOpen, setIsLocalRomModalOpen] = useState(false);
 
   // URL Routing Sync (Deep Linking for ?game=slug or ?category=action or ?admin=true or ?legal=privacy)
   useEffect(() => {
@@ -236,6 +238,7 @@ export const App: React.FC = () => {
         onOpenStudio={() => setIsStudioOpen(true)}
         onOpenDeveloperPortal={() => setIsDeveloperPortalOpen(true)}
         onOpenAdminPanel={() => setIsAdminOpen(true)}
+        onOpenLocalRomModal={() => setIsLocalRomModalOpen(true)}
         soundEnabled={soundEnabled}
         onToggleSound={handleToggleSound}
         favoritesCount={favorites.length}
@@ -311,11 +314,23 @@ export const App: React.FC = () => {
                 onToggleFavorite={handleToggleFavorite}
                 selectedTag={selectedTag}
                 onOpenAdmin={() => setIsAdminOpen(true)}
+                onOpenLocalRomModal={() => setIsLocalRomModalOpen(true)}
               />
             </div>
           )}
         </main>
       </div>
+
+      {/* Client-Side BYOG Emulator Drop & Run Modal */}
+      {isLocalRomModalOpen && (
+        <ClientLocalRomModal
+          isOpen={isLocalRomModalOpen}
+          onClose={() => setIsLocalRomModalOpen(false)}
+          onPlayGame={(game: GameItem) => {
+            handleSelectGame(game);
+          }}
+        />
+      )}
 
       {/* Admin Dashboard Modal */}
       {isAdminOpen && (

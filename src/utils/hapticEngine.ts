@@ -49,6 +49,14 @@ export class HapticEngine {
     this.heavyCrash();
   }
 
+  static selectionClick() {
+    this.lightTick();
+  }
+
+  static impactSuccess() {
+    this.victoryFanfare();
+  }
+
   /**
    * Checkpoint & Level Clear Fanfare Rhythm
    */

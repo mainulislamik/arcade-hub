@@ -23,7 +23,8 @@ import {
   Crosshair, 
   ShieldCheck,
   Leaf,
-  Wrench
+  Wrench,
+  UploadCloud
 } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 import { GameItem, GameCategory } from '../types/game';
@@ -44,6 +45,7 @@ interface HeaderProps {
   onOpenStudio?: () => void;
   onOpenDeveloperPortal?: () => void;
   onOpenAdminPanel?: () => void;
+  onOpenLocalRomModal?: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
   favoritesCount: number;
@@ -74,6 +76,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenStudio,
   onOpenDeveloperPortal,
   onOpenAdminPanel,
+  onOpenLocalRomModal,
   soundEnabled,
   onToggleSound,
   favoritesCount,
@@ -286,6 +289,22 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Trophy className="w-4 h-4" />
           </button>
+
+          {/* Local Game Emulator Loader (Client-Side BYOG) */}
+          {onOpenLocalRomModal && (
+            <button
+              onClick={() => {
+                sounds.playClick();
+                HapticEngine.lightTick();
+                onOpenLocalRomModal();
+              }}
+              className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500/20 to-blue-500/20 hover:from-cyan-500/30 hover:to-blue-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105 cursor-pointer"
+              title="Play Local ROM from your PC (.JAR, .SIS, .GBA, .NES, .SWF) - Zero Server Upload"
+            >
+              <UploadCloud className="w-4 h-4 text-cyan-400" />
+              <span className="hidden sm:inline">DROP ROM</span>
+            </button>
+          )}
 
           {/* Level Studio / Map Maker */}
           {onOpenStudio && (
