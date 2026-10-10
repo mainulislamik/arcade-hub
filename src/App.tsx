@@ -226,7 +226,7 @@ export const App: React.FC = () => {
       {/* CrazyGames Top Header */}
       <Header
         games={allGames}
-        activeCategory={selectedGame ? (selectedGame.category as GameCategory) : activeCategory}
+        activeCategory={activeCategory}
         onSelectCategory={handleSelectCategory}
         onSelectGame={handleSelectGame}
         onPlayRandom={handlePlayRandom}
@@ -248,7 +248,7 @@ export const App: React.FC = () => {
         {/* Left Sticky Sidebar Navigation with Live Games Count */}
         <Sidebar
           games={allGames}
-          currentCategory={selectedGame ? (selectedGame.category as GameCategory) : activeCategory}
+          currentCategory={activeCategory}
           onSelectCategory={handleSelectCategory}
           onOpenLegal={(page) => setActiveLegalModal(page)}
           onOpenDeveloperPortal={() => setIsDeveloperPortalOpen(true)}
