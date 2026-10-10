@@ -122,14 +122,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onSelectCategory('all');
               onCloseMobile();
             }}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
               currentCategory === 'all' 
                 ? 'bg-cyan-500/20 text-cyan-300 shadow-sm border border-cyan-500/40' 
                 : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
             }`}
           >
-            <Gamepad2 className="w-5 h-5 text-cyan-400 shrink-0" />
-            {!isCollapsed && <span className="truncate">Featured 3D & Hits</span>}
+            <div className="flex items-center gap-3">
+              <Gamepad2 className="w-5 h-5 text-cyan-400 shrink-0" />
+              {!isCollapsed && <span className="truncate">Featured / All Games</span>}
+            </div>
+            {!isCollapsed && (
+              <span className="text-[10px] font-black w-6 h-5 flex items-center justify-center bg-cyan-500/20 text-cyan-400 rounded-md border border-cyan-500/30">
+                {getCategoryCount('all')}
+              </span>
+            )}
           </button>
 
           <button
@@ -137,28 +144,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onSelectCategory('favorites');
               onCloseMobile();
             }}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
               currentCategory === 'favorites' 
-                ? 'bg-rose-500/20 text-rose-300 shadow-sm border border-rose-500/40' 
+                ? 'bg-rose-500/20 text-rose-300 shadow-sm border border-rose-500/30' 
                 : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
             }`}
           >
-            <Heart className="w-5 h-5 text-rose-400 shrink-0" />
-            {!isCollapsed && (
-              <div className="flex items-center justify-between w-full">
-                <span className="truncate">Favorites</span>
-                {favoritesCount > 0 && (
-                  <span className="px-1.5 py-0.2 bg-rose-500 text-white rounded-full text-[10px] font-bold">
-                    {favoritesCount}
-                  </span>
-                )}
-              </div>
+            <div className="flex items-center gap-3">
+              <Heart className="w-5 h-5 text-rose-400 shrink-0" />
+              {!isCollapsed && <span className="truncate">My Favorites</span>}
+            </div>
+            {!isCollapsed && favoritesCount > 0 && (
+              <span className="text-[10px] font-black w-5 h-5 flex items-center justify-center bg-rose-500/20 text-rose-400 rounded-md border border-rose-500/30">
+                {favoritesCount}
+              </span>
             )}
           </button>
         </div>
 
         {/* Categories Section */}
-        <div className="space-y-1">
+        <div>
           {!isCollapsed && (
             <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 px-3 block mb-1">
               Top Categories
