@@ -79,9 +79,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const categories: { id: GameCategory; label: string; icon: React.ReactNode; count: number }[] = [
     { id: 'all', label: 'All Games', icon: <Gamepad2 className="w-5 h-5 text-cyan-400" />, count: getCategoryCount('all') },
     { id: 'action', label: 'Action & 3D', icon: <Swords className="w-5 h-5 text-rose-400" />, count: getCategoryCount('action') },
+    { id: 'retro', label: 'Retro & Nokia', icon: <RotateCcw className="w-5 h-5 text-amber-300" />, count: getCategoryCount('retro') },
+    { id: 'arcade', label: 'Arcade & Skill', icon: <Zap className="w-5 h-5 text-purple-400" />, count: getCategoryCount('arcade') },
     { id: 'driving', label: 'Driving & Cars', icon: <Car className="w-5 h-5 text-amber-400" />, count: getCategoryCount('driving') },
     { id: 'shooting', label: 'Shooting & FPS', icon: <Crosshair className="w-5 h-5 text-cyan-400" />, count: getCategoryCount('shooting') },
-    { id: 'arcade', label: 'Arcade & Skill', icon: <Zap className="w-5 h-5 text-purple-400" />, count: getCategoryCount('arcade') },
     { id: 'puzzle', label: 'Puzzle & Logic', icon: <Puzzle className="w-5 h-5 text-emerald-400" />, count: getCategoryCount('puzzle') },
     { id: 'strategy', label: 'Strategy & Brain', icon: <Brain className="w-5 h-5 text-blue-400" />, count: getCategoryCount('strategy') },
   ];
