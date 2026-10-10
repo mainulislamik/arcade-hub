@@ -10,7 +10,8 @@ import {
   ShieldCheck, 
   Zap, 
   Smartphone,
-  Leaf
+  Leaf,
+  Maximize2
 } from 'lucide-react';
 import { sounds } from '../../utils/soundEngine';
 import { HapticEngine } from '../../utils/hapticEngine';
@@ -41,6 +42,29 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
   const [isEco, setIsEco] = useState(EcoEngine.isEco());
   
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [selectedRatio, setSelectedRatio] = useState<string>(aspectRatio);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      if (containerRef.current) {
+        containerRef.current.requestFullscreen().catch((err) => {
+          console.error('Error attempting to enable fullscreen:', err);
+        });
+      }
+    } else {
+      document.exitFullscreen();
+    }
+  };
 
   // Subscribe to Eco Mode changes
   useEffect(() => {
@@ -979,18 +1003,20 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
     ['1', '2', '3'],
     ['4', '5', '6'],
     ['7', '8', '9'],
-    ['*', '0', '#']
+    ['*', '0', '#'],
+    ['Left', 'Up', 'Right'],
+    ['Down', 'Ok', 'C']
   ];
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-white rounded-2xl overflow-hidden shadow-2xl relative select-none">
+    <div ref={containerRef} className="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-white rounded-2xl overflow-hidden shadow-2xl relative select-none">
       {/* Emulator Canvas Display Area */}
       <div 
-        className="w-full flex-1 flex items-center justify-center relative rounded-xl overflow-hidden bg-black"
+        className={`w-full flex-1 flex items-center justify-center relative ${!isFullscreen && 'rounded-xl'} overflow-hidden bg-black`}
         style={{
-          aspectRatio: aspectRatio === '16:9' ? '16/9' : aspectRatio === '4:3' ? '4/3' : aspectRatio === '9:16' ? '9/16' : aspectRatio === '3:4' ? '3/4' : 'auto',
-          minHeight: '480px',
-          maxHeight: '82vh'
+          aspectRatio: selectedRatio === '16:9' ? '16/9' : selectedRatio === '4:3' ? '4/3' : selectedRatio === '9:16' ? '9/16' : selectedRatio === '3:4' ? '3/4' : 'auto',
+          minHeight: isFullscreen ? '100vh' : '480px',
+          maxHeight: isFullscreen ? '100vh' : '82vh'
         }}
       >
         <iframe
@@ -1008,6 +1034,34 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
             <span className="text-sm font-bold text-cyan-400">Booting Multi-Core WASM Runtime...</span>
           </div>
         )}
+
+        {/* Floating Quick Controls inside Player */}
+        <div className="absolute top-4 right-4 flex items-center gap-2 z-10 opacity-0 hover:opacity-100 transition-opacity">
+          <select 
+            value={selectedRatio}
+            onChange={(e) => {
+              HapticEngine.lightTick();
+              setSelectedRatio(e.target.value);
+            }}
+            className="bg-slate-900/80 backdrop-blur-md text-white border border-slate-700 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-cyan-500 cursor-pointer"
+          >
+            <option value="auto">Auto Ratio (Native)</option>
+            <option value="16:9">Widescreen (16:9)</option>
+            <option value="4:3">Classic CRT (4:3)</option>
+            <option value="9:16">Vertical Mobile (9:16)</option>
+            <option value="3:4">Vertical Arcade (3:4)</option>
+          </select>
+          <button 
+            onClick={() => {
+              HapticEngine.selectionClick();
+              toggleFullscreen();
+            }}
+            className="bg-slate-900/80 backdrop-blur-md hover:bg-cyan-600/80 text-white rounded-lg p-2 border border-slate-700 hover:border-cyan-400 transition-all cursor-pointer"
+            title="Toggle Fullscreen"
+          >
+            <Maximize2 className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Docked Virtual Keypad for Mobile / Touch Devices */}
