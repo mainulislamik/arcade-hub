@@ -11,7 +11,8 @@ import {
   Zap, 
   Smartphone,
   Leaf,
-  Maximize2
+  Maximize2,
+  Gamepad2
 } from 'lucide-react';
 import { sounds } from '../../utils/soundEngine';
 import { HapticEngine } from '../../utils/hapticEngine';
@@ -1092,6 +1093,86 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
                 ))}
               </React.Fragment>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Docked Virtual Arcade Gamepad for Retro Games on Mobile */}
+      {['gba', 'nes', 'snes', 'md', 'gb', 'gbc'].includes(format) && (
+        <div className="w-full bg-slate-900 border-t border-slate-800 px-4 py-4 flex flex-col items-center gap-4 sm:hidden">
+          <div className="flex items-center justify-between w-full max-w-sm text-[10px] text-slate-400 font-mono px-2">
+            <span className="flex items-center gap-1.5 text-rose-400">
+              <Gamepad2 className="w-3.5 h-3.5" />
+              <span>Arcade Joypad</span>
+            </span>
+            <span className="text-[10px] text-slate-500">Rotate phone or pair controller</span>
+          </div>
+
+          <div className="flex items-center justify-between w-full max-w-[320px] px-2">
+            {/* D-Pad */}
+            <div className="grid grid-cols-3 gap-0 relative w-24 h-24 transform scale-110">
+              <div />
+              <button 
+                onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('ArrowUp', 'keydown'); }}
+                onTouchEnd={(e) => { e.preventDefault(); sendKey('ArrowUp', 'keyup'); }}
+                className="bg-slate-700/80 active:bg-cyan-600 rounded-t-lg border-t border-x border-slate-600 w-full h-full flex items-center justify-center text-slate-400 active:text-white pb-1"
+              >▲</button>
+              <div />
+              <button 
+                onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('ArrowLeft', 'keydown'); }}
+                onTouchEnd={(e) => { e.preventDefault(); sendKey('ArrowLeft', 'keyup'); }}
+                className="bg-slate-700/80 active:bg-cyan-600 rounded-l-lg border-l border-y border-slate-600 w-full h-full flex items-center justify-center text-slate-400 active:text-white pr-1"
+              >◀</button>
+              <div className="bg-slate-700/80 w-full h-full border border-slate-600 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-600 to-slate-700/80" />
+              <button 
+                onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('ArrowRight', 'keydown'); }}
+                onTouchEnd={(e) => { e.preventDefault(); sendKey('ArrowRight', 'keyup'); }}
+                className="bg-slate-700/80 active:bg-cyan-600 rounded-r-lg border-r border-y border-slate-600 w-full h-full flex items-center justify-center text-slate-400 active:text-white pl-1"
+              >▶</button>
+              <div />
+              <button 
+                onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('ArrowDown', 'keydown'); }}
+                onTouchEnd={(e) => { e.preventDefault(); sendKey('ArrowDown', 'keyup'); }}
+                className="bg-slate-700/80 active:bg-cyan-600 rounded-b-lg border-b border-x border-slate-600 w-full h-full flex items-center justify-center text-slate-400 active:text-white pt-1"
+              >▼</button>
+              <div />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="relative w-28 h-24 flex items-end justify-end pb-2 pr-2">
+              <button 
+                onTouchStart={(e) => { e.preventDefault(); HapticEngine.selectionClick(); sendKey('KeyX', 'keydown'); }}
+                onTouchEnd={(e) => { e.preventDefault(); sendKey('KeyX', 'keyup'); }}
+                className="absolute top-0 right-12 w-10 h-10 rounded-full bg-slate-700/80 active:bg-rose-500 border-2 border-slate-600 text-slate-300 active:text-white font-bold text-sm shadow-md flex items-center justify-center"
+              >Y</button>
+              <button 
+                onTouchStart={(e) => { e.preventDefault(); HapticEngine.selectionClick(); sendKey('Escape', 'keydown'); }}
+                onTouchEnd={(e) => { e.preventDefault(); sendKey('Escape', 'keyup'); }}
+                className="absolute top-2 right-0 w-10 h-10 rounded-full bg-slate-700/80 active:bg-emerald-500 border-2 border-slate-600 text-slate-300 active:text-white font-bold text-sm shadow-md flex items-center justify-center"
+              >X</button>
+              <button 
+                onTouchStart={(e) => { e.preventDefault(); HapticEngine.selectionClick(); sendKey('Enter', 'keydown'); }}
+                onTouchEnd={(e) => { e.preventDefault(); sendKey('Enter', 'keyup'); }}
+                className="absolute bottom-2 right-12 w-10 h-10 rounded-full bg-slate-700/80 active:bg-amber-500 border-2 border-slate-600 text-slate-300 active:text-white font-bold text-sm shadow-md flex items-center justify-center"
+              >B</button>
+              <button 
+                onTouchStart={(e) => { e.preventDefault(); HapticEngine.selectionClick(); sendKey('Space', 'keydown'); }}
+                onTouchEnd={(e) => { e.preventDefault(); sendKey('Space', 'keyup'); }}
+                className="absolute bottom-4 right-2 w-10 h-10 rounded-full bg-slate-700/80 active:bg-blue-500 border-2 border-slate-600 text-slate-300 active:text-white font-bold text-sm shadow-md flex items-center justify-center"
+              >A</button>
+            </div>
+          </div>
+          <div className="w-full flex items-center justify-center gap-6 mt-2">
+            <button 
+              onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('Shift', 'keydown'); }}
+              onTouchEnd={(e) => { e.preventDefault(); sendKey('Shift', 'keyup'); }}
+              className="px-4 py-1.5 rounded-full bg-slate-800 active:bg-cyan-600 border border-slate-700 text-[9px] font-black tracking-[0.2em] text-slate-400 active:text-white uppercase"
+            >Select</button>
+            <button 
+              onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('Enter', 'keydown'); }}
+              onTouchEnd={(e) => { e.preventDefault(); sendKey('Enter', 'keyup'); }}
+              className="px-4 py-1.5 rounded-full bg-slate-800 active:bg-cyan-600 border border-slate-700 text-[9px] font-black tracking-[0.2em] text-slate-400 active:text-white uppercase"
+            >Start</button>
           </div>
         </div>
       )}
