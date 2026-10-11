@@ -24,8 +24,7 @@ import {
   ShieldCheck,
   Leaf,
   Wrench,
-  UploadCloud,
-  Crown
+  UploadCloud
 } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 import { GameItem, GameCategory } from '../types/game';
@@ -47,7 +46,6 @@ interface HeaderProps {
   onOpenDeveloperPortal?: () => void;
   onOpenAdminPanel?: () => void;
   onOpenLocalRomModal?: () => void;
-  onOpenOnlineRecharge?: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
   favoritesCount: number;
@@ -79,7 +77,6 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenDeveloperPortal,
   onOpenAdminPanel,
   onOpenLocalRomModal,
-  onOpenOnlineRecharge,
   soundEnabled,
   onToggleSound,
   favoritesCount,
@@ -266,22 +263,6 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Gift className="w-4 h-4 text-amber-400" />
               <span className="hidden sm:inline">QUESTS</span>
-            </button>
-          )}
-
-          {/* Online Recharge & VIP Pass (bKash/Nagad/Voucher) */}
-          {onOpenOnlineRecharge && (
-            <button
-              onClick={() => {
-                sounds.playClick();
-                HapticEngine.lightTick();
-                onOpenOnlineRecharge();
-              }}
-              className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-rose-500/20 hover:from-amber-500/30 hover:to-rose-500/30 text-amber-300 border border-amber-500/40 text-xs font-black flex items-center gap-1.5 shadow-sm transition-all hover:scale-105 cursor-pointer"
-              title="Online Recharge & VIP Pass (bKash/Nagad/Vouchers) - Zero Coin Restriction"
-            >
-              <Crown className="w-4 h-4 text-amber-400" />
-              <span className="hidden sm:inline">VIP RECHARGE</span>
             </button>
           )}
 

@@ -11,10 +11,6 @@ import {
   AlertCircle, 
   TrendingUp, 
   HardDrive, 
-  CreditCard, 
-  Key, 
-  Copy, 
-  Check, 
   Download, 
   Play, 
   ArrowLeft, 
@@ -27,7 +23,6 @@ import {
   Zap,
   Globe,
   Radio,
-  FileText
 } from 'lucide-react';
 import { GameItem } from '../../types/game';
 import { 
@@ -37,15 +32,6 @@ import {
   storeRomBinary,
   getStorageStats
 } from '../../utils/customGamesStorage';
-import { 
-  getTransactions, 
-  updateTransactionStatus, 
-  getVouchers, 
-  generateVoucher, 
-  RechargeTransaction, 
-  VipVoucher, 
-  VipTier 
-} from '../../utils/rechargeStorage';
 import { sounds } from '../../utils/soundEngine';
 
 interface SuperAdminDashboardProps {
@@ -69,18 +55,14 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
 
-  // Active Tab: 'overview' | 'games' | 'recharge' | 'vouchers' | 'radar' | 'system'
-  const [activeTab, setActiveTab] = useState<'overview' | 'games' | 'recharge' | 'vouchers' | 'radar' | 'system'>('overview');
+  // Active Tab: 'overview' | 'games' | 'radar' | 'system'
+  const [activeTab, setActiveTab] = useState<'overview' | 'games' | 'radar' | 'system'>('overview');
 
   // Custom Games & Storage Stats
   const [customGames, setCustomGames] = useState<GameItem[]>([]);
   const [storageStats, setStorageStats] = useState<{ count: number; totalSizeMb: number }>({ count: 0, totalSizeMb: 0 });
 
-  // Recharge & Vouchers State
-  const [transactions, setTransactions] = useState<RechargeTransaction[]>([]);
-  const [vouchers, setVouchers] = useState<VipVoucher[]>([]);
-  const [selectedVipTier, setSelectedVipTier] = useState<VipTier>('monthly_vip');
-  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
 
   // Upload Form State
   const [uploadTitle, setUploadTitle] = useState('');
@@ -109,8 +91,6 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
       setCustomGames(cGames);
       const sStats = await getStorageStats();
       setStorageStats(sStats);
-      setTransactions(getTransactions());
-      setVouchers(getVouchers());
     } catch (err) {
       console.error('Failed to load admin data', err);
     }
@@ -242,20 +222,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
     }
   };
 
-  // Generate Voucher Code
-  const handleCreateVoucher = () => {
-    sounds.playPowerup();
-    const duration = selectedVipTier === 'lifetime_vip' ? 3650 : selectedVipTier === 'monthly_vip' ? 30 : selectedVipTier === 'weekly_vip' ? 7 : 1;
-    generateVoucher(selectedVipTier, duration);
-    setVouchers(getVouchers());
-  };
 
-  const copyToClipboard = (code: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedCode(code);
-    sounds.playClick();
-    setTimeout(() => setCopiedCode(null), 2000);
-  };
 
   // Filtered games
   const filteredGames = allGames.filter(g => 
@@ -264,10 +231,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
     g.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Total BDT Revenue
-  const totalRevenueBDT = transactions
-    .filter(t => t.status === 'completed')
-    .reduce((sum, t) => sum + t.amountBDT, 0);
+
 
   // 1. AUTH GATE (If not logged in)
   if (!isAuthenticated) {
@@ -418,30 +382,6 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
           </button>
 
           <button
-            onClick={() => setActiveTab('recharge')}
-            className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left whitespace-nowrap cursor-pointer ${
-              activeTab === 'recharge'
-                ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <CreditCard className="w-4 h-4 flex-shrink-0" />
-            <span>Online Recharge (BDT)</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('vouchers')}
-            className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left whitespace-nowrap cursor-pointer ${
-              activeTab === 'vouchers'
-                ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <Key className="w-4 h-4 flex-shrink-0" />
-            <span>Vouchers & VIP PINs</span>
-          </button>
-
-          <button
             onClick={() => setActiveTab('radar')}
             className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left whitespace-nowrap cursor-pointer ${
               activeTab === 'radar'
@@ -473,7 +413,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
             <div className="space-y-6 max-w-6xl">
               <div>
                 <h2 className="text-xl font-black text-white">System Executive Summary</h2>
-                <p className="text-xs text-slate-400 mt-1">Live status of games, revenue, storage, and zero-server execution.</p>
+                <p className="text-xs text-slate-400 mt-1">Live status of games, library storage, and 100% free zero-server execution.</p>
               </div>
 
               {/* Metric Cards Grid */}
@@ -491,12 +431,12 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
 
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
                   <div className="flex items-center justify-between text-slate-400 mb-2">
-                    <span className="text-xs font-mono font-semibold">TOTAL RECHARGE (BDT)</span>
-                    <CreditCard className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-mono font-semibold">PLATFORM MODEL</span>
+                    <Sparkles className="w-4 h-4 text-emerald-400" />
                   </div>
-                  <div className="text-2xl font-black text-emerald-400">৳{totalRevenueBDT}</div>
+                  <div className="text-2xl font-black text-emerald-400">100% FREE</div>
                   <div className="text-[10px] text-slate-500 mt-2 flex items-center gap-1 font-mono">
-                    Direct MFS & VIP Passes
+                    Zero Fees · Unlimited Free Access
                   </div>
                 </div>
 
@@ -525,37 +465,42 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
 
               {/* Quick Actions & Recent Transactions */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
-                {/* Recent Recharges */}
+                {/* Custom Ingested Games Quick List */}
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                      <CreditCard className="w-4 h-4 text-emerald-400" />
-                      <span>Recent Online Recharges (Direct BDT)</span>
+                      <Gamepad2 className="w-4 h-4 text-cyan-400" />
+                      <span>Custom Ingested Games ({customGames.length})</span>
                     </h3>
                     <button
-                      onClick={() => setActiveTab('recharge')}
+                      onClick={() => setActiveTab('games')}
                       className="text-xs text-cyan-400 hover:underline cursor-pointer"
                     >
-                      View All
+                      Manage Library
                     </button>
                   </div>
                   <div className="space-y-2.5">
-                    {transactions.slice(0, 4).map((tx) => (
-                      <div key={tx.id} className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl flex items-center justify-between">
-                        <div>
-                          <div className="text-xs font-bold text-white">{tx.userPhoneOrAccount} · <span className="uppercase text-cyan-400">{tx.method}</span></div>
-                          <div className="text-[10px] text-slate-500 font-mono mt-0.5">{tx.trxId} · {tx.tierLabel}</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-xs font-bold text-emerald-400">৳{tx.amountBDT}</div>
-                          <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
-                            tx.status === 'completed' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
-                          }`}>
-                            {tx.status}
-                          </span>
-                        </div>
+                    {customGames.length === 0 ? (
+                      <div className="p-4 bg-slate-950/60 border border-slate-800 rounded-xl text-center text-xs text-slate-500 font-mono">
+                        No custom ROMs ingested yet. Use the Games & ROM Library tab to upload .jar, .sis, .gba files.
                       </div>
-                    ))}
+                    ) : (
+                      customGames.slice(0, 4).map((g) => (
+                        <div key={g.id} className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl flex items-center justify-between">
+                          <div>
+                            <div className="text-xs font-bold text-white">{g.title}</div>
+                            <div className="text-[10px] text-slate-500 font-mono mt-0.5 uppercase">{g.romFormat || 'ROM'} · {g.category}</div>
+                          </div>
+                          <button
+                            onClick={() => onPlayGame(g)}
+                            className="px-2.5 py-1 bg-cyan-600/20 hover:bg-cyan-600 text-cyan-400 hover:text-white rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
+                          >
+                            <Play className="w-3 h-3" />
+                            <span>Launch</span>
+                          </button>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
 
@@ -783,219 +728,6 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                                 </button>
                               )}
                             </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 3: ONLINE RECHARGE (BDT & MFS - ZERO COINS) */}
-          {activeTab === 'recharge' && (
-            <div className="space-y-6 max-w-6xl">
-              <div>
-                <h2 className="text-xl font-black text-white">Online Recharge & VIP Pass Hub</h2>
-                <p className="text-xs text-slate-400 mt-1">Direct BDT transactions via bKash, Nagad, Rocket, and Bank Cards.</p>
-              </div>
-
-              {/* VIP Packages Pricing Matrix */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] font-mono text-slate-400 uppercase">24-Hour Pass</span>
-                    <h4 className="text-xl font-black text-white mt-1">৳20 BDT</h4>
-                    <p className="text-xs text-slate-400 mt-1">1 Day Unrestricted Save States & Zero Ads</p>
-                  </div>
-                  <div className="mt-4 text-[10px] text-cyan-400 font-mono">Tier: daily_pass</div>
-                </div>
-
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] font-mono text-indigo-400 uppercase">Weekly VIP</span>
-                    <h4 className="text-xl font-black text-white mt-1">৳70 BDT</h4>
-                    <p className="text-xs text-slate-400 mt-1">7 Days Unlimited Rewind & Pro Emulators</p>
-                  </div>
-                  <div className="mt-4 text-[10px] text-cyan-400 font-mono">Tier: weekly_vip</div>
-                </div>
-
-                <div className="bg-slate-900 border border-cyan-800/40 bg-gradient-to-br from-slate-900 to-cyan-950/20 rounded-2xl p-4 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] font-mono text-cyan-400 uppercase font-bold">Monthly VIP (Popular)</span>
-                    <h4 className="text-xl font-black text-cyan-300 mt-1">৳200 BDT</h4>
-                    <p className="text-xs text-slate-300 mt-1">30 Days Full Cloud Save & AI Level Studio</p>
-                  </div>
-                  <div className="mt-4 text-[10px] text-cyan-400 font-mono">Tier: monthly_vip</div>
-                </div>
-
-                <div className="bg-slate-900 border border-amber-800/40 bg-gradient-to-br from-slate-900 to-amber-950/20 rounded-2xl p-4 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] font-mono text-amber-400 uppercase font-bold">Lifetime Founder</span>
-                    <h4 className="text-xl font-black text-amber-300 mt-1">৳500 BDT</h4>
-                    <p className="text-xs text-slate-300 mt-1">Permanent VIP Badge, Beta Roms & All Future Perks</p>
-                  </div>
-                  <div className="mt-4 text-[10px] text-amber-400 font-mono">Tier: lifetime_vip</div>
-                </div>
-              </div>
-
-              {/* Transactions Ledger Table */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                    <CreditCard className="w-4 h-4 text-emerald-400" />
-                    <span>Transaction Ledger ({transactions.length} Records)</span>
-                  </h3>
-                  <div className="text-xs font-mono text-emerald-400 font-bold">
-                    Total Collected: ৳{totalRevenueBDT} BDT
-                  </div>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead>
-                      <tr className="border-b border-slate-800 text-slate-400 font-mono text-[11px]">
-                        <th className="py-2.5 px-3">Tx ID</th>
-                        <th className="py-2.5 px-3">User / Account</th>
-                        <th className="py-2.5 px-3">Gateway</th>
-                        <th className="py-2.5 px-3">Amount</th>
-                        <th className="py-2.5 px-3">VIP Pass Tier</th>
-                        <th className="py-2.5 px-3">Status</th>
-                        <th className="py-2.5 px-3 text-right">Approval</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800/60">
-                      {transactions.map((tx) => (
-                        <tr key={tx.id} className="hover:bg-slate-800/40 transition-colors">
-                          <td className="py-2.5 px-3 font-mono font-bold text-slate-300">{tx.id}</td>
-                          <td className="py-2.5 px-3 font-bold text-white">{tx.userPhoneOrAccount}</td>
-                          <td className="py-2.5 px-3">
-                            <span className="px-2 py-0.5 bg-slate-800 border border-slate-700 rounded text-[10px] uppercase font-bold text-cyan-400">
-                              {tx.method}
-                            </span>
-                          </td>
-                          <td className="py-2.5 px-3 font-bold text-emerald-400">৳{tx.amountBDT}</td>
-                          <td className="py-2.5 px-3 text-slate-300">{tx.tierLabel}</td>
-                          <td className="py-2.5 px-3">
-                            <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
-                              tx.status === 'completed'
-                                ? 'bg-emerald-500/20 text-emerald-400'
-                                : tx.status === 'pending'
-                                ? 'bg-amber-500/20 text-amber-400'
-                                : 'bg-rose-500/20 text-rose-400'
-                            }`}>
-                              {tx.status}
-                            </span>
-                          </td>
-                          <td className="py-2.5 px-3 text-right">
-                            {tx.status === 'pending' ? (
-                              <button
-                                onClick={() => {
-                                  updateTransactionStatus(tx.id, 'completed');
-                                  setTransactions(getTransactions());
-                                  sounds.playPowerup();
-                                }}
-                                className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold cursor-pointer"
-                              >
-                                Approve
-                              </button>
-                            ) : (
-                              <span className="text-[10px] text-slate-500 font-mono">Verified ✓</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 4: VOUCHERS & VIP PINS */}
-          {activeTab === 'vouchers' && (
-            <div className="space-y-6 max-w-6xl">
-              <div>
-                <h2 className="text-xl font-black text-white">VIP Voucher & Recharge PIN Generator</h2>
-                <p className="text-xs text-slate-400 mt-1">Generate 1-click secret VIP pass codes for players or promotions.</p>
-              </div>
-
-              {/* Generator Box */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-                  <Key className="w-4 h-4 text-cyan-400" />
-                  <span>Generate New VIP Activation PIN</span>
-                </h3>
-
-                <div className="flex flex-col sm:flex-row items-center gap-4">
-                  <div className="w-full sm:w-72">
-                    <label className="block text-xs font-mono font-bold text-slate-400 uppercase mb-1">
-                      Choose VIP Tier
-                    </label>
-                    <select
-                      value={selectedVipTier}
-                      onChange={(e) => setSelectedVipTier(e.target.value as any)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-cyan-500 cursor-pointer"
-                    >
-                      <option value="daily_pass">24-Hour Day Pass (1 Day)</option>
-                      <option value="weekly_vip">Weekly VIP Pass (7 Days)</option>
-                      <option value="monthly_vip">Monthly VIP Pass (30 Days)</option>
-                      <option value="lifetime_vip">Lifetime Founder Pass (3650 Days)</option>
-                    </select>
-                  </div>
-
-                  <div className="w-full sm:w-auto pt-5">
-                    <button
-                      onClick={handleCreateVoucher}
-                      className="w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-lg shadow-cyan-600/20 flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>Generate PIN Code</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Vouchers Table */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-cyan-400" />
-                  <span>Active & Redeemed Voucher PINs ({vouchers.length})</span>
-                </h3>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead>
-                      <tr className="border-b border-slate-800 text-slate-400 font-mono text-[11px]">
-                        <th className="py-2.5 px-3">Voucher PIN Code</th>
-                        <th className="py-2.5 px-3">Pass Duration</th>
-                        <th className="py-2.5 px-3">Tier</th>
-                        <th className="py-2.5 px-3">Status</th>
-                        <th className="py-2.5 px-3 text-right">Copy</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800/60">
-                      {vouchers.map((v) => (
-                        <tr key={v.code} className="hover:bg-slate-800/40 transition-colors">
-                          <td className="py-2.5 px-3 font-mono font-bold text-cyan-300">{v.code}</td>
-                          <td className="py-2.5 px-3 text-slate-300 font-bold">{v.durationDays} Days</td>
-                          <td className="py-2.5 px-3 uppercase text-[10px] font-mono text-slate-400">{v.tier}</td>
-                          <td className="py-2.5 px-3">
-                            <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
-                              v.isUsed ? 'bg-slate-800 text-slate-500' : 'bg-emerald-500/20 text-emerald-400'
-                            }`}>
-                              {v.isUsed ? 'Redeemed' : 'Ready to Use'}
-                            </span>
-                          </td>
-                          <td className="py-2.5 px-3 text-right">
-                            <button
-                              onClick={() => copyToClipboard(v.code)}
-                              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg flex items-center gap-1 font-mono text-xs cursor-pointer ml-auto"
-                            >
-                              {copiedCode === v.code ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                              <span>{copiedCode === v.code ? 'Copied' : 'Copy'}</span>
-                            </button>
                           </td>
                         </tr>
                       ))}

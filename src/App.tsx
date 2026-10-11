@@ -19,7 +19,6 @@ import { ArcadexLevelStudioModal } from './components/studio/ArcadexLevelStudioM
 import { ClientLocalRomModal } from './components/player/ClientLocalRomModal';
 import { ChiptuneJukebox } from './components/player/ChiptuneJukebox';
 import { SuperAdminDashboard } from './components/admin/SuperAdminDashboard';
-import { OnlineRechargeModal } from './components/recharge/OnlineRechargeModal';
 import { LanguageCode } from './utils/i18n';
 
 export const App: React.FC = () => {
@@ -84,7 +83,6 @@ export const App: React.FC = () => {
   const [isSuperAdminRoute, setIsSuperAdminRoute] = useState<boolean>(() => {
     return window.location.pathname === '/imon' || window.location.pathname.startsWith('/imon/');
   });
-  const [isOnlineRechargeOpen, setIsOnlineRechargeOpen] = useState<boolean>(false);
 
   // URL Routing Sync (Deep Linking for /imon, ?game=slug or ?category=action or ?admin=true or ?legal=privacy)
   useEffect(() => {
@@ -272,7 +270,6 @@ export const App: React.FC = () => {
         onOpenDeveloperPortal={() => setIsDeveloperPortalOpen(true)}
         onOpenAdminPanel={() => setIsAdminOpen(true)}
         onOpenLocalRomModal={() => setIsLocalRomModalOpen(true)}
-        onOpenOnlineRecharge={() => setIsOnlineRechargeOpen(true)}
         soundEnabled={soundEnabled}
         onToggleSound={handleToggleSound}
         favoritesCount={favorites.length}
@@ -424,14 +421,6 @@ export const App: React.FC = () => {
         <ArcadexLevelStudioModal
           isOpen={isStudioOpen}
           onClose={() => setIsStudioOpen(false)}
-        />
-      )}
-
-      {/* Online VIP Recharge & MFS Modal */}
-      {isOnlineRechargeOpen && (
-        <OnlineRechargeModal
-          isOpen={isOnlineRechargeOpen}
-          onClose={() => setIsOnlineRechargeOpen(false)}
         />
       )}
 
