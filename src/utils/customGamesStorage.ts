@@ -143,3 +143,20 @@ export async function deleteCustomGame(gameId: string, customRomKey?: string): P
     tx.onerror = () => reject(tx.error);
   });
 }
+
+// Get Storage Stats
+export async function getStorageStats(): Promise<{ count: number; totalSizeMb: number }> {
+  try {
+    const games = await getCustomGames();
+    let totalMb = 0;
+    games.forEach((g) => {
+      totalMb += g.fileSizeMb || 0.5;
+    });
+    return {
+      count: games.length,
+      totalSizeMb: +totalMb.toFixed(2)
+    };
+  } catch {
+    return { count: 0, totalSizeMb: 0 };
+  }
+}

@@ -18,6 +18,8 @@ import { DailyQuestsModal } from './components/gamification/DailyQuestsModal';
 import { ArcadexLevelStudioModal } from './components/studio/ArcadexLevelStudioModal';
 import { ClientLocalRomModal } from './components/player/ClientLocalRomModal';
 import { ChiptuneJukebox } from './components/player/ChiptuneJukebox';
+import { SuperAdminDashboard } from './components/admin/SuperAdminDashboard';
+import { OnlineRechargeModal } from './components/recharge/OnlineRechargeModal';
 import { LanguageCode } from './utils/i18n';
 
 export const App: React.FC = () => {
@@ -79,10 +81,22 @@ export const App: React.FC = () => {
   const [isDeveloperPortalOpen, setIsDeveloperPortalOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isLocalRomModalOpen, setIsLocalRomModalOpen] = useState(false);
+  const [isSuperAdminRoute, setIsSuperAdminRoute] = useState<boolean>(() => {
+    return window.location.pathname === '/imon' || window.location.pathname.startsWith('/imon/');
+  });
+  const [isOnlineRechargeOpen, setIsOnlineRechargeOpen] = useState<boolean>(false);
 
-  // URL Routing Sync (Deep Linking for ?game=slug or ?category=action or ?admin=true or ?legal=privacy)
+  // URL Routing Sync (Deep Linking for /imon, ?game=slug or ?category=action or ?admin=true or ?legal=privacy)
   useEffect(() => {
     const handleUrlChange = () => {
+      const path = window.location.pathname;
+      if (path === '/imon' || path.startsWith('/imon/')) {
+        setIsSuperAdminRoute(true);
+        return;
+      } else {
+        setIsSuperAdminRoute(false);
+      }
+
       const params = new URLSearchParams(window.location.search);
       const gameSlug = params.get('game');
       const catParam = params.get('category') as GameCategory | null;
@@ -223,6 +237,25 @@ export const App: React.FC = () => {
     localStorage.setItem('arcadex_lang', lang);
   };
 
+  // Dedicated Full-Page Super Admin Portal for /imon Route
+  if (isSuperAdminRoute) {
+    return (
+      <SuperAdminDashboard
+        allGames={allGames}
+        onGameAddedOrUpdated={refreshCustomGames}
+        onExitToLobby={() => {
+          window.history.pushState({}, '', '/');
+          setIsSuperAdminRoute(false);
+        }}
+        onPlayGame={(game) => {
+          window.history.pushState({}, '', `/?game=${game.slug || game.id}`);
+          setIsSuperAdminRoute(false);
+          setSelectedGame(game);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
       {/* CrazyGames Top Header */}
@@ -239,6 +272,7 @@ export const App: React.FC = () => {
         onOpenDeveloperPortal={() => setIsDeveloperPortalOpen(true)}
         onOpenAdminPanel={() => setIsAdminOpen(true)}
         onOpenLocalRomModal={() => setIsLocalRomModalOpen(true)}
+        onOpenOnlineRecharge={() => setIsOnlineRechargeOpen(true)}
         soundEnabled={soundEnabled}
         onToggleSound={handleToggleSound}
         favoritesCount={favorites.length}
@@ -390,6 +424,14 @@ export const App: React.FC = () => {
         <ArcadexLevelStudioModal
           isOpen={isStudioOpen}
           onClose={() => setIsStudioOpen(false)}
+        />
+      )}
+
+      {/* Online VIP Recharge & MFS Modal */}
+      {isOnlineRechargeOpen && (
+        <OnlineRechargeModal
+          isOpen={isOnlineRechargeOpen}
+          onClose={() => setIsOnlineRechargeOpen(false)}
         />
       )}
 
