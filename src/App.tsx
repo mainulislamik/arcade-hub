@@ -267,14 +267,10 @@ export const App: React.FC = () => {
         />
 
         {/* Main Content Area */}
-        <main 
-          className={`flex-1 transition-all duration-300 min-w-0 ${
-            isSidebarCollapsed ? 'md:ml-16' : 'md:ml-64'
-          }`}
-        >
+        <main className="flex-1 transition-all duration-300 min-w-0 w-full">
           {selectedGame ? (
             /* Dedicated Game Theater & SEO Page */
-            <div className="p-3 sm:p-6 max-w-[1500px] mx-auto">
+            <div className="p-3 sm:p-6 w-full">
               <GameTheaterPage
                 game={selectedGame}
                 allGames={allGames}
@@ -288,7 +284,7 @@ export const App: React.FC = () => {
             </div>
           ) : (
             /* Homepage Bento & Category Grids */
-            <div className="p-3 sm:p-6 max-w-[1600px] mx-auto">
+            <div className="p-3 sm:p-6 w-full">
               {selectedTag && (
                 <div className="mb-4 flex items-center justify-between bg-cyan-950/40 border border-cyan-500/40 p-3 rounded-2xl backdrop-blur-md">
                   <div className="flex items-center gap-2">
