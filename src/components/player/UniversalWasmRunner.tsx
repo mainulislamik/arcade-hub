@@ -86,9 +86,10 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
   // Determine ROM format from metadata
   useEffect(() => {
     let fmt = 'jar';
-    const filename = (game.romFileName || game.title || '').toLowerCase();
+    const filename = (game.romFileName || game.romUrl || game.title || '').toLowerCase();
     
-    if (filename.endsWith('.sis') || game.engineType === 'symbian_sis') fmt = 'sis';
+    if (game.romFormat) fmt = game.romFormat;
+    else if (filename.endsWith('.sis') || game.engineType === 'symbian_sis') fmt = 'sis';
     else if (filename.endsWith('.swf') || game.engineType === 'ruffle_flash') fmt = 'swf';
     else if (filename.endsWith('.gba')) fmt = 'gba';
     else if (filename.endsWith('.nes')) fmt = 'nes';
@@ -117,7 +118,10 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
 
         if (game.romUrl) {
           if (isMounted) {
-            setRomBlobUrl(game.romUrl);
+            const finalUrl = game.romUrl.startsWith('http') || game.romUrl.startsWith('blob:')
+              ? game.romUrl
+              : (typeof window !== 'undefined' ? window.location.origin + game.romUrl : game.romUrl);
+            setRomBlobUrl(finalUrl);
             setIsLoading(false);
             return;
           }

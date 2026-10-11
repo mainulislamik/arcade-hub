@@ -290,7 +290,7 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
         {/* Active Game Runtime */}
         {isStreamingReady && (
           <div className="w-full h-full flex flex-col items-center justify-center">
-            {game.isCustomUpload || ['j2me_wasm', 'emulatorjs', 'ruffle_flash', 'symbian_sis', 'html5_zip'].includes(game.engineType || '') ? (
+            {game.isCustomUpload || Boolean(game.romUrl) || ['j2me_wasm', 'emulatorjs', 'ruffle_flash', 'symbian_sis', 'html5_zip'].includes(game.engineType || '') ? (
               <UniversalWasmRunner
                 game={game}
                 soundEnabled={soundEnabled}
