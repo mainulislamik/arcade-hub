@@ -45,7 +45,12 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [selectedRatio, setSelectedRatio] = useState<string>(aspectRatio);
+  const [selectedRatio, setSelectedRatio] = useState<string>(() => {
+    if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+      return (aspectRatio === 'auto' || !aspectRatio) ? '16:9' : aspectRatio;
+    }
+    return aspectRatio || 'auto';
+  });
   const [showTouchKeypad, setShowTouchKeypad] = useState<boolean>(false);
 
   useEffect(() => {
@@ -286,12 +291,10 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
               image-rendering: pixelated;
               image-rendering: -moz-crisp-edges;
               image-rendering: crisp-edges;
+              width: 100%;
               height: 100%;
-              max-height: 100%;
-              width: auto;
               max-width: 100%;
-              aspect-ratio: ${selectedRatio === '16:9' ? '16/9' : selectedRatio === '4:3' ? '4/3' : selectedRatio === 'fill' ? 'auto' : '3/4'};
-              ${selectedRatio === 'fill' ? 'width: 100%; height: 100%;' : ''}
+              max-height: 100%;
               object-fit: contain;
               border-radius: 8px;
               box-shadow: 0 0 60px rgba(0,0,0,0.95), 0 0 40px rgba(56, 189, 248, 0.15);
@@ -331,7 +334,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
         </head>
         <body>
           <div id="app-root">
-            <canvas id="game-canvas" width="480" height="640"></canvas>
+            <canvas id="game-canvas" width="${selectedRatio === '16:9' || selectedRatio === 'auto' ? '1138' : selectedRatio === '4:3' ? '854' : selectedRatio === 'fill' ? '1280' : '480'}" height="${selectedRatio === 'fill' ? '720' : '640'}"></canvas>
             <div id="touch-controls">
               <div style="display: flex; gap: 12px;">
                 <div class="touch-btn" id="btn-left">◀</div>
@@ -348,9 +351,13 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
             const ctx = canvas.getContext('2d');
             let isEcoMode = ${isEco ? 'true' : 'false'};
 
-            // High-DPI Canvas internal sizing
-            const W = 480;
-            const H = 640;
+            // High-DPI Canvas internal sizing based on selected ratio
+            const isWide = ${selectedRatio === '16:9' || selectedRatio === 'auto' ? 'true' : 'false'};
+            const isClassic = ${selectedRatio === '4:3' ? 'true' : 'false'};
+            const isFill = ${selectedRatio === 'fill' ? 'true' : 'false'};
+
+            const W = isWide ? 1138 : isClassic ? 854 : isFill ? 1280 : 480;
+            const H = isFill ? 720 : 640;
             canvas.width = W;
             canvas.height = H;
 
@@ -1027,6 +1034,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
         className="w-full flex-1 h-full min-h-[580px] flex items-center justify-center relative overflow-hidden bg-black"
       >
         <iframe
+          key={`${game.id}-${selectedRatio}`}
           ref={iframeRef}
           srcDoc={buildEmulatorDoc()}
           title={game.title}
@@ -1068,12 +1076,13 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
               HapticEngine.lightTick();
               setSelectedRatio(e.target.value);
             }}
-            className="bg-slate-900/80 backdrop-blur-md text-white border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-cyan-500 cursor-pointer"
+            className="bg-slate-900/90 backdrop-blur-md text-white border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-cyan-500 cursor-pointer font-bold shadow-md"
           >
-            <option value="auto">Native (3:4)</option>
-            <option value="4:3">Classic CRT (4:3)</option>
-            <option value="16:9">Widescreen (16:9)</option>
-            <option value="fill">Fill Screen</option>
+            <option value="16:9">🖥️ Widescreen HD (16:9) - Full Stage</option>
+            <option value="4:3">🕹️ Classic Arcade (4:3)</option>
+            <option value="fill">🔲 Stretch Fill (100%)</option>
+            <option value="3:4">📱 Retro Nokia (3:4)</option>
+            <option value="auto">⚡ Auto Fit</option>
           </select>
           <button 
             onClick={() => {

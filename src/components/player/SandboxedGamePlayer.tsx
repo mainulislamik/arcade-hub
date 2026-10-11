@@ -221,7 +221,7 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
   };
 
   return (
-    <div ref={containerRef} className="w-full flex flex-col items-center">
+    <div ref={containerRef} className="w-full h-full flex-1 flex flex-col items-center">
       {/* 0% Server Load Execution Meter HUD */}
       <div className="w-full flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800 text-xs font-mono text-slate-300">
         <div className="flex items-center gap-3">
@@ -255,7 +255,7 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
       </div>
 
       {/* Main Game Screen Canvas / Iframe */}
-      <div className="w-full relative bg-slate-950 flex flex-col items-center justify-center overflow-hidden min-h-[420px] sm:min-h-[520px]">
+      <div className="w-full flex-1 h-full relative bg-slate-950 flex flex-col items-center justify-center overflow-hidden min-h-[580px] sm:min-h-[640px]">
         {/* Streaming / Binary Loading Progress Overlay */}
         {isStreamingActive && !isStreamingReady && (
           <div className="absolute inset-0 z-30 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">

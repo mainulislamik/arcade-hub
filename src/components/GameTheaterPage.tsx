@@ -97,7 +97,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
   // Advanced features state
   const [ambientGlowEnabled, setAmbientGlowEnabled] = useState(true);
   const [arcadeCabinetMode, setArcadeCabinetMode] = useState(false);
-  const [aspectRatio, setAspectRatio] = useState<'auto' | '16:9' | '4:3' | '3:4' | '9:16' | 'fill'>('auto');
+  const [aspectRatio, setAspectRatio] = useState<'auto' | '16:9' | '4:3' | '3:4' | '9:16' | 'fill'>('16:9');
   const [shaderPreset, setShaderPreset] = useState<ShaderPreset>('none');
   const [showMultiplayerModal, setShowMultiplayerModal] = useState(false);
   const [showInterstitial, setShowInterstitial] = useState(false);
@@ -279,7 +279,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 transition-all duration-300">
+    <div className="w-full max-w-[1720px] mx-auto px-2 sm:px-6 py-4 transition-all duration-300">
       {/* Deep SEO Schema.org & Meta Tags */}
       <GameSEO game={game} />
 
@@ -311,7 +311,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
       </div>
 
       {/* Main Theater Card Container */}
-      <div className={`transition-all duration-300 ${isTheaterExpanded ? 'max-w-none' : 'max-w-6xl mx-auto'}`}>
+      <div className={`w-full transition-all duration-300 ${isTheaterExpanded ? 'max-w-none' : 'max-w-7xl mx-auto'}`}>
         {/* Game Title Bar & Quick Actions */}
         <div className="bg-white border border-slate-200 rounded-t-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-sm">
           <div className="flex items-center gap-3">
