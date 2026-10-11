@@ -46,6 +46,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedRatio, setSelectedRatio] = useState<string>(aspectRatio);
+  const [showTouchKeypad, setShowTouchKeypad] = useState<boolean>(false);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -274,32 +275,42 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
               width: 100%;
               height: 100%;
               display: flex;
-              flex-direction: column;
               align-items: center;
               justify-content: center;
               position: relative;
+              background: #020617;
+              padding: 0;
             }
             #game-canvas {
-              background: #1e293b;
+              background: #0f172a;
               image-rendering: pixelated;
               image-rendering: -moz-crisp-edges;
               image-rendering: crisp-edges;
-              width: 100%;
               height: 100%;
+              max-height: 100%;
+              width: auto;
+              max-width: 100%;
+              aspect-ratio: ${selectedRatio === '16:9' ? '16/9' : selectedRatio === '4:3' ? '4/3' : selectedRatio === 'fill' ? 'auto' : '3/4'};
+              ${selectedRatio === 'fill' ? 'width: 100%; height: 100%;' : ''}
               object-fit: contain;
-              aspect-ratio: 3/4;
-              box-shadow: 0 0 50px rgba(0,0,0,0.9);
+              border-radius: 8px;
+              box-shadow: 0 0 60px rgba(0,0,0,0.95), 0 0 40px rgba(56, 189, 248, 0.15);
             }
             #touch-controls {
               position: absolute;
-              bottom: 12px;
+              bottom: 16px;
               left: 0;
               right: 0;
               display: flex;
               justify-content: space-between;
-              padding: 0 20px;
+              padding: 0 24px;
               pointer-events: none;
               opacity: 0.85;
+            }
+            @media (hover: hover) and (pointer: fine) {
+              #touch-controls {
+                display: none !important;
+              }
             }
             .touch-btn {
               pointer-events: auto;
@@ -1013,12 +1024,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
     <div ref={containerRef} className="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-white rounded-2xl overflow-hidden shadow-2xl relative select-none">
       {/* Emulator Canvas Display Area */}
       <div 
-        className={`w-full flex-1 flex items-center justify-center relative ${!isFullscreen && 'rounded-xl'} overflow-hidden bg-black`}
-        style={{
-          aspectRatio: selectedRatio === '16:9' ? '16/9' : selectedRatio === '4:3' ? '4/3' : selectedRatio === '9:16' ? '9/16' : selectedRatio === '3:4' ? '3/4' : 'auto',
-          minHeight: isFullscreen ? '100vh' : '480px',
-          maxHeight: isFullscreen ? '100vh' : '82vh'
-        }}
+        className="w-full flex-1 h-full min-h-[580px] flex items-center justify-center relative overflow-hidden bg-black"
       >
         <iframe
           ref={iframeRef}
@@ -1037,20 +1043,37 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
         )}
 
         {/* Floating Quick Controls inside Player */}
-        <div className="absolute top-4 right-4 flex items-center gap-2 z-10 opacity-0 hover:opacity-100 transition-opacity">
+        <div className="absolute top-4 right-4 flex items-center gap-2 z-10 opacity-80 hover:opacity-100 transition-opacity">
+          {['jar', 'sis'].includes(format) && (
+            <button
+              onClick={() => {
+                HapticEngine.lightTick();
+                setShowTouchKeypad(!showTouchKeypad);
+              }}
+              className={`backdrop-blur-md rounded-lg px-2.5 py-1.5 text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${
+                showTouchKeypad 
+                  ? 'bg-cyan-600 text-white border-cyan-400 shadow-md shadow-cyan-600/30' 
+                  : 'bg-slate-900/80 hover:bg-slate-800 text-slate-300 border-slate-700'
+              }`}
+              title="Toggle Virtual Phone Keypad"
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>{showTouchKeypad ? 'Hide Keypad' : 'Virtual Keypad'}</span>
+            </button>
+          )}
+
           <select 
             value={selectedRatio}
             onChange={(e) => {
               HapticEngine.lightTick();
               setSelectedRatio(e.target.value);
             }}
-            className="bg-slate-900/80 backdrop-blur-md text-white border border-slate-700 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-cyan-500 cursor-pointer"
+            className="bg-slate-900/80 backdrop-blur-md text-white border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-cyan-500 cursor-pointer"
           >
-            <option value="auto">Auto Ratio (Native)</option>
-            <option value="16:9">Widescreen (16:9)</option>
+            <option value="auto">Native (3:4)</option>
             <option value="4:3">Classic CRT (4:3)</option>
-            <option value="9:16">Vertical Mobile (9:16)</option>
-            <option value="3:4">Vertical Arcade (3:4)</option>
+            <option value="16:9">Widescreen (16:9)</option>
+            <option value="fill">Fill Screen</option>
           </select>
           <button 
             onClick={() => {
@@ -1065,9 +1088,9 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
         </div>
       </div>
 
-      {/* Docked Virtual Keypad for Mobile / Touch Devices */}
-      {['jar', 'sis'].includes(format) && (
-        <div className="w-full bg-slate-900 border-t border-slate-800 px-4 py-3 flex flex-col items-center gap-2">
+      {/* Docked Virtual Keypad for Mobile / Touch Devices (Shown only when toggled on) */}
+      {showTouchKeypad && ['jar', 'sis'].includes(format) && (
+        <div className="w-full bg-slate-900/95 border-t border-slate-800 px-4 py-3 flex flex-col items-center gap-2 animate-in slide-in-from-bottom duration-200 shrink-0">
           <div className="flex items-center justify-between w-full max-w-md text-xs text-slate-400 font-mono px-2">
             <span className="flex items-center gap-1.5 text-cyan-400">
               <Smartphone className="w-3.5 h-3.5" />

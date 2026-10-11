@@ -268,20 +268,12 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
   const getAspectRatioContainerClass = () => {
     switch (aspectRatio) {
       case '16:9': return 'w-full aspect-[16/9] max-h-[88vh]';
-      case '4:3': return 'w-full max-w-[960px] aspect-[4/3] max-h-[88vh] mx-auto';
-      case '3:4': return 'w-full max-w-[620px] aspect-[3/4] max-h-[88vh] mx-auto';
-      case '9:16': return 'w-full max-w-[480px] aspect-[9/16] max-h-[88vh] mx-auto';
-      case 'fill': return 'w-full h-[82vh] max-h-[920px]';
+      case '4:3': return 'w-full max-w-5xl aspect-[4/3] max-h-[88vh] mx-auto';
+      case '3:4': return 'w-full max-w-4xl aspect-[3/4] max-h-[88vh] mx-auto';
+      case '9:16': return 'w-full max-w-2xl aspect-[9/16] max-h-[88vh] mx-auto';
+      case 'fill': return 'w-full h-[85vh] max-h-[940px]';
       default: {
-        // Auto detection based on platform / game properties
-        const fmt = (game.romFormat || game.platform || '').toLowerCase();
-        if (fmt === 'jar' || fmt === 'sis' || game.aspectRatio === '9:16' || game.aspectRatio === '3:4') {
-          return 'w-full max-w-[640px] aspect-[3/4] max-h-[88vh] mx-auto';
-        }
-        if (['gba', 'nes', 'snes', 'gb', 'arcade', 'retro'].includes(fmt) || game.aspectRatio === '4:3') {
-          return 'w-full max-w-[960px] aspect-[4/3] max-h-[88vh] mx-auto';
-        }
-        return 'w-full min-h-[540px] h-[78vh] max-h-[880px]';
+        return 'w-full min-h-[580px] h-[78vh] sm:h-[84vh] max-h-[920px]';
       }
     }
   };

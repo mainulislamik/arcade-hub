@@ -452,7 +452,7 @@ export const UniversalProceduralCore: React.FC<UniversalProceduralCoreProps> = (
   }, [isPlaying, isPaused, isGameOverState, game.id, game.category, game.engineType, highScore, onGameOver, onScoreUpdate, soundEnabled]);
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
+    <div className="relative w-full max-w-full mx-auto flex flex-col items-center bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
       {/* Top HUD Bar */}
       <div className="w-full flex items-center justify-between px-6 py-3 bg-slate-900/90 border-b border-slate-800 text-xs font-mono">
         <div className="flex items-center gap-4">
@@ -484,7 +484,7 @@ export const UniversalProceduralCore: React.FC<UniversalProceduralCoreProps> = (
       </div>
 
       {/* Main Game Screen Canvas */}
-      <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] max-h-[560px] flex items-center justify-center bg-slate-950">
+      <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] min-h-[520px] max-h-[780px] flex items-center justify-center bg-slate-950">
         <canvas
           ref={canvasRef}
           width={800}

@@ -82,12 +82,8 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
   const [isStreamingReady, setIsStreamingReady] = useState<boolean>(false);
   const [isStreamingActive, setIsStreamingActive] = useState<boolean>(false);
   const [fps, setFps] = useState<number>(60);
-  const [showKeypad, setShowKeypad] = useState<boolean>(
-    game.emulatorConfig?.platform === 'java' || game.emulatorConfig?.platform === 'symbian' || game.engineType === 'java_j2me'
-  );
-  const [showVirtualGamepad, setShowVirtualGamepad] = useState<boolean>(
-    game.emulatorConfig?.platform === 'dos' || game.emulatorConfig?.platform === 'arcade' || game.engineType === 'retro_dos'
-  );
+  const [showKeypad, setShowKeypad] = useState<boolean>(false);
+  const [showVirtualGamepad, setShowVirtualGamepad] = useState<boolean>(false);
   
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -322,63 +318,65 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
         )}
       </div>
 
-      {/* Retro Controller / Keypad Toggles */}
-      <div className="w-full p-4 bg-slate-900/90 border-t border-slate-800 flex flex-col items-center gap-4">
-        {/* Keypad Mode Selectors */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => {
-              setShowKeypad(!showKeypad);
-              setShowVirtualGamepad(false);
-            }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
-              showKeypad 
-                ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20' 
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-            }`}
-          >
-            <Smartphone className="w-3.5 h-3.5" />
-            {showKeypad ? 'Hide Retro Keypad' : 'Nokia/Symbian Keypad'}
-          </button>
+      {/* Retro Controller / Keypad Toggles (Only for legacy canvas games when explicitly enabled) */}
+      {!game.isCustomUpload && !['j2me_wasm', 'emulatorjs', 'ruffle_flash', 'symbian_sis', 'html5_zip', 'java_j2me'].includes(game.engineType || '') && (
+        <div className="w-full p-3 bg-slate-900/90 border-t border-slate-800 flex flex-col items-center gap-3">
+          {/* Keypad Mode Selectors */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                setShowKeypad(!showKeypad);
+                setShowVirtualGamepad(false);
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                showKeypad 
+                  ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20' 
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>{showKeypad ? 'Hide Retro Keypad' : 'Nokia/Symbian Keypad'}</span>
+            </button>
 
-          <button
-            onClick={() => {
-              setShowVirtualGamepad(!showVirtualGamepad);
-              setShowKeypad(false);
-            }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
-              showVirtualGamepad 
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-            }`}
-          >
-            <Gamepad className="w-3.5 h-3.5" />
-            {showVirtualGamepad ? 'Hide Gamepad' : 'Arcade Gamepad'}
-          </button>
+            <button
+              onClick={() => {
+                setShowVirtualGamepad(!showVirtualGamepad);
+                setShowKeypad(false);
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                showVirtualGamepad 
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              <Gamepad className="w-3.5 h-3.5" />
+              <span>{showVirtualGamepad ? 'Hide Gamepad' : 'Arcade Gamepad'}</span>
+            </button>
+          </div>
+
+          {/* Dynamic Mobile Keypad Overlay */}
+          {showKeypad && (
+            <div className="w-full animate-in fade-in zoom-in duration-200">
+              <RetroMobileKeypad
+                onKeyPress={handleKeypadPress}
+                onKeyRelease={handleKeypadRelease}
+                soundEnabled={soundEnabled}
+              />
+            </div>
+          )}
+
+          {/* Dynamic Virtual Arcade Gamepad Overlay */}
+          {showVirtualGamepad && (
+            <div className="w-full animate-in fade-in zoom-in duration-200">
+              <VirtualGamepad
+                onButtonPress={handleKeypadPress}
+                onButtonRelease={handleKeypadRelease}
+                soundEnabled={soundEnabled}
+              />
+            </div>
+          )}
         </div>
-
-        {/* Dynamic Mobile Keypad Overlay */}
-        {showKeypad && (
-          <div className="w-full animate-in fade-in zoom-in duration-200">
-            <RetroMobileKeypad
-              onKeyPress={handleKeypadPress}
-              onKeyRelease={handleKeypadRelease}
-              soundEnabled={soundEnabled}
-            />
-          </div>
-        )}
-
-        {/* Dynamic Virtual Arcade Gamepad Overlay */}
-        {showVirtualGamepad && (
-          <div className="w-full animate-in fade-in zoom-in duration-200">
-            <VirtualGamepad
-              onButtonPress={handleKeypadPress}
-              onButtonRelease={handleKeypadRelease}
-              soundEnabled={soundEnabled}
-            />
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };
