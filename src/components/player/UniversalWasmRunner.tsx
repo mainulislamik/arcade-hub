@@ -233,26 +233,236 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
 
     // 2. RETRO CONSOLE GAMES (.GBA, .NES, .SNES) -> EmulatorJS Multi-Core
     if (['gba', 'nes', 'snes', 'gb', 'md'].includes(format)) {
+      const platformName = format === 'gba' ? 'Game Boy Advance (32-Bit)' : format === 'snes' ? 'Super Nintendo (16-Bit)' : 'Nintendo Entertainment System (8-Bit)';
+      const coverImg = game.thumbnailUrl || game.coverImage || game.cover || '/assets/covers/super-mario-boxart.jpg';
       return `
         <!DOCTYPE html>
         <html>
         <head>
           <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>${game.title}</title>
           <style>
-            body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #020617; }
+            * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+            body, html { width: 100%; height: 100%; overflow: hidden; background: #020617; font-family: system-ui, -apple-system, sans-serif; }
+            #container { width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; }
             #game { width: 100%; height: 100%; }
+            #arcade-splash {
+              position: absolute;
+              inset: 0;
+              background: radial-gradient(circle at center, rgba(15, 23, 42, 0.94) 0%, rgba(2, 6, 23, 0.98) 100%);
+              backdrop-filter: blur(12px);
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              z-index: 99999;
+              cursor: pointer;
+              padding: 20px;
+              text-align: center;
+            }
+            .splash-card {
+              max-width: 500px;
+              width: 100%;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 16px;
+              animation: fadeIn 0.3s ease-out;
+            }
+            @keyframes fadeIn {
+              from { opacity: 0; transform: scale(0.96); }
+              to { opacity: 1; transform: scale(1); }
+            }
+            .cover-frame {
+              width: 140px;
+              height: 190px;
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(6, 182, 212, 0.35);
+              border: 2px solid rgba(56, 189, 248, 0.5);
+              background: #0f172a;
+            }
+            .cover-frame img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+            .badge-platform {
+              display: inline-flex;
+              align-items: center;
+              gap: 6px;
+              background: rgba(6, 182, 212, 0.15);
+              border: 1px solid rgba(6, 182, 212, 0.4);
+              color: #38bdf8;
+              font-size: 11px;
+              font-weight: 800;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+              padding: 4px 12px;
+              border-radius: 9999px;
+            }
+            .game-title {
+              font-size: 24px;
+              font-weight: 900;
+              color: #f8fafc;
+              letter-spacing: -0.02em;
+              text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            }
+            .btn-start {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              gap: 10px;
+              background: linear-gradient(135deg, #06b6d4 0%, #2563eb 100%);
+              color: white;
+              font-size: 16px;
+              font-weight: 800;
+              letter-spacing: 0.05em;
+              padding: 14px 38px;
+              border-radius: 9999px;
+              border: none;
+              box-shadow: 0 10px 25px -4px rgba(6, 182, 212, 0.5), 0 0 15px rgba(37, 99, 235, 0.4);
+              cursor: pointer;
+              transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .btn-start:hover {
+              transform: translateY(-2px) scale(1.03);
+              box-shadow: 0 14px 30px -4px rgba(6, 182, 212, 0.7), 0 0 25px rgba(37, 99, 235, 0.6);
+            }
+            .controls-panel {
+              background: rgba(30, 41, 59, 0.6);
+              border: 1px solid rgba(71, 85, 105, 0.4);
+              border-radius: 12px;
+              padding: 12px 20px;
+              width: 100%;
+              display: grid;
+              grid-template-columns: repeat(2, 1fr);
+              gap: 8px;
+              font-size: 12px;
+              color: #94a3b8;
+            }
+            .ctrl-item {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 8px;
+            }
+            .ctrl-key {
+              background: #334155;
+              color: #e2e8f0;
+              font-family: monospace;
+              font-weight: bold;
+              padding: 2px 8px;
+              border-radius: 4px;
+              border-bottom: 2px solid #1e293b;
+            }
+            .tip-sound {
+              font-size: 11px;
+              color: #64748b;
+              font-style: italic;
+            }
           </style>
         </head>
         <body>
-          <div id="game"></div>
+          <div id="container">
+            <div id="game"></div>
+
+            <div id="arcade-splash" onclick="bootArcadeEngine()" tabindex="0">
+              <div class="splash-card">
+                <div class="cover-frame">
+                  <img src="${coverImg}" alt="${game.title}" />
+                </div>
+                <div class="badge-platform">
+                  ● ${platformName}
+                </div>
+                <h1 class="game-title">${game.title}</h1>
+
+                <button class="btn-start" type="button">
+                  ▶ START GAME
+                </button>
+
+                <div class="controls-panel">
+                  <div class="ctrl-item">
+                    <span>D-Pad / Movement</span>
+                    <span class="ctrl-key">Arrow Keys</span>
+                  </div>
+                  <div class="ctrl-item">
+                    <span>Action A / Jump</span>
+                    <span class="ctrl-key">Z</span>
+                  </div>
+                  <div class="ctrl-item">
+                    <span>Action B / Attack</span>
+                    <span class="ctrl-key">X</span>
+                  </div>
+                  <div class="ctrl-item">
+                    <span>Start / Pause</span>
+                    <span class="ctrl-key">Enter</span>
+                  </div>
+                </div>
+
+                <p class="tip-sound">🔊 Click to activate sound & authentic 60FPS WASM engine</p>
+              </div>
+            </div>
+          </div>
+
           <script>
-            window.EJS_player = '#game';
-            window.EJS_core = '${format}';
-            window.EJS_gameUrl = '${romBlobUrl}';
-            window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
-            window.EJS_startOnLoaded = true;
+            var booted = false;
+            function bootArcadeEngine() {
+              if (booted) return;
+              booted = true;
+
+              var splash = document.getElementById('arcade-splash');
+              if (splash) {
+                splash.style.opacity = '0';
+                splash.style.pointerEvents = 'none';
+                setTimeout(function() {
+                  splash.remove();
+                }, 300);
+              }
+
+              // Unlock and resume Web Audio immediately with user gesture
+              try {
+                var AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) {
+                  window.__arcadeAudio = new AudioCtx();
+                  window.__arcadeAudio.resume();
+                }
+              } catch (e) {}
+
+              // Configure EmulatorJS
+              window.EJS_player = '#game';
+              window.EJS_core = '${format}';
+              window.EJS_gameUrl = '${romBlobUrl}';
+              window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+              window.EJS_startOnLoaded = true;
+
+              var loaderScript = document.createElement('script');
+              loaderScript.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
+              loaderScript.async = true;
+              document.body.appendChild(loaderScript);
+
+              // Auto-focus canvas when ready
+              var focusAttempts = 0;
+              var pollInterval = setInterval(function() {
+                focusAttempts++;
+                var canvas = document.querySelector('canvas');
+                if (canvas) {
+                  canvas.focus();
+                  clearInterval(pollInterval);
+                } else if (focusAttempts > 50) {
+                  clearInterval(pollInterval);
+                }
+              }, 150);
+            }
+
+            // Also allow starting on Enter / Space key press
+            window.addEventListener('keydown', function(e) {
+              if (!booted && (e.key === 'Enter' || e.key === ' ' || e.code === 'Space')) {
+                bootArcadeEngine();
+              }
+            });
           </script>
-          <script src="https://cdn.emulatorjs.org/stable/data/loader.js"></script>
         </body>
         </html>
       `;
@@ -1043,6 +1253,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
           srcDoc={buildEmulatorDoc()}
           title={game.title}
           className="w-full h-full border-0 bg-slate-950"
+          allow="autoplay; fullscreen; gamepad; accelerometer; gyroscope"
           sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-forms allow-modals"
           onLoad={() => setIsLoading(false)}
         />
