@@ -118,9 +118,11 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
 
         if (game.romUrl) {
           if (isMounted) {
-            const finalUrl = game.romUrl.startsWith('http') || game.romUrl.startsWith('blob:')
+            const resolved = game.romUrl.startsWith('http') || game.romUrl.startsWith('blob:')
               ? game.romUrl
               : (typeof window !== 'undefined' ? window.location.origin + game.romUrl : game.romUrl);
+            // Append cache buster to guarantee fresh ROM loading
+            const finalUrl = resolved.includes('?') ? `${resolved}&v=3` : `${resolved}?v=3`;
             setRomBlobUrl(finalUrl);
             setIsLoading(false);
             return;
