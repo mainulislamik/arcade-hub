@@ -699,22 +699,55 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
                       <td className="py-3 px-4 font-bold text-slate-900">Primary Movement</td>
                       <td className="py-3 px-4">
                         <span className="px-2 py-1 bg-slate-100 border border-slate-300 rounded font-mono text-[11px] text-slate-800">
-                          {game.controls?.keyboard || 'Arrow Keys / WASD'}
+                          {game.controls?.keyboard || 'Arrow Keys (↑ ↓ ← →) / WASD'}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-slate-700">
-                        {game.controls?.touch || 'Swipe on screen or Virtual D-Pad'}
+                        {game.controls?.touch || 'Virtual D-Pad on screen'}
                       </td>
                     </tr>
                     <tr>
-                      <td className="py-3 px-4 font-bold text-slate-900">Action / Fire / Select</td>
+                      <td className="py-3 px-4 font-bold text-slate-900">Shoot / Action (Button B)</td>
                       <td className="py-3 px-4">
-                        <span className="px-2 py-1 bg-slate-100 border border-slate-300 rounded font-mono text-[11px] text-slate-800">
-                          Spacebar / Left Click / Enter
+                        <span className="px-2 py-1 bg-amber-50 border border-amber-300 rounded font-mono text-[11px] text-amber-900 font-bold">
+                          Z or J
                         </span>
                       </td>
                       <td className="py-3 px-4 text-slate-700">
-                        Tap on Action Button / Screen
+                        Tap "FIRE" Button
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 px-4 font-bold text-slate-900">Jump / Action (Button A)</td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-cyan-50 border border-cyan-300 rounded font-mono text-[11px] text-cyan-900 font-bold">
+                          X or K or Spacebar
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-slate-700">
+                        Tap "JUMP" Button
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 px-4 font-bold text-slate-900">Start / Pause</td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-slate-100 border border-slate-300 rounded font-mono text-[11px] text-slate-800 font-bold">
+                          Enter
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-slate-700">
+                        Tap "START" Button
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 px-4 font-bold text-slate-900">Select / 2-Players</td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-1 bg-slate-100 border border-slate-300 rounded font-mono text-[11px] text-slate-800 font-bold">
+                          V or Shift
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-slate-700">
+                        Tap "SELECT" Button
                       </td>
                     </tr>
                     <tr>
