@@ -16,6 +16,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
   const categories: { id: GameCategory; label: string; icon: React.ReactNode }[] = [
     { id: 'all', label: 'All Games', icon: <LayoutGrid className="w-4 h-4" /> },
     { id: 'retro', label: 'Retro Classics', icon: <Gamepad2 className="w-4 h-4" /> },
+    { id: 'playstation', label: 'PlayStation (PS1/PS2/PS3/PSP)', icon: <Gamepad2 className="w-4 h-4 text-cyan-500" /> },
     { id: 'puzzle', label: 'Puzzle & Logic', icon: <Puzzle className="w-4 h-4" /> },
     { id: 'word', label: 'Word Games', icon: <BookOpen className="w-4 h-4" /> },
     { id: 'arcade', label: 'Arcade & Action', icon: <Zap className="w-4 h-4" /> },

@@ -54,11 +54,24 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
     filteredGames = games.filter(g => favorites.includes(g.id));
   } else if (activeCategory !== 'all') {
     const catLower = activeCategory.toLowerCase();
-    filteredGames = games.filter(g => 
-      (g.category && g.category.toLowerCase() === catLower) || 
-      (g.romFormat && g.romFormat.toLowerCase() === catLower) ||
-      (g.platform && g.platform.toLowerCase().includes(catLower))
-    );
+    if (catLower === 'playstation') {
+      filteredGames = games.filter(g => 
+        ['psx', 'ps2', 'ps3', 'psp'].includes(g.romFormat?.toLowerCase() || '') ||
+        g.platform?.toLowerCase().includes('playstation') ||
+        g.platform?.toLowerCase().includes('sony') ||
+        g.platform?.toLowerCase().includes('psx') ||
+        g.platform?.toLowerCase().includes('ps2') ||
+        g.platform?.toLowerCase().includes('ps3') ||
+        g.platform?.toLowerCase().includes('psp') ||
+        g.category?.toLowerCase() === 'playstation'
+      );
+    } else {
+      filteredGames = games.filter(g => 
+        (g.category && g.category.toLowerCase() === catLower) || 
+        (g.romFormat && g.romFormat.toLowerCase() === catLower) ||
+        (g.platform && g.platform.toLowerCase().includes(catLower))
+      );
+    }
   }
 
   const displayedGames = filteredGames.slice(0, visibleCount);

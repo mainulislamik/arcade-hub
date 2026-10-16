@@ -73,11 +73,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const getCategoryCount = (catId: GameCategory) => {
     if (catId === 'all') return games.length;
+    if (catId === 'playstation') {
+      return games.filter(g => 
+        ['psx', 'ps2', 'ps3', 'psp'].includes(g.romFormat?.toLowerCase() || '') ||
+        g.platform?.toLowerCase().includes('playstation') ||
+        g.category?.toLowerCase() === 'playstation'
+      ).length;
+    }
     return games.filter(g => g.category === catId).length;
   };
 
   const categories: { id: GameCategory; label: string; icon: React.ReactNode; count: number }[] = [
     { id: 'all', label: 'All Games', icon: <Gamepad2 className="w-5 h-5 text-cyan-400" />, count: getCategoryCount('all') },
+    { id: 'playstation', label: 'PlayStation (PS1/2/3)', icon: <Gamepad2 className="w-5 h-5 text-indigo-400" />, count: getCategoryCount('playstation') },
     { id: 'action', label: 'Action & 3D', icon: <Swords className="w-5 h-5 text-rose-400" />, count: getCategoryCount('action') },
     { id: 'driving', label: 'Driving & Cars', icon: <Car className="w-5 h-5 text-amber-400" />, count: getCategoryCount('driving') },
     { id: 'shooting', label: 'Shooting & FPS', icon: <Crosshair className="w-5 h-5 text-cyan-400" />, count: getCategoryCount('shooting') },

@@ -1,4 +1,4 @@
-export type GameCategory = 'all' | 'arcade' | 'puzzle' | 'retro' | 'action' | 'strategy' | 'word' | 'driving' | 'shooting' | 'favorites';
+export type GameCategory = 'all' | 'arcade' | 'puzzle' | 'retro' | 'action' | 'strategy' | 'word' | 'driving' | 'shooting' | 'favorites' | 'playstation' | 'ps2' | 'ps3' | 'psp';
 
 export type GameEngineType = 
   | 'native_canvas' 
@@ -10,7 +10,9 @@ export type GameEngineType =
   | 'emulatorjs'
   | 'ruffle_flash'
   | 'symbian_sis'
-  | 'html5_zip';
+  | 'html5_zip'
+  | 'ps2_wasm'
+  | 'ps3_cloud';
 
 export interface GameFAQ {
   question: string;
@@ -74,7 +76,7 @@ export interface GameItem {
   binaryUrl?: string;
   romUrl?: string;
   romFileName?: string;
-  romFormat?: 'jar' | 'sis' | 'gba' | 'nes' | 'snes' | 'swf' | 'zip' | 'html';
+  romFormat?: 'jar' | 'sis' | 'gba' | 'nes' | 'snes' | 'swf' | 'zip' | 'html' | 'psx' | 'sega' | 'dos' | 'ps2' | 'psp' | 'ps3' | string;
   isCustomUpload?: boolean;
   customRomKey?: string;
   customRomData?: string;
