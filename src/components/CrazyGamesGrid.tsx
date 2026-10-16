@@ -53,7 +53,12 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
   } else if (activeCategory === 'favorites') {
     filteredGames = games.filter(g => favorites.includes(g.id));
   } else if (activeCategory !== 'all') {
-    filteredGames = games.filter(g => g.category === activeCategory);
+    const catLower = activeCategory.toLowerCase();
+    filteredGames = games.filter(g => 
+      (g.category && g.category.toLowerCase() === catLower) || 
+      (g.romFormat && g.romFormat.toLowerCase() === catLower) ||
+      (g.platform && g.platform.toLowerCase().includes(catLower))
+    );
   }
 
   const displayedGames = filteredGames.slice(0, visibleCount);
