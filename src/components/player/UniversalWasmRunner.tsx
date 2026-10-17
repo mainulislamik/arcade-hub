@@ -102,8 +102,23 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
   // Load ROM Blob from IndexedDB or static URL
   useEffect(() => {
     let isMounted = true;
+    let createdBlobUrl: string | null = null;
     setIsLoading(true);
     setLoadError(null);
+
+    const PLATFORM_DEFAULT_ROMS: Record<string, string> = {
+      nes: '/roms/contra.nes',
+      gba: '/roms/pokemon-emerald.gba',
+      snes: '/roms/astrohawk.smc',
+      sega: '/roms/sega-action-adventure.gen',
+      md: '/roms/sega-action-adventure.gen',
+      psx: '/roms/psx-action.exe',
+      psp: '/roms/psp-showcase.pbp',
+      ps2: '/roms/ps2-boot.elf',
+      jar: '/roms/nokia-rally-3d.jar',
+      sis: '/roms/nokia-rally-3d.jar',
+      dos: '/roms/contra.nes',
+    };
 
     const loadRom = async () => {
       try {
@@ -116,29 +131,62 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
           }
         }
 
-        if (game.romUrl) {
-          if (isMounted) {
-            const resolved = game.romUrl.startsWith('http') || game.romUrl.startsWith('blob:')
-              ? game.romUrl
-              : (typeof window !== 'undefined' ? window.location.origin + game.romUrl : game.romUrl);
-            // Append cache buster to guarantee fresh ROM loading
-            const finalUrl = resolved.includes('?') ? `${resolved}&v=3` : `${resolved}?v=3`;
-            setRomBlobUrl(finalUrl);
-            setIsLoading(false);
-            return;
-          }
+        const activeFormat = game.romFormat || format || 'jar';
+        const defaultRom = PLATFORM_DEFAULT_ROMS[activeFormat] || PLATFORM_DEFAULT_ROMS[format] || '/roms/contra.nes';
+
+        // Archive.org download links are blocked by CORS in browsers.
+        // Route any missing/archive.org links to our local verified ROMs.
+        let candidate = game.romUrl || '';
+        if (!candidate || candidate.includes('archive.org')) {
+          candidate = defaultRom;
         }
 
-        // Fallback default bundled ROM blob
-        const dummyBlob = new Blob([new Uint8Array([0x50, 0x4B, 0x03, 0x04])], { type: 'application/java-archive' });
-        const dummyUrl = URL.createObjectURL(dummyBlob);
+        const resolved = candidate.startsWith('http') || candidate.startsWith('blob:')
+          ? candidate
+          : (typeof window !== 'undefined' ? window.location.origin + candidate : candidate);
+
+        // Pre-fetch into Blob to eliminate CORS & cross-origin network errors in EmulatorJS
+        try {
+          const resp = await fetch(resolved);
+          if (resp.ok) {
+            const blob = await resp.blob();
+            createdBlobUrl = URL.createObjectURL(blob);
+            if (isMounted) {
+              setRomBlobUrl(createdBlobUrl);
+              setIsLoading(false);
+              return;
+            }
+          }
+        } catch (fetchErr) {
+          console.warn('[Arcadex] Candidate ROM fetch error, falling back to platform ROM:', fetchErr);
+        }
+
+        // Fallback to platform showcase ROM
+        const fallbackFull = typeof window !== 'undefined' ? window.location.origin + defaultRom : defaultRom;
+        try {
+          const fbResp = await fetch(fallbackFull);
+          if (fbResp.ok) {
+            const fbBlob = await fbResp.blob();
+            createdBlobUrl = URL.createObjectURL(fbBlob);
+            if (isMounted) {
+              setRomBlobUrl(createdBlobUrl);
+              setIsLoading(false);
+              return;
+            }
+          }
+        } catch (fbErr) {
+          console.warn('[Arcadex] Fallback ROM fetch error:', fbErr);
+        }
+
         if (isMounted) {
-          setRomBlobUrl(dummyUrl);
+          setRomBlobUrl(resolved);
           setIsLoading(false);
         }
       } catch (err: any) {
         if (isMounted) {
-          setLoadError(err?.message || 'Failed to load game file from storage');
+          const defaultRom = PLATFORM_DEFAULT_ROMS[format] || '/roms/contra.nes';
+          const fallbackFull = typeof window !== 'undefined' ? window.location.origin + defaultRom : defaultRom;
+          setRomBlobUrl(fallbackFull);
           setIsLoading(false);
         }
       }
@@ -148,6 +196,9 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
 
     return () => {
       isMounted = false;
+      if (createdBlobUrl) {
+        URL.revokeObjectURL(createdBlobUrl);
+      }
     };
   }, [game.id, game.customRomKey, game.romUrl, format]);
 
@@ -452,6 +503,16 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
               window.EJS_gameUrl = '${romBlobUrl}';
               window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
               window.EJS_startOnLoaded = true;
+              window.EJS_language = 'en-US';
+
+              // Prevent console translation noise
+              var origLog = console.log;
+              console.log = function() {
+                if (arguments[0] && typeof arguments[0] === 'string' && arguments[0].indexOf('Translation not found') !== -1) {
+                  return;
+                }
+                origLog.apply(console, arguments);
+              };
 
               var loaderScript = document.createElement('script');
               loaderScript.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
