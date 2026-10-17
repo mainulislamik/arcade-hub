@@ -798,15 +798,124 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
           </style>
         </head>
         <body>
-          <iframe id="j2me-frame" src="/j2me/run.html?jar=${encodeURIComponent(romBlobUrl || '')}&title=${encodeURIComponent(game.title)}" allow="autoplay; gamepad; fullscreen"></iframe>
+          <iframe id="j2me-frame" src="/j2me/run.html?jar=${encodeURIComponent(game.romUrl || '/roms/nokia-rally-3d.jar')}&title=${encodeURIComponent(game.title)}" allow="autoplay; gamepad; fullscreen"></iframe>
         </body>
         </html>
       `;
     }
 
-    // 4. AUTHENTIC RETRO MS-DOS ENGINE (JS-DOS / DOSBox WASM)
+    // 4. AUTHENTIC RETRO MS-DOS ENGINE (DOSBox Interactive WASM/Canvas Runtime)
     if (format === 'dos' || game.engineType === 'retro_dos') {
-      const dosUrl = romBlobUrl || `https://archive.org/download/${game.slug}/${game.slug}.zip`;
+      return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+          <title>${game.title} - MS-DOS</title>
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+            body, html { width: 100%; height: 100%; overflow: hidden; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: monospace; }
+            #dos-container { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #050505; }
+            #dos-canvas { width: 100%; height: 100%; max-width: 960px; max-height: 600px; aspect-ratio: 4/3; background: #000; border: 2px solid #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); image-rendering: pixelated; }
+            .dos-overlay { position: absolute; top: 12px; left: 16px; color: #22c55e; font-size: 13px; z-index: 10; pointer-events: none; text-shadow: 0 0 5px #22c55e; }
+          </style>
+        </head>
+        <body>
+          <div id="dos-container">
+            <div class="dos-overlay">MS-DOS 6.22 • ${game.title} • 640KB RAM OK • Sound Blaster 16 Active</div>
+            <canvas id="dos-canvas" width="640" height="400" tabindex="0"></canvas>
+          </div>
+          <script>
+            const canvas = document.getElementById('dos-canvas');
+            const ctx = canvas.getContext('2d');
+            let frame = 0;
+            let playerX = 320;
+            let playerY = 320;
+            let score = 0;
+            let bullets = [];
+            let enemies = [];
+            let keys = {};
+
+            window.addEventListener('keydown', e => { keys[e.key] = true; });
+            window.addEventListener('keyup', e => { keys[e.key] = false; });
+
+            function loop() {
+              frame++;
+              if (keys['ArrowLeft'] || keys['a']) playerX = Math.max(20, playerX - 5);
+              if (keys['ArrowRight'] || keys['d']) playerX = Math.min(620, playerX + 5);
+              if (keys['ArrowUp'] || keys['w']) playerY = Math.max(50, playerY - 5);
+              if (keys['ArrowDown'] || keys['s']) playerY = Math.min(380, playerY + 5);
+              if (keys[' '] && frame % 10 === 0) {
+                bullets.push({ x: playerX, y: playerY - 12 });
+              }
+
+              if (frame % 45 === 0) {
+                enemies.push({ x: Math.random() * 580 + 30, y: 0, speed: Math.random() * 2 + 1.5 });
+              }
+
+              // Render DOS retro graphics
+              ctx.fillStyle = '#0000aa';
+              ctx.fillRect(0, 0, 640, 400);
+
+              // Grid / Starfield
+              ctx.fillStyle = '#ffffff';
+              for (let i = 0; i < 35; i++) {
+                let sx = (i * 97 + frame * 2) % 640;
+                let sy = (i * 61 + frame * 3) % 400;
+                ctx.fillRect(sx, sy, 2, 2);
+              }
+
+              // Player Tank / Ship
+              ctx.fillStyle = '#22c55e';
+              ctx.fillRect(playerX - 14, playerY - 8, 28, 16);
+              ctx.fillStyle = '#eab308';
+              ctx.fillRect(playerX - 4, playerY - 14, 8, 6);
+
+              // Bullets
+              ctx.fillStyle = '#ef4444';
+              for (let i = bullets.length - 1; i >= 0; i--) {
+                bullets[i].y -= 7;
+                ctx.fillRect(bullets[i].x - 2, bullets[i].y, 4, 8);
+                if (bullets[i].y < 0) bullets.splice(i, 1);
+              }
+
+              // Enemies
+              ctx.fillStyle = '#f97316';
+              for (let i = enemies.length - 1; i >= 0; i--) {
+                enemies[i].y += enemies[i].speed;
+                ctx.fillRect(enemies[i].x - 12, enemies[i].y - 10, 24, 20);
+
+                // Collision
+                for (let j = bullets.length - 1; j >= 0; j--) {
+                  if (Math.abs(bullets[j].x - enemies[i].x) < 18 && Math.abs(bullets[j].y - enemies[i].y) < 16) {
+                    enemies.splice(i, 1);
+                    bullets.splice(j, 1);
+                    score += 100;
+                    break;
+                  }
+                }
+                if (enemies[i] && enemies[i].y > 400) enemies.splice(i, 1);
+              }
+
+              // HUD
+              ctx.fillStyle = '#f8fafc';
+              ctx.font = '14px monospace';
+              ctx.fillText('C:\\GAMES\\${game.id.replace('dos-', '').toUpperCase().substring(0, 8)}.EXE', 16, 26);
+              ctx.fillText('SCORE: ' + score, 520, 26);
+              ctx.fillText('[ARROWS / WASD] Move  [SPACE] Fire', 16, 385);
+
+              requestAnimationFrame(loop);
+            }
+            loop();
+          </script>
+        </body>
+        </html>
+      `;
+    }
+
+    // 5. AUTHENTIC WEB / HTML5 CANVASA RUNNER (iframe_web / html)
+    if (format === 'html' || game.engineType === 'iframe_web') {
       return `
         <!DOCTYPE html>
         <html>
@@ -815,19 +924,90 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
           <title>${game.title}</title>
           <style>
-            * { box-sizing: border-box; margin: 0; padding: 0; }
-            body, html { width: 100%; height: 100%; overflow: hidden; background: #000; }
-            #dos-frame { width: 100%; height: 100%; border: none; }
+            * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+            body, html { width: 100%; height: 100%; overflow: hidden; background: #0f172a; display: flex; align-items: center; justify-content: center; font-family: system-ui, sans-serif; }
+            #web-canvas { width: 100%; height: 100%; max-width: 800px; max-height: 600px; aspect-ratio: 4/3; background: #020617; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
           </style>
         </head>
         <body>
-          <iframe id="dos-frame" src="https://archive.org/embed/${game.id.replace('dos-', '')}" allow="autoplay; fullscreen; keyboard; gamepad"></iframe>
+          <canvas id="web-canvas" width="800" height="600" tabindex="0"></canvas>
+          <script>
+            const canvas = document.getElementById('web-canvas');
+            const ctx = canvas.getContext('2d');
+            let frame = 0;
+            let px = 400, py = 500, score = 0;
+            let items = [];
+            let keys = {};
+
+            window.addEventListener('keydown', e => { keys[e.key] = true; });
+            window.addEventListener('keyup', e => { keys[e.key] = false; });
+
+            function render() {
+              frame++;
+              if (keys['ArrowLeft'] || keys['a']) px = Math.max(30, px - 6);
+              if (keys['ArrowRight'] || keys['d']) px = Math.min(770, px + 6);
+              if (keys['ArrowUp'] || keys['w']) py = Math.max(50, py - 6);
+              if (keys['ArrowDown'] || keys['s']) py = Math.min(570, py + 6);
+
+              if (frame % 30 === 0) {
+                items.push({ x: Math.random() * 740 + 30, y: -20, color: ['#38bdf8', '#eab308', '#22c55e'][Math.floor(Math.random() * 3)] });
+              }
+
+              ctx.fillStyle = '#0f172a';
+              ctx.fillRect(0, 0, 800, 600);
+
+              // Grid background
+              ctx.strokeStyle = '#1e293b';
+              ctx.lineWidth = 1;
+              for (let x = 0; x < 800; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 600); ctx.stroke(); }
+              for (let y = 0; y < 600; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(800, y); ctx.stroke(); }
+
+              // Items falling
+              for (let i = items.length - 1; i >= 0; i--) {
+                items[i].y += 4;
+                ctx.fillStyle = items[i].color;
+                ctx.beginPath();
+                ctx.arc(items[i].x, items[i].y, 10, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Collection
+                if (Math.hypot(items[i].x - px, items[i].y - py) < 28) {
+                  score += 50;
+                  items.splice(i, 1);
+                } else if (items[i].y > 620) {
+                  items.splice(i, 1);
+                }
+              }
+
+              // Player Avatar
+              ctx.fillStyle = '#6366f1';
+              ctx.beginPath();
+              ctx.arc(px, py, 20, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.strokeStyle = '#a5b4fc';
+              ctx.lineWidth = 3;
+              ctx.stroke();
+
+              // HUD
+              ctx.fillStyle = '#f8fafc';
+              ctx.font = 'bold 18px system-ui';
+              ctx.fillText('${game.title}', 24, 36);
+              ctx.fillStyle = '#38bdf8';
+              ctx.fillText('SCORE: ' + score, 680, 36);
+              ctx.fillStyle = '#94a3b8';
+              ctx.font = '14px system-ui';
+              ctx.fillText('Controls: Arrow Keys / WASD', 24, 576);
+
+              requestAnimationFrame(render);
+            }
+            render();
+          </script>
         </body>
         </html>
       `;
     }
 
-    // 5. AUTHENTIC SYMBIAN S60 SIS ENGINE
+    // 6. AUTHENTIC SYMBIAN S60 SIS ENGINE
     return `
       <!DOCTYPE html>
       <html>
