@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameItem } from '../../types/game';
-import { getRomBlobUrl } from '../../utils/customGamesStorage';
+import { getRomBlobUrl, getRomBinaryBlob, storeRomBinary } from '../../utils/customGamesStorage';
 import { 
   Play, 
   RotateCcw, 
@@ -36,6 +36,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
   onGameOver
 }) => {
   const [romBlobUrl, setRomBlobUrl] = useState<string | null>(null);
+  const [downloadStatus, setDownloadStatus] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [gameStarted, setGameStarted] = useState(false);
@@ -131,37 +132,79 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
           }
         }
 
+        // Check local IndexedDB cache first for zero-bandwidth instant boot
+        const cacheKey = `cached_rom_${game.id}`;
+        try {
+          const cachedBlob = await getRomBinaryBlob(cacheKey);
+          if (cachedBlob && isMounted) {
+            setDownloadStatus('Loaded from local device cache');
+            createdBlobUrl = URL.createObjectURL(cachedBlob);
+            setRomBlobUrl(createdBlobUrl);
+            setIsLoading(false);
+            return;
+          }
+        } catch (e) {
+          console.warn('[Arcadex] Cache check failed:', e);
+        }
+
         const activeFormat = game.romFormat || format || 'jar';
         const defaultRom = PLATFORM_DEFAULT_ROMS[activeFormat] || PLATFORM_DEFAULT_ROMS[format] || '/roms/contra.nes';
 
-        // Archive.org download links are blocked by CORS in browsers.
-        // Route any missing/archive.org links to our local verified ROMs.
-        let candidate = game.romUrl || '';
-        if (!candidate || candidate.includes('archive.org')) {
-          candidate = defaultRom;
+        // Build Multi-Mirror Failover Source List
+        const sourceCandidates: string[] = [];
+        if (Array.isArray(game.romSources) && game.romSources.length > 0) {
+          sourceCandidates.push(...game.romSources);
+        }
+        if (game.romUrl && !sourceCandidates.includes(game.romUrl)) {
+          sourceCandidates.push(game.romUrl);
+        }
+        if (!sourceCandidates.includes(defaultRom)) {
+          sourceCandidates.push(defaultRom);
         }
 
-        const resolved = candidate.startsWith('http') || candidate.startsWith('blob:')
-          ? candidate
-          : (typeof window !== 'undefined' ? window.location.origin + candidate : candidate);
+        let fetchedBlob: Blob | null = null;
+        let mirrorIndex = 0;
 
-        // Pre-fetch into Blob to eliminate CORS & cross-origin network errors in EmulatorJS
-        try {
-          const resp = await fetch(resolved);
-          if (resp.ok) {
-            const blob = await resp.blob();
-            createdBlobUrl = URL.createObjectURL(blob);
+        for (const candidate of sourceCandidates) {
+          if (!candidate) continue;
+          mirrorIndex++;
+          const resolved = candidate.startsWith('http') || candidate.startsWith('blob:')
+            ? candidate
+            : (typeof window !== 'undefined' ? window.location.origin + candidate : candidate);
+
+          try {
             if (isMounted) {
-              setRomBlobUrl(createdBlobUrl);
-              setIsLoading(false);
-              return;
+              setDownloadStatus(`Loading from Mirror ${mirrorIndex} of ${sourceCandidates.length}...`);
             }
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+            const resp = await fetch(resolved, { signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            if (resp.ok) {
+              fetchedBlob = await resp.blob();
+              // Cache into IndexedDB for instant offline re-play without re-downloading
+              try {
+                await storeRomBinary(cacheKey, fetchedBlob);
+              } catch (cacheErr) {
+                console.warn('[Arcadex] Could not save to IDB cache:', cacheErr);
+              }
+              break;
+            }
+          } catch (fetchErr) {
+            console.warn(`[Arcadex] Mirror ${mirrorIndex} (${candidate}) failed, trying next mirror:`, fetchErr);
           }
-        } catch (fetchErr) {
-          console.warn('[Arcadex] Candidate ROM fetch error, falling back to platform ROM:', fetchErr);
         }
 
-        // Fallback to platform showcase ROM
+        if (fetchedBlob && isMounted) {
+          createdBlobUrl = URL.createObjectURL(fetchedBlob);
+          setRomBlobUrl(createdBlobUrl);
+          setIsLoading(false);
+          setDownloadStatus(null);
+          return;
+        }
+
+        // Final safety fallback
         const fallbackFull = typeof window !== 'undefined' ? window.location.origin + defaultRom : defaultRom;
         try {
           const fbResp = await fetch(fallbackFull);
@@ -171,6 +214,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
             if (isMounted) {
               setRomBlobUrl(createdBlobUrl);
               setIsLoading(false);
+              setDownloadStatus(null);
               return;
             }
           }
@@ -179,8 +223,9 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
         }
 
         if (isMounted) {
-          setRomBlobUrl(resolved);
+          setRomBlobUrl(fallbackFull);
           setIsLoading(false);
+          setDownloadStatus(null);
         }
       } catch (err: any) {
         if (isMounted) {
@@ -1217,6 +1262,9 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
           <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center z-20">
             <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4" />
             <span className="text-sm font-bold text-cyan-400">Booting Multi-Core WASM Runtime...</span>
+            {downloadStatus && (
+              <span className="text-xs text-slate-400 mt-2 font-mono animate-pulse">{downloadStatus}</span>
+            )}
           </div>
         )}
 

@@ -75,6 +75,7 @@ export interface GameItem {
   engineType?: GameEngineType;
   binaryUrl?: string;
   romUrl?: string;
+  romSources?: string[];
   romFileName?: string;
   romFormat?: 'jar' | 'sis' | 'gba' | 'nes' | 'snes' | 'swf' | 'zip' | 'html' | 'psx' | 'sega' | 'dos' | 'ps2' | 'psp' | 'ps3' | string;
   isCustomUpload?: boolean;
