@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { GameItem, GameStats } from '../types/game';
 import { Play, Trophy, Heart, Star, Flame, Sparkles, Shield, Gamepad2, Info } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
+import { handleGameImageError } from '../utils/imageFallback';
 
 interface GameCardProps {
   game: GameItem;
@@ -37,6 +38,7 @@ export const GameCard: React.FC<GameCardProps> = ({
             src={game.coverImage}
             alt={`${game.title} Official Game Cover`}
             loading="lazy"
+            onError={(e) => handleGameImageError(e, game.title, game.platform, game.category)}
             className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out"
           />
         ) : (

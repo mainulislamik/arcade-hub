@@ -349,7 +349,7 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
                 <iframe
                   ref={iframeRef}
                   title={game.title}
-                  src={game.binaryUrl || `/games/${game.id}/index.html`}
+                  src={game.binaryUrl || (game.romUrl && game.romUrl.startsWith('http') ? game.romUrl : `/games/web-runner.html?game=${encodeURIComponent(game.title)}`)}
                   className="w-full h-full min-h-[560px] border-0 rounded-xl"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                   sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups"

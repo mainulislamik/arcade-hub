@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameItem } from '../../types/game';
-import { 
-  saveCustomGame, 
-  getCustomGames, 
-  deleteCustomGame 
+import {
+  saveCustomGame,
+  getCustomGames,
+  deleteCustomGame
 } from '../../utils/customGamesStorage';
+import { handleGameImageError } from '../../utils/imageFallback';
 import { 
   Lock, 
   ShieldCheck, 
@@ -698,6 +699,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                                   <img
                                     src={game.cover || game.thumbnailUrl}
                                     alt={game.title}
+                                    onError={(e) => handleGameImageError(e, game.title, game.platform, game.category)}
                                     className="w-12 h-8 rounded-lg object-cover border border-slate-700"
                                   />
                                 </td>

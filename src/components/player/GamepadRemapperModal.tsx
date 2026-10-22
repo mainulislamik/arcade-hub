@@ -77,10 +77,10 @@ export const GamepadRemapperModal: React.FC<GamepadRemapperModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="bg-slate-900 border border-indigo-500/40 rounded-3xl w-full max-w-lg shadow-2xl flex flex-col overflow-hidden shadow-indigo-950/50 max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-lg shadow-2xl flex flex-col overflow-hidden max-h-[90vh]">
         {/* Header */}
-        <div className="p-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 text-white flex items-center justify-between shadow-lg">
+        <div className="p-5 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 text-white flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 shadow-inner">
               <Gamepad2 className="w-6 h-6 text-white animate-pulse" />
@@ -101,10 +101,10 @@ export const GamepadRemapperModal: React.FC<GamepadRemapperModalProps> = ({
         {/* Controller Status Banner */}
         <div className={`p-4 border-b flex items-center gap-3 ${
           isConnected 
-            ? 'bg-emerald-950/30 border-emerald-900/40 text-emerald-300' 
-            : 'bg-slate-950/60 border-slate-800 text-slate-400'
+            ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
+            : 'bg-slate-50 border-slate-200 text-slate-600'
         }`}>
-          <div className={`w-3 h-3 rounded-full shrink-0 ${isConnected ? 'bg-emerald-400 animate-ping' : 'bg-slate-600'}`} />
+          <div className={`w-3 h-3 rounded-full shrink-0 ${isConnected ? 'bg-emerald-500 animate-ping' : 'bg-slate-400'}`} />
           <span className="text-xs font-bold truncate">{gamepadName}</span>
         </div>
 
@@ -112,44 +112,44 @@ export const GamepadRemapperModal: React.FC<GamepadRemapperModalProps> = ({
         <div className="p-5 space-y-5 overflow-y-auto flex-1">
           {/* Dual Analog Stick Visualizers */}
           <div>
-            <span className="text-xs font-black text-slate-300 uppercase tracking-wider block mb-2.5">
+            <span className="text-xs font-black text-slate-700 uppercase tracking-wider block mb-2.5">
               Live Analog Stick Tracking
             </span>
             <div className="grid grid-cols-2 gap-4">
               {/* Left Stick */}
-              <div className="p-3 bg-slate-950/80 rounded-2xl border border-slate-800 flex flex-col items-center">
-                <span className="text-[11px] font-bold text-slate-400 mb-2">Left Analog (LX, LY)</span>
-                <div className="w-24 h-24 rounded-full border-2 border-slate-700 bg-slate-900 relative flex items-center justify-center shadow-inner">
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col items-center shadow-inner">
+                <span className="text-[11px] font-bold text-slate-600 mb-2">Left Analog (LX, LY)</span>
+                <div className="w-24 h-24 rounded-full border-2 border-slate-300 bg-white relative flex items-center justify-center shadow-inner">
                   {/* Center reticle */}
-                  <div className="w-1 h-1 bg-slate-600 rounded-full" />
+                  <div className="w-1.5 h-1.5 bg-slate-400 rounded-full" />
                   {/* Stick indicator */}
                   <div 
-                    className="w-6 h-6 rounded-full bg-indigo-500 shadow-md shadow-indigo-500/50 absolute transition-transform duration-75"
+                    className="w-6 h-6 rounded-full bg-indigo-600 shadow-md shadow-indigo-600/40 absolute transition-transform duration-75"
                     style={{
                       transform: `translate(${axes[0] * 32}px, ${axes[1] * 32}px)`
                     }}
                   />
                 </div>
-                <span className="text-[10px] font-mono text-indigo-400 mt-2">
+                <span className="text-[10px] font-mono font-bold text-indigo-600 mt-2">
                   X: {axes[0]?.toFixed(2)} | Y: {axes[1]?.toFixed(2)}
                 </span>
               </div>
 
               {/* Right Stick */}
-              <div className="p-3 bg-slate-950/80 rounded-2xl border border-slate-800 flex flex-col items-center">
-                <span className="text-[11px] font-bold text-slate-400 mb-2">Right Analog (RX, RY)</span>
-                <div className="w-24 h-24 rounded-full border-2 border-slate-700 bg-slate-900 relative flex items-center justify-center shadow-inner">
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col items-center shadow-inner">
+                <span className="text-[11px] font-bold text-slate-600 mb-2">Right Analog (RX, RY)</span>
+                <div className="w-24 h-24 rounded-full border-2 border-slate-300 bg-white relative flex items-center justify-center shadow-inner">
                   {/* Center reticle */}
-                  <div className="w-1 h-1 bg-slate-600 rounded-full" />
+                  <div className="w-1.5 h-1.5 bg-slate-400 rounded-full" />
                   {/* Stick indicator */}
                   <div 
-                    className="w-6 h-6 rounded-full bg-purple-500 shadow-md shadow-purple-500/50 absolute transition-transform duration-75"
+                    className="w-6 h-6 rounded-full bg-purple-600 shadow-md shadow-purple-600/40 absolute transition-transform duration-75"
                     style={{
                       transform: `translate(${axes[2] * 32}px, ${axes[3] * 32}px)`
                     }}
                   />
                 </div>
-                <span className="text-[10px] font-mono text-purple-400 mt-2">
+                <span className="text-[10px] font-mono font-bold text-purple-600 mt-2">
                   X: {axes[2]?.toFixed(2)} | Y: {axes[3]?.toFixed(2)}
                 </span>
               </div>
@@ -158,7 +158,7 @@ export const GamepadRemapperModal: React.FC<GamepadRemapperModalProps> = ({
 
           {/* Button Activity Matrix */}
           <div>
-            <span className="text-xs font-black text-slate-300 uppercase tracking-wider block mb-2">
+            <span className="text-xs font-black text-slate-700 uppercase tracking-wider block mb-2">
               Buttons Matrix (A, B, X, Y, Triggers)
             </span>
             <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
@@ -167,8 +167,8 @@ export const GamepadRemapperModal: React.FC<GamepadRemapperModalProps> = ({
                   key={idx}
                   className={`p-2 rounded-xl border text-center transition-all ${
                     buttons[idx] 
-                      ? 'bg-indigo-500 text-white font-black border-indigo-400 shadow-md shadow-indigo-500/40 scale-105' 
-                      : 'bg-slate-950/60 text-slate-500 border-slate-800 text-[10px] font-bold'
+                      ? 'bg-indigo-600 text-white font-black border-indigo-500 shadow-md scale-105' 
+                      : 'bg-slate-50 text-slate-600 border-slate-200 text-[10px] font-bold'
                   }`}
                 >
                   <span className="text-[10px] block leading-tight truncate">{lbl}</span>
@@ -178,13 +178,13 @@ export const GamepadRemapperModal: React.FC<GamepadRemapperModalProps> = ({
           </div>
 
           {/* Deadzone Slider */}
-          <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800">
-            <div className="flex items-center justify-between text-xs font-bold text-slate-300 mb-2">
+          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+            <div className="flex items-center justify-between text-xs font-bold text-slate-700 mb-2">
               <span className="flex items-center gap-1.5">
-                <Sliders className="w-4 h-4 text-indigo-400" />
+                <Sliders className="w-4 h-4 text-indigo-600" />
                 Analog Stick Deadzone Filter
               </span>
-              <span className="text-indigo-400 font-mono">{(deadzone * 100).toFixed(0)}%</span>
+              <span className="text-indigo-600 font-mono font-bold">{(deadzone * 100).toFixed(0)}%</span>
             </div>
             <input
               type="range"
@@ -193,28 +193,28 @@ export const GamepadRemapperModal: React.FC<GamepadRemapperModalProps> = ({
               step="0.05"
               value={deadzone}
               onChange={(e) => setDeadzone(parseFloat(e.target.value))}
-              className="w-full accent-indigo-500 cursor-pointer"
+              className="w-full accent-indigo-600 cursor-pointer"
             />
           </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 bg-slate-950 border-t border-slate-800 flex items-center justify-between">
+        <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
           <button
             onClick={testVibration}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
               vibrationTested 
                 ? 'bg-emerald-600 text-white' 
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
+                : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-sm'
             }`}
           >
-            <Zap className="w-3.5 h-3.5 text-amber-400" />
+            <Zap className="w-3.5 h-3.5 text-amber-500" />
             <span>Test Vibration Rumble</span>
           </button>
 
           <button
             onClick={() => { sounds.playClick(); onClose(); }}
-            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl text-xs transition-all shadow-md shadow-indigo-900/40 cursor-pointer"
+            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-xs transition-all shadow-md shadow-indigo-600/30 cursor-pointer"
           >
             Save & Calibrate
           </button>

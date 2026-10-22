@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 import { GameItem, GameCategory } from '../types/game';
+import { handleGameImageError } from '../utils/imageFallback';
 import { LanguageCode } from '../utils/i18n';
 import { Globe } from 'lucide-react';
 import { EcoEngine } from '../utils/ecoEngine';
@@ -226,7 +227,12 @@ export const Header: React.FC<HeaderProps> = ({
                   >
                     <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
                       {game.coverImage ? (
-                        <img src={game.coverImage} alt={game.title} className="w-full h-full object-cover" />
+                        <img
+                          src={game.coverImage}
+                          alt={game.title}
+                          onError={(e) => handleGameImageError(e, game.title, game.platform, game.category)}
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-indigo-50">
                           <Gamepad2 className="w-5 h-5 text-indigo-600" />

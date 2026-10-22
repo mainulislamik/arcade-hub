@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 import { GameCardPreview } from './cards/GameCardPreview';
+import { handleGameImageError } from '../utils/imageFallback';
 
 interface CrazyGamesGridProps {
   games: Game[];
@@ -101,9 +102,10 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
         <div className="relative w-full aspect-[16/10] bg-slate-100 overflow-hidden">
           {/* Static Cover Image */}
           {game.coverImage ? (
-            <img 
-              src={game.coverImage} 
+            <img
+              src={game.coverImage}
               alt={game.title}
+              onError={(e) => handleGameImageError(e, game.title, game.platform, game.category)}
               className={`w-full h-full object-cover transition-all duration-500 ${
                 isHovered ? 'scale-110 opacity-0' : 'scale-100 opacity-100'
               }`}
@@ -257,9 +259,10 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
             {/* Right Visual / Art Area */}
             <div className="lg:col-span-5 h-64 lg:h-80 relative overflow-hidden flex items-center justify-center p-4">
               {featuredGame.coverImage ? (
-                <img 
-                  src={featuredGame.coverImage} 
+                <img
+                  src={featuredGame.coverImage}
                   alt={featuredGame.title}
+                  onError={(e) => handleGameImageError(e, featuredGame.title, featuredGame.platform, featuredGame.category)}
                   className="w-full h-full object-cover rounded-2xl border border-slate-200 shadow-md group-hover:scale-105 transition-transform duration-700"
                 />
               ) : (

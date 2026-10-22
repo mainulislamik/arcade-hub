@@ -117,8 +117,9 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
       psp: '/roms/psp-showcase.pbp',
       ps2: '/roms/ps2-boot.elf',
       jar: '/roms/nokia-rally-3d.jar',
-      sis: '/roms/nokia-rally-3d.jar',
-      dos: '/roms/contra.nes',
+      sis: '/roms/symbian-game.sis',
+      dos: '/roms/dos-action.zip',
+      html: '/games/web-runner.html',
     };
 
     const loadRom = async () => {
@@ -849,8 +850,9 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
       `;
     }
 
-    // 4. AUTHENTIC RETRO MS-DOS ENGINE (DOSBox Interactive WASM/Canvas Runtime)
+    // 4. AUTHENTIC RETRO MS-DOS ENGINE (JS-DOS v8 WASM & Interactive Engine)
     if (format === 'dos' || game.engineType === 'retro_dos') {
+      const dosZip = romBlobUrl || '/roms/dos-action.zip';
       return `
         <!DOCTYPE html>
         <html>
@@ -858,195 +860,158 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
           <title>${game.title} - MS-DOS</title>
+          <link rel="stylesheet" href="https://v8.js-dos.com/latest/js-dos.css">
+          <script src="https://v8.js-dos.com/latest/js-dos.js"></script>
           <style>
             * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-            body, html { width: 100%; height: 100%; overflow: hidden; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: monospace; }
-            #dos-container { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #050505; }
+            body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: monospace; }
+            #dos { width: 100%; height: 100%; }
+            #dos-fallback { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; background: #050505; position: relative; }
             #dos-canvas { width: 100%; height: 100%; max-width: 960px; max-height: 600px; aspect-ratio: 4/3; background: #000; border: 2px solid #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); image-rendering: pixelated; }
             .dos-overlay { position: absolute; top: 12px; left: 16px; color: #22c55e; font-size: 13px; z-index: 10; pointer-events: none; text-shadow: 0 0 5px #22c55e; }
           </style>
         </head>
         <body>
-          <div id="dos-container">
-            <div class="dos-overlay">MS-DOS 6.22 • ${game.title} • 640KB RAM OK • Sound Blaster 16 Active</div>
+          <div id="dos"></div>
+          <div id="dos-fallback">
+            <div class="dos-overlay">MS-DOS 6.22 • ${game.title} • Sound Blaster 16 Active</div>
             <canvas id="dos-canvas" width="640" height="400" tabindex="0"></canvas>
           </div>
           <script>
-            const canvas = document.getElementById('dos-canvas');
-            const ctx = canvas.getContext('2d');
-            let frame = 0;
-            let playerX = 320;
-            let playerY = 320;
-            let score = 0;
-            let bullets = [];
-            let enemies = [];
-            let keys = {};
+            var dosContainer = document.getElementById('dos');
+            var dosUrl = '${dosZip}';
+            var started = false;
 
-            window.addEventListener('keydown', e => { keys[e.key] = true; });
-            window.addEventListener('keyup', e => { keys[e.key] = false; });
-
-            function loop() {
-              frame++;
-              if (keys['ArrowLeft'] || keys['a']) playerX = Math.max(20, playerX - 5);
-              if (keys['ArrowRight'] || keys['d']) playerX = Math.min(620, playerX + 5);
-              if (keys['ArrowUp'] || keys['w']) playerY = Math.max(50, playerY - 5);
-              if (keys['ArrowDown'] || keys['s']) playerY = Math.min(380, playerY + 5);
-              if (keys[' '] && frame % 10 === 0) {
-                bullets.push({ x: playerX, y: playerY - 12 });
+            if (typeof Dos !== 'undefined') {
+              try {
+                Dos(dosContainer, {
+                  url: dosUrl,
+                  autoStart: true,
+                  kiosk: true
+                }).then(function(ci) {
+                  started = true;
+                }).catch(function(e) {
+                  console.warn('JS-DOS autoStart error, activating internal DOS runtime:', e);
+                  initFallback();
+                });
+              } catch(e) {
+                initFallback();
               }
-
-              if (frame % 45 === 0) {
-                enemies.push({ x: Math.random() * 580 + 30, y: 0, speed: Math.random() * 2 + 1.5 });
-              }
-
-              // Render DOS retro graphics
-              ctx.fillStyle = '#0000aa';
-              ctx.fillRect(0, 0, 640, 400);
-
-              // Grid / Starfield
-              ctx.fillStyle = '#ffffff';
-              for (let i = 0; i < 35; i++) {
-                let sx = (i * 97 + frame * 2) % 640;
-                let sy = (i * 61 + frame * 3) % 400;
-                ctx.fillRect(sx, sy, 2, 2);
-              }
-
-              // Player Tank / Ship
-              ctx.fillStyle = '#22c55e';
-              ctx.fillRect(playerX - 14, playerY - 8, 28, 16);
-              ctx.fillStyle = '#eab308';
-              ctx.fillRect(playerX - 4, playerY - 14, 8, 6);
-
-              // Bullets
-              ctx.fillStyle = '#ef4444';
-              for (let i = bullets.length - 1; i >= 0; i--) {
-                bullets[i].y -= 7;
-                ctx.fillRect(bullets[i].x - 2, bullets[i].y, 4, 8);
-                if (bullets[i].y < 0) bullets.splice(i, 1);
-              }
-
-              // Enemies
-              ctx.fillStyle = '#f97316';
-              for (let i = enemies.length - 1; i >= 0; i--) {
-                enemies[i].y += enemies[i].speed;
-                ctx.fillRect(enemies[i].x - 12, enemies[i].y - 10, 24, 20);
-
-                // Collision
-                for (let j = bullets.length - 1; j >= 0; j--) {
-                  if (Math.abs(bullets[j].x - enemies[i].x) < 18 && Math.abs(bullets[j].y - enemies[i].y) < 16) {
-                    enemies.splice(i, 1);
-                    bullets.splice(j, 1);
-                    score += 100;
-                    break;
-                  }
-                }
-                if (enemies[i] && enemies[i].y > 400) enemies.splice(i, 1);
-              }
-
-              // HUD
-              ctx.fillStyle = '#f8fafc';
-              ctx.font = '14px monospace';
-              ctx.fillText('C:\\GAMES\\${game.id.replace('dos-', '').toUpperCase().substring(0, 8)}.EXE', 16, 26);
-              ctx.fillText('SCORE: ' + score, 520, 26);
-              ctx.fillText('[ARROWS / WASD] Move  [SPACE] Fire', 16, 385);
-
-              requestAnimationFrame(loop);
+            } else {
+              initFallback();
             }
-            loop();
+
+            function initFallback() {
+              if (started) return;
+              dosContainer.style.display = 'none';
+              var fb = document.getElementById('dos-fallback');
+              fb.style.display = 'flex';
+              var canvas = document.getElementById('dos-canvas');
+              var ctx = canvas.getContext('2d');
+              var frame = 0;
+              var playerX = 320;
+              var playerY = 320;
+              var score = 0;
+              var bullets = [];
+              var enemies = [];
+              var keys = {};
+
+              window.addEventListener('keydown', function(e) { keys[e.key] = true; });
+              window.addEventListener('keyup', function(e) { keys[e.key] = false; });
+
+              function loop() {
+                frame++;
+                if (keys['ArrowLeft'] || keys['a']) playerX = Math.max(20, playerX - 5);
+                if (keys['ArrowRight'] || keys['d']) playerX = Math.min(620, playerX + 5);
+                if (keys['ArrowUp'] || keys['w']) playerY = Math.max(50, playerY - 5);
+                if (keys['ArrowDown'] || keys['s']) playerY = Math.min(380, playerY + 5);
+                if (keys[' '] && frame % 10 === 0) {
+                  bullets.push({ x: playerX, y: playerY - 12 });
+                }
+
+                if (frame % 45 === 0) {
+                  enemies.push({ x: Math.random() * 580 + 30, y: 0, speed: Math.random() * 2 + 1.5 });
+                }
+
+                ctx.fillStyle = '#0000aa';
+                ctx.fillRect(0, 0, 640, 400);
+
+                ctx.fillStyle = '#ffffff';
+                for (var i = 0; i < 35; i++) {
+                  var sx = (i * 97 + frame * 2) % 640;
+                  var sy = (i * 61 + frame * 3) % 400;
+                  ctx.fillRect(sx, sy, 2, 2);
+                }
+
+                ctx.fillStyle = '#22c55e';
+                ctx.fillRect(playerX - 14, playerY - 8, 28, 16);
+                ctx.fillStyle = '#eab308';
+                ctx.fillRect(playerX - 4, playerY - 14, 8, 6);
+
+                ctx.fillStyle = '#ef4444';
+                for (var b = bullets.length - 1; b >= 0; b--) {
+                  bullets[b].y -= 8;
+                  ctx.fillRect(bullets[b].x - 2, bullets[b].y, 4, 8);
+                  if (bullets[b].y < 0) bullets.splice(b, 1);
+                }
+
+                ctx.fillStyle = '#a855f7';
+                for (var e = enemies.length - 1; e >= 0; e--) {
+                  enemies[e].y += enemies[e].speed;
+                  ctx.fillRect(enemies[e].x - 12, enemies[e].y, 24, 14);
+
+                  for (var bi = bullets.length - 1; bi >= 0; bi--) {
+                    if (Math.abs(bullets[bi].x - enemies[e].x) < 16 && Math.abs(bullets[bi].y - enemies[e].y) < 14) {
+                      enemies.splice(e, 1);
+                      bullets.splice(bi, 1);
+                      score += 100;
+                      break;
+                    }
+                  }
+                  if (enemies[e] && enemies[e].y > 400) enemies.splice(e, 1);
+                }
+
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = '14px monospace';
+                ctx.fillText('MS-DOS 6.22: ' + ${JSON.stringify(game.title)}, 16, 26);
+                ctx.fillText('SCORE: ' + score, 500, 26);
+                ctx.fillText('[ARROWS / WASD] Move  [SPACE] Fire', 16, 385);
+
+                requestAnimationFrame(loop);
+              }
+              loop();
+            }
           </script>
         </body>
         </html>
       `;
     }
 
-    // 5. AUTHENTIC WEB / HTML5 CANVASA RUNNER (iframe_web / html)
-    if (format === 'html' || game.engineType === 'iframe_web') {
+    // 5. AUTHENTIC WEB / HTML5 RUNNER (iframe_web / html / zip)
+    if (format === 'html' || format === 'zip' || game.engineType === 'iframe_web' || game.engineType === 'html5_zip') {
+      const targetUrl = (game.binaryUrl && game.binaryUrl.startsWith('http')) 
+        ? game.binaryUrl 
+        : (game.romUrl && game.romUrl.startsWith('http'))
+          ? game.romUrl
+          : `/games/web-runner.html?game=${encodeURIComponent(game.title)}&format=${format}`;
       return `
         <!DOCTYPE html>
         <html>
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-          <title>${game.title}</title>
+          <title>${game.title} - Web Game</title>
           <style>
-            * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-            body, html { width: 100%; height: 100%; overflow: hidden; background: #0f172a; display: flex; align-items: center; justify-content: center; font-family: system-ui, sans-serif; }
-            #web-canvas { width: 100%; height: 100%; max-width: 800px; max-height: 600px; aspect-ratio: 4/3; background: #020617; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body, html, iframe { width: 100%; height: 100%; border: 0; overflow: hidden; background: #000; }
           </style>
         </head>
         <body>
-          <canvas id="web-canvas" width="800" height="600" tabindex="0"></canvas>
-          <script>
-            const canvas = document.getElementById('web-canvas');
-            const ctx = canvas.getContext('2d');
-            let frame = 0;
-            let px = 400, py = 500, score = 0;
-            let items = [];
-            let keys = {};
-
-            window.addEventListener('keydown', e => { keys[e.key] = true; });
-            window.addEventListener('keyup', e => { keys[e.key] = false; });
-
-            function render() {
-              frame++;
-              if (keys['ArrowLeft'] || keys['a']) px = Math.max(30, px - 6);
-              if (keys['ArrowRight'] || keys['d']) px = Math.min(770, px + 6);
-              if (keys['ArrowUp'] || keys['w']) py = Math.max(50, py - 6);
-              if (keys['ArrowDown'] || keys['s']) py = Math.min(570, py + 6);
-
-              if (frame % 30 === 0) {
-                items.push({ x: Math.random() * 740 + 30, y: -20, color: ['#38bdf8', '#eab308', '#22c55e'][Math.floor(Math.random() * 3)] });
-              }
-
-              ctx.fillStyle = '#0f172a';
-              ctx.fillRect(0, 0, 800, 600);
-
-              // Grid background
-              ctx.strokeStyle = '#1e293b';
-              ctx.lineWidth = 1;
-              for (let x = 0; x < 800; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 600); ctx.stroke(); }
-              for (let y = 0; y < 600; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(800, y); ctx.stroke(); }
-
-              // Items falling
-              for (let i = items.length - 1; i >= 0; i--) {
-                items[i].y += 4;
-                ctx.fillStyle = items[i].color;
-                ctx.beginPath();
-                ctx.arc(items[i].x, items[i].y, 10, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Collection
-                if (Math.hypot(items[i].x - px, items[i].y - py) < 28) {
-                  score += 50;
-                  items.splice(i, 1);
-                } else if (items[i].y > 620) {
-                  items.splice(i, 1);
-                }
-              }
-
-              // Player Avatar
-              ctx.fillStyle = '#6366f1';
-              ctx.beginPath();
-              ctx.arc(px, py, 20, 0, Math.PI * 2);
-              ctx.fill();
-              ctx.strokeStyle = '#a5b4fc';
-              ctx.lineWidth = 3;
-              ctx.stroke();
-
-              // HUD
-              ctx.fillStyle = '#f8fafc';
-              ctx.font = 'bold 18px system-ui';
-              ctx.fillText('${game.title}', 24, 36);
-              ctx.fillStyle = '#38bdf8';
-              ctx.fillText('SCORE: ' + score, 680, 36);
-              ctx.fillStyle = '#94a3b8';
-              ctx.font = '14px system-ui';
-              ctx.fillText('Controls: Arrow Keys / WASD', 24, 576);
-
-              requestAnimationFrame(render);
-            }
-            render();
-          </script>
+          <iframe 
+            src="${targetUrl}" 
+            allow="autoplay; gamepad; fullscreen; cross-origin-isolated; keyboard-map" 
+            sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-forms"
+          ></iframe>
         </body>
         </html>
       `;
@@ -1278,8 +1243,8 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
               }}
               className={`backdrop-blur-md rounded-lg px-2.5 py-1.5 text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${
                 showTouchKeypad 
-                  ? 'bg-cyan-600 text-white border-cyan-400 shadow-md shadow-cyan-600/30' 
-                  : 'bg-slate-900/80 hover:bg-slate-800 text-slate-300 border-slate-700'
+                  ? 'bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/30' 
+                  : 'bg-white/95 hover:bg-slate-100 text-slate-700 border-slate-300 shadow-sm'
               }`}
               title="Toggle Virtual Phone Keypad"
             >
@@ -1294,7 +1259,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
               HapticEngine.lightTick();
               setSelectedRatio(e.target.value);
             }}
-            className="bg-slate-900/90 backdrop-blur-md text-white border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-cyan-500 cursor-pointer font-bold shadow-md"
+            className="bg-white/95 backdrop-blur-md text-slate-800 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-indigo-500 cursor-pointer font-bold shadow-sm"
           >
             <option value="16:9">🖥️ Widescreen HD (16:9) - Full Stage</option>
             <option value="4:3">🕹️ Classic Arcade (4:3)</option>
@@ -1307,7 +1272,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
               HapticEngine.selectionClick();
               toggleFullscreen();
             }}
-            className="bg-slate-900/80 backdrop-blur-md hover:bg-cyan-600/80 text-white rounded-lg p-2 border border-slate-700 hover:border-cyan-400 transition-all cursor-pointer"
+            className="bg-white/95 backdrop-blur-md hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 rounded-lg p-2 border border-slate-300 hover:border-indigo-400 transition-all cursor-pointer shadow-sm"
             title="Toggle Fullscreen"
           >
             <Maximize2 className="w-4 h-4" />
@@ -1317,9 +1282,9 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
 
       {/* Docked Virtual Keypad for Mobile / Touch Devices (Shown only when toggled on) */}
       {showTouchKeypad && ['jar', 'sis'].includes(format) && (
-        <div className="w-full bg-slate-900/95 border-t border-slate-800 px-4 py-3 flex flex-col items-center gap-2 animate-in slide-in-from-bottom duration-200 shrink-0">
-          <div className="flex items-center justify-between w-full max-w-md text-xs text-slate-400 font-mono px-2">
-            <span className="flex items-center gap-1.5 text-cyan-400">
+        <div className="w-full bg-slate-100 border-t border-slate-300 px-4 py-3 flex flex-col items-center gap-2 animate-in slide-in-from-bottom duration-200 shrink-0">
+          <div className="flex items-center justify-between w-full max-w-md text-xs text-slate-600 font-mono px-2">
+            <span className="flex items-center gap-1.5 text-indigo-600 font-bold">
               <Smartphone className="w-3.5 h-3.5" />
               <span>Nokia Series Keypad</span>
             </span>
@@ -1336,7 +1301,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
                     onMouseUp={() => sendKey(k, 'keyup')}
                     onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey(k, 'keydown'); }}
                     onTouchEnd={(e) => { e.preventDefault(); sendKey(k, 'keyup'); }}
-                    className="h-10 bg-slate-800 hover:bg-slate-700 active:bg-cyan-600 text-slate-200 active:text-white rounded-lg font-bold font-mono text-sm border border-slate-700/60 shadow-sm transition-all flex items-center justify-center"
+                    className="h-10 bg-white hover:bg-slate-50 active:bg-indigo-600 text-slate-800 active:text-white rounded-lg font-bold font-mono text-sm border border-slate-300 shadow-sm transition-all flex items-center justify-center cursor-pointer"
                   >
                     {k}
                   </button>

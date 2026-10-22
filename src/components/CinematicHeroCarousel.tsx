@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { GameItem } from '../types/game';
 import { Play, Sparkles, Star, Trophy, Info, ChevronLeft, ChevronRight, Gamepad2, Shield, Heart, Eye, Box } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
+import { handleGameImageError } from '../utils/imageFallback';
 
 interface CinematicHeroCarouselProps {
   games: GameItem[];
@@ -65,6 +66,7 @@ export const CinematicHeroCarousel: React.FC<CinematicHeroCarouselProps> = ({
         <img
           src={currentGame.heroImage || currentGame.coverImage}
           alt={currentGame.title}
+          onError={(e) => handleGameImageError(e, currentGame.title, currentGame.platform, currentGame.category)}
           className="w-full h-full object-cover object-center transform scale-105 transition-all duration-1000 ease-out filter brightness-90"
         />
         {/* Cinematic Dual Gradients */}
@@ -208,6 +210,7 @@ export const CinematicHeroCarousel: React.FC<CinematicHeroCarouselProps> = ({
                   <img
                     src={game.coverImage || game.heroImage}
                     alt={game.title}
+                    onError={(e) => handleGameImageError(e, game.title, game.platform, game.category)}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
