@@ -255,7 +255,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-600 selection:text-white">
       {/* CrazyGames Top Header */}
       <Header
         games={allGames}
@@ -317,16 +317,16 @@ export const App: React.FC = () => {
             /* Homepage Bento & Category Grids */
             <div className="p-3 sm:p-6 w-full">
               {selectedTag && (
-                <div className="mb-4 flex items-center justify-between bg-cyan-950/40 border border-cyan-500/40 p-3 rounded-2xl backdrop-blur-md">
+                <div className="mb-4 flex items-center justify-between bg-white border border-slate-200 p-3.5 rounded-2xl shadow-sm">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-cyan-400 uppercase">Filtered by Tag:</span>
-                    <span className="text-sm font-black text-cyan-200 bg-slate-900 px-2.5 py-0.5 rounded-lg border border-cyan-500/50">
+                    <span className="text-xs font-bold text-indigo-600 uppercase">Filtered by Tag:</span>
+                    <span className="text-sm font-black text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-lg border border-indigo-200">
                       #{selectedTag}
                     </span>
                   </div>
                   <button
                     onClick={() => setSelectedTag(null)}
-                    className="text-xs text-slate-400 hover:text-white px-2 py-1 bg-slate-900 rounded-lg cursor-pointer"
+                    className="text-xs font-semibold text-slate-500 hover:text-slate-900 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg cursor-pointer transition-colors"
                   >
                     Clear Filter
                   </button>

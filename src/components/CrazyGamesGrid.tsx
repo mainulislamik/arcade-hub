@@ -93,12 +93,12 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
           sounds.playClick();
           onSelectGame(game);
         }}
-        className={`group relative rounded-2xl overflow-hidden bg-slate-900/90 border border-slate-800/80 shadow-md hover:shadow-[0_0_30px_rgba(6,182,212,0.25)] hover:border-cyan-500/70 transition-all duration-300 cursor-pointer flex flex-col transform hover:-translate-y-1.5 select-none ${
+        className={`group relative rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm hover:shadow-xl hover:border-indigo-400 transition-all duration-300 cursor-pointer flex flex-col transform hover:-translate-y-1 select-none ${
           size === 'large' ? 'sm:col-span-2 sm:row-span-2' : ''
         }`}
       >
         {/* Cover / Interactive Live Canvas Area */}
-        <div className="relative w-full aspect-[16/10] bg-slate-950 overflow-hidden">
+        <div className="relative w-full aspect-[16/10] bg-slate-100 overflow-hidden">
           {/* Static Cover Image */}
           {game.coverImage ? (
             <img 
@@ -110,11 +110,11 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
               loading="lazy"
             />
           ) : (
-            <div className={`w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-cyan-950 via-slate-900 to-slate-950 p-4 text-center transition-opacity ${
+            <div className={`w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 via-slate-50 to-slate-100 p-4 text-center transition-opacity ${
               isHovered ? 'opacity-0' : 'opacity-100'
             }`}>
-              <Gamepad2 className="w-10 h-10 text-cyan-400/60 mb-2 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-black text-white/90 tracking-wider uppercase">{game.title}</span>
+              <Gamepad2 className="w-10 h-10 text-indigo-600/60 mb-2 group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-black text-slate-800 tracking-wider uppercase">{game.title}</span>
             </div>
           )}
 
@@ -122,8 +122,8 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
           {isHovered && (
             <div className="absolute inset-0 z-10 animate-in fade-in duration-200">
               <GameCardPreview gameId={game.id} category={game.category} />
-              <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-cyan-950/80 border border-cyan-400/50 backdrop-blur-md text-[9px] font-black uppercase tracking-wider text-cyan-300 flex items-center gap-1 shadow-sm">
-                <Tv className="w-2.5 h-2.5 text-cyan-400 animate-pulse" />
+              <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-white/90 border border-indigo-200 backdrop-blur-md text-[9px] font-black uppercase tracking-wider text-indigo-700 flex items-center gap-1 shadow-sm">
+                <Tv className="w-2.5 h-2.5 text-indigo-600 animate-pulse" />
                 <span>LIVE PREVIEW</span>
               </div>
             </div>
@@ -132,12 +132,12 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
           {/* Top Overlays */}
           <div className="absolute top-2.5 inset-x-2.5 flex items-center justify-between pointer-events-none z-20">
             <div className="flex items-center gap-1.5">
-              <span className="px-2 py-0.5 rounded-lg bg-slate-950/80 backdrop-blur-md text-[10px] font-black uppercase tracking-wider text-slate-200 border border-white/10 shadow-sm">
+              <span className="px-2 py-0.5 rounded-lg bg-white/90 backdrop-blur-md text-[10px] font-black uppercase tracking-wider text-slate-700 border border-slate-200 shadow-sm">
                 {game.category}
               </span>
               {is3D && (
-                <span className="px-1.5 py-0.5 rounded-md bg-cyan-950/90 border border-cyan-400/60 text-[9px] font-black text-cyan-300 flex items-center gap-0.5 shadow-sm">
-                  <Sparkles className="w-2.5 h-2.5 text-cyan-400" />
+                <span className="px-1.5 py-0.5 rounded-md bg-indigo-50 border border-indigo-200 text-[9px] font-black text-indigo-700 flex items-center gap-0.5 shadow-sm">
+                  <Sparkles className="w-2.5 h-2.5 text-indigo-600" />
                   3D
                 </span>
               )}
@@ -149,10 +149,10 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
                 sounds.playPowerup();
                 onToggleFavorite(game.id);
               }}
-              className={`pointer-events-auto p-1.5 rounded-xl backdrop-blur-md transition-all ${
+              className={`pointer-events-auto p-1.5 rounded-xl backdrop-blur-md transition-all shadow-sm ${
                 isFav 
-                  ? 'bg-rose-500 text-white shadow-sm scale-110' 
-                  : 'bg-slate-950/60 text-white/70 hover:text-white hover:bg-slate-950/90'
+                  ? 'bg-rose-500 text-white shadow-rose-500/20 scale-110' 
+                  : 'bg-white/90 text-slate-500 hover:text-rose-600 hover:bg-white border border-slate-200'
               }`}
               title={isFav ? 'Remove from favorites' : 'Add to favorites'}
             >
@@ -161,41 +161,41 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
           </div>
 
           {/* Hover Play Button Overlay */}
-          <div className={`absolute inset-0 bg-cyan-950/30 backdrop-blur-[1px] flex items-center justify-center transition-opacity duration-200 z-20 ${
+          <div className={`absolute inset-0 bg-indigo-950/20 backdrop-blur-[1px] flex items-center justify-center transition-opacity duration-200 z-20 ${
             isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}>
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/40 flex items-center justify-center transform scale-90 group-hover:scale-100 transition-transform">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-blue-600 text-white shadow-lg shadow-indigo-500/30 flex items-center justify-center transform scale-90 group-hover:scale-100 transition-transform">
               <Play className="w-6 h-6 fill-current ml-0.5" />
             </div>
           </div>
 
           {/* Bottom stats pill on image */}
-          <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[11px] font-bold text-white/90 drop-shadow-md z-20">
-            <div className="flex items-center gap-1 bg-slate-950/80 backdrop-blur-md px-2 py-0.5 rounded-lg border border-white/10">
-              <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+          <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[11px] font-bold z-20">
+            <div className="flex items-center gap-1 bg-white/90 backdrop-blur-md px-2 py-0.5 rounded-lg border border-slate-200 text-slate-800 shadow-sm">
+              <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
               <span>{game.rating ? game.rating.toFixed(1) : '4.9'}</span>
             </div>
-            <div className="bg-slate-950/80 backdrop-blur-md px-2 py-0.5 rounded-lg border border-white/10 text-[10px] text-slate-300">
+            <div className="bg-white/90 backdrop-blur-md px-2 py-0.5 rounded-lg border border-slate-200 text-[10px] text-slate-600 shadow-sm">
               {game.plays ? `${(game.plays / 1000).toFixed(1)}k plays` : '12.4k plays'}
             </div>
           </div>
         </div>
 
         {/* Card Info Footer */}
-        <div className="p-3 bg-slate-900/90 flex flex-col justify-between flex-1 border-t border-slate-800/80">
+        <div className="p-3 bg-white flex flex-col justify-between flex-1 border-t border-slate-100">
           <div>
-            <h3 className="text-xs sm:text-sm font-black text-white group-hover:text-cyan-400 transition-colors line-clamp-1">
+            <h3 className="text-xs sm:text-sm font-black text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">
               {game.title}
             </h3>
-            <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5 leading-tight">
+            <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5 leading-tight">
               {game.description}
             </p>
           </div>
 
           {/* Tags */}
-          <div className="flex items-center gap-1 overflow-hidden mt-2 pt-2 border-t border-slate-800/60">
+          <div className="flex items-center gap-1 overflow-hidden mt-2 pt-2 border-t border-slate-100">
             {game.tags.slice(0, 2).map((tag: string) => (
-              <span key={tag} className="text-[10px] font-semibold text-slate-400 bg-slate-800/60 border border-slate-700/40 px-1.5 py-0.5 rounded-md">
+              <span key={tag} className="text-[10px] font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md">
                 #{tag}
               </span>
             ))}
@@ -209,25 +209,25 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
     <div className="space-y-8 pb-12">
       {/* Featured Big Bento Spotlight Banner (When browsing All / Home) */}
       {activeCategory === 'all' && !selectedTag && featuredGame && (
-        <div className="relative rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl group">
+        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-indigo-50/80 via-blue-50/40 to-white border border-indigo-100 shadow-sm group">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             {/* Left Info Column */}
             <div className="p-6 sm:p-8 lg:p-10 lg:col-span-7 space-y-4 z-10">
               <div className="flex items-center gap-2">
-                <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-xs font-black uppercase tracking-wider animate-pulse">
-                  <Flame className="w-3.5 h-3.5 fill-cyan-400" />
-                  #1 3D Trending Game of the Week
+                <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-black uppercase tracking-wider">
+                  <Flame className="w-3.5 h-3.5 fill-indigo-600 text-indigo-600" />
+                  #1 Trending Game of the Week
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-xs font-bold">
+                <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200 text-xs font-bold">
                   {featuredGame.category.toUpperCase()}
                 </span>
               </div>
 
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-none">
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-none">
                 {featuredGame.title}
               </h1>
 
-              <p className="text-xs sm:text-sm text-slate-300 line-clamp-2 sm:line-clamp-3 max-w-xl leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 sm:line-clamp-3 max-w-xl leading-relaxed">
                 {featuredGame.description}
               </p>
 
@@ -237,18 +237,18 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
                     sounds.playClick();
                     onSelectGame(featuredGame);
                   }}
-                  className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-sm shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-black text-sm shadow-lg shadow-indigo-500/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Play className="w-4 h-4 fill-current" />
                   PLAY NOW FREE
                 </button>
 
-                <div className="flex items-center gap-4 px-4 py-2 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 text-white text-xs font-bold">
+                <div className="flex items-center gap-4 px-4 py-2 rounded-2xl bg-white/80 backdrop-blur-md border border-slate-200 text-slate-800 text-xs font-bold shadow-sm">
                   <div className="flex items-center gap-1.5">
-                    <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                    <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                     <span>4.95 Rating</span>
                   </div>
-                  <div className="w-1 h-3 bg-white/20 rounded-full" />
+                  <div className="w-1 h-3 bg-slate-200 rounded-full" />
                   <span>240K+ Plays</span>
                 </div>
               </div>
@@ -260,11 +260,11 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
                 <img 
                   src={featuredGame.coverImage} 
                   alt={featuredGame.title}
-                  className="w-full h-full object-cover rounded-2xl border border-white/10 shadow-2xl group-hover:scale-105 transition-transform duration-700"
+                  className="w-full h-full object-cover rounded-2xl border border-slate-200 shadow-md group-hover:scale-105 transition-transform duration-700"
                 />
               ) : (
-                <div className="w-full h-full rounded-2xl bg-gradient-to-tr from-cyan-600 via-blue-600 to-pink-600 flex items-center justify-center">
-                  <Gamepad2 className="w-24 h-24 text-white/80" />
+                <div className="w-full h-full rounded-2xl bg-gradient-to-tr from-indigo-100 via-blue-100 to-indigo-50 flex items-center justify-center border border-indigo-200">
+                  <Gamepad2 className="w-24 h-24 text-indigo-600/70" />
                 </div>
               )}
             </div>
@@ -274,17 +274,17 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
 
       {/* Client-Side BYOG Emulator Dropzone Banner */}
       {onOpenLocalRomModal && (
-        <div className="mb-6 rounded-2xl bg-gradient-to-r from-slate-900 via-cyan-950/40 to-slate-900 border border-cyan-500/30 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl backdrop-blur-md">
+        <div className="mb-6 rounded-2xl bg-white border border-indigo-200 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm backdrop-blur-md">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 shrink-0">
               <UploadCloud className="w-6 h-6 animate-pulse" />
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
-                Play Any ROM on Your Device <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase font-mono">100% Client-Side</span>
+              <h3 className="text-sm sm:text-base font-black text-slate-900 flex items-center gap-2">
+                Play Any ROM on Your Device <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200 uppercase font-mono">100% Client-Side</span>
               </h3>
-              <p className="text-xs text-slate-400">
-                Drag & Drop your own <strong className="text-slate-200">.JAR, .SIS, .GBA, .NES, .SNES, .MD, .SWF</strong> files to run instantly in browser. Zero server upload.
+              <p className="text-xs text-slate-500">
+                Drag & Drop your own <strong className="text-slate-700">.JAR, .SIS, .GBA, .NES, .SNES, .MD, .SWF</strong> files to run instantly in browser. Zero server upload.
               </p>
             </div>
           </div>
@@ -293,7 +293,7 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
               sounds.playPowerup();
               onOpenLocalRomModal();
             }}
-            className="shrink-0 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-cyan-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+            className="shrink-0 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
           >
             <UploadCloud className="w-4 h-4" />
             <span>DROP & PLAY ROM</span>
@@ -310,13 +310,13 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
           })}
         </div>
       ) : (
-        <div className="p-12 text-center bg-slate-900/60 rounded-3xl border border-dashed border-cyan-500/30 flex flex-col items-center justify-center gap-4 max-w-2xl mx-auto shadow-2xl">
-          <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+        <div className="p-12 text-center bg-white rounded-3xl border border-dashed border-indigo-200 flex flex-col items-center justify-center gap-4 max-w-2xl mx-auto shadow-sm">
+          <div className="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600">
             <Gamepad2 className="w-8 h-8" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-black text-white">No Games Found</h3>
-            <p className="text-xs text-slate-400 max-w-md">
+            <h3 className="text-lg font-black text-slate-900">No Games Found</h3>
+            <p className="text-xs text-slate-500 max-w-md">
               There are currently no games in this category. Check back soon for new additions!
             </p>
           </div>
@@ -331,7 +331,7 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
               sounds.playClick();
               setVisibleCount(prev => prev + 24);
             }}
-            className="px-8 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700/80 font-black text-sm shadow-md hover:shadow-cyan-500/20 hover:border-cyan-500/50 transition-all flex items-center gap-2 cursor-pointer"
+            className="px-8 py-3.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-black text-sm shadow-sm hover:border-indigo-400 transition-all flex items-center gap-2 cursor-pointer"
           >
             <span>LOAD MORE GAMES ({filteredGames.length - displayedGames.length} LEFT)</span>
             <ArrowRight className="w-4 h-4" />

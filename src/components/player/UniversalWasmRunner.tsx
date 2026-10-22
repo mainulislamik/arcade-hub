@@ -1349,18 +1349,18 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
 
       {/* Universal Interactive Game Key Suggestions & Controller Bar (Desktop + Mobile) */}
       {['gba', 'nes', 'snes', 'md', 'sega', 'psx', 'gb', 'gbc', 'psp', 'ps2', 'emulatorjs'].includes(format) || game.engineType === 'emulatorjs' || game.engineType === 'ps2_wasm' ? (
-        <div className="w-full bg-slate-900/95 border-t border-slate-800 p-3 sm:p-4 flex flex-col items-center gap-3 shadow-inner">
+        <div className="w-full bg-white border-t border-slate-200 p-3 sm:p-4 flex flex-col items-center gap-3 shadow-sm">
           {/* Header & Status Indicator */}
           <div className="flex flex-wrap items-center justify-between w-full max-w-4xl text-xs px-2 gap-2">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5 font-mono text-[11px] sm:text-xs">
-                <Gamepad2 className="w-4 h-4 text-cyan-400 inline" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5 font-mono text-[11px] sm:text-xs">
+                <Gamepad2 className="w-4 h-4 text-indigo-600 inline" />
                 <span>GAME CONTROLS GUIDE (KEYBOARD & TOUCH)</span>
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] text-slate-400 hidden md:inline">
+              <span className="text-[11px] text-slate-500 hidden md:inline">
                 Press physical keyboard or click/touch buttons below:
               </span>
               <button
@@ -1369,7 +1369,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
                   iframeRef.current?.focus();
                   iframeRef.current?.contentWindow?.focus();
                 }}
-                className="px-2.5 py-1 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/50 rounded text-cyan-300 font-mono text-[11px] font-bold transition-colors cursor-pointer"
+                className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded text-indigo-700 font-mono text-[11px] font-bold transition-colors cursor-pointer"
                 title="Focus game canvas for keyboard"
               >
                 🎯 Refocus Game
@@ -1380,17 +1380,17 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
           {/* Key Suggestions Cards & Interactive Virtual Controller Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 w-full max-w-4xl">
             {/* 1. D-Pad / Movement */}
-            <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-2.5 flex flex-col items-center justify-between gap-1.5 shadow-sm col-span-2 sm:col-span-2">
-              <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-between gap-1.5 shadow-sm col-span-2 sm:col-span-2">
+              <div className="text-[10px] uppercase font-bold text-slate-600 tracking-wider">
                 Direction / Aim & Run
               </div>
-              <div className="flex items-center gap-1 font-mono text-[11px] text-cyan-300">
-                <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-200 font-bold">↑</kbd>
-                <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-200 font-bold">↓</kbd>
-                <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-200 font-bold">←</kbd>
-                <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-200 font-bold">→</kbd>
-                <span className="text-slate-500 mx-1">or</span>
-                <span className="text-slate-300 font-bold">WASD</span>
+              <div className="flex items-center gap-1 font-mono text-[11px] text-indigo-600">
+                <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-slate-800 font-bold shadow-sm">↑</kbd>
+                <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-slate-800 font-bold shadow-sm">↓</kbd>
+                <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-slate-800 font-bold shadow-sm">←</kbd>
+                <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-slate-800 font-bold shadow-sm">→</kbd>
+                <span className="text-slate-400 mx-1">or</span>
+                <span className="text-slate-700 font-bold">WASD</span>
               </div>
               <div className="grid grid-cols-3 gap-1 w-28 h-20 items-center justify-center mt-1">
                 <div />
@@ -1399,7 +1399,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
                   onMouseUp={() => sendKey('ArrowUp', 'keyup')}
                   onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('ArrowUp', 'keydown'); }}
                   onTouchEnd={(e) => { e.preventDefault(); sendKey('ArrowUp', 'keyup'); }}
-                  className="h-8 bg-slate-800 hover:bg-slate-700 active:bg-cyan-500 rounded border border-slate-700 text-slate-200 active:text-white font-bold flex items-center justify-center text-xs shadow cursor-pointer"
+                  className="h-8 bg-white hover:bg-slate-100 active:bg-indigo-600 rounded border border-slate-300 text-slate-700 active:text-white font-bold flex items-center justify-center text-xs shadow-sm cursor-pointer"
                 >▲</button>
                 <div />
                 <button
@@ -1407,76 +1407,76 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
                   onMouseUp={() => sendKey('ArrowLeft', 'keyup')}
                   onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('ArrowLeft', 'keydown'); }}
                   onTouchEnd={(e) => { e.preventDefault(); sendKey('ArrowLeft', 'keyup'); }}
-                  className="h-8 bg-slate-800 hover:bg-slate-700 active:bg-cyan-500 rounded border border-slate-700 text-slate-200 active:text-white font-bold flex items-center justify-center text-xs shadow cursor-pointer"
+                  className="h-8 bg-white hover:bg-slate-100 active:bg-indigo-600 rounded border border-slate-300 text-slate-700 active:text-white font-bold flex items-center justify-center text-xs shadow-sm cursor-pointer"
                 >◀</button>
                 <button
                   onMouseDown={() => { HapticEngine.lightTick(); sendKey('ArrowDown', 'keydown'); }}
                   onMouseUp={() => sendKey('ArrowDown', 'keyup')}
                   onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('ArrowDown', 'keydown'); }}
                   onTouchEnd={(e) => { e.preventDefault(); sendKey('ArrowDown', 'keyup'); }}
-                  className="h-8 bg-slate-800 hover:bg-slate-700 active:bg-cyan-500 rounded border border-slate-700 text-slate-200 active:text-white font-bold flex items-center justify-center text-xs shadow cursor-pointer"
+                  className="h-8 bg-white hover:bg-slate-100 active:bg-indigo-600 rounded border border-slate-300 text-slate-700 active:text-white font-bold flex items-center justify-center text-xs shadow-sm cursor-pointer"
                 >▼</button>
                 <button
                   onMouseDown={() => { HapticEngine.lightTick(); sendKey('ArrowRight', 'keydown'); }}
                   onMouseUp={() => sendKey('ArrowRight', 'keyup')}
                   onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('ArrowRight', 'keydown'); }}
                   onTouchEnd={(e) => { e.preventDefault(); sendKey('ArrowRight', 'keyup'); }}
-                  className="h-8 bg-slate-800 hover:bg-slate-700 active:bg-cyan-500 rounded border border-slate-700 text-slate-200 active:text-white font-bold flex items-center justify-center text-xs shadow cursor-pointer"
+                  className="h-8 bg-white hover:bg-slate-100 active:bg-indigo-600 rounded border border-slate-300 text-slate-700 active:text-white font-bold flex items-center justify-center text-xs shadow-sm cursor-pointer"
                 >▶</button>
               </div>
             </div>
 
             {/* 2. Fire / Shoot (Button B) */}
-            <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-2.5 flex flex-col items-center justify-between gap-1.5 shadow-sm">
-              <div className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-between gap-1.5 shadow-sm">
+              <div className="text-[10px] uppercase font-bold text-rose-600 tracking-wider">
                 🔫 Fire / Shoot (B)
               </div>
               <div className="flex items-center gap-1 font-mono text-[11px]">
-                <kbd className="px-2 py-0.5 bg-amber-950/80 border border-amber-600/70 rounded text-amber-300 font-bold">Z</kbd>
-                <span className="text-slate-500">or</span>
-                <kbd className="px-2 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-300 font-bold">J</kbd>
+                <kbd className="px-2 py-0.5 bg-rose-50 border border-rose-200 rounded text-rose-700 font-bold shadow-sm">Z</kbd>
+                <span className="text-slate-400">or</span>
+                <kbd className="px-2 py-0.5 bg-white border border-slate-300 rounded text-slate-700 font-bold shadow-sm">J</kbd>
               </div>
               <button
                 onMouseDown={() => { HapticEngine.selectionClick(); sendKey('KeyZ', 'keydown'); }}
                 onMouseUp={() => sendKey('KeyZ', 'keyup')}
                 onTouchStart={(e) => { e.preventDefault(); HapticEngine.selectionClick(); sendKey('KeyZ', 'keydown'); }}
                 onTouchEnd={(e) => { e.preventDefault(); sendKey('KeyZ', 'keyup'); }}
-                className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-600 to-rose-600 hover:from-amber-500 hover:to-rose-500 active:scale-95 text-white font-black text-sm shadow-lg shadow-amber-900/40 border-2 border-amber-400 flex items-center justify-center cursor-pointer transition-transform"
+                className="w-14 h-14 rounded-full bg-gradient-to-br from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 active:scale-95 text-white font-black text-sm shadow-md shadow-rose-500/20 border-2 border-white flex items-center justify-center cursor-pointer transition-transform"
               >
                 FIRE
               </button>
             </div>
 
             {/* 3. Jump (Button A) */}
-            <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-2.5 flex flex-col items-center justify-between gap-1.5 shadow-sm">
-              <div className="text-[10px] uppercase font-bold text-cyan-400 tracking-wider">
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-between gap-1.5 shadow-sm">
+              <div className="text-[10px] uppercase font-bold text-indigo-600 tracking-wider">
                 🦘 Jump (A)
               </div>
               <div className="flex items-center gap-1 font-mono text-[11px]">
-                <kbd className="px-2 py-0.5 bg-cyan-950/80 border border-cyan-600/70 rounded text-cyan-300 font-bold">X</kbd>
-                <span className="text-slate-500">or</span>
-                <kbd className="px-2 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-300 font-bold">K</kbd>
+                <kbd className="px-2 py-0.5 bg-indigo-50 border border-indigo-200 rounded text-indigo-700 font-bold shadow-sm">X</kbd>
+                <span className="text-slate-400">or</span>
+                <kbd className="px-2 py-0.5 bg-white border border-slate-300 rounded text-slate-700 font-bold shadow-sm">K</kbd>
               </div>
               <button
                 onMouseDown={() => { HapticEngine.selectionClick(); sendKey('KeyX', 'keydown'); }}
                 onMouseUp={() => sendKey('KeyX', 'keyup')}
                 onTouchStart={(e) => { e.preventDefault(); HapticEngine.selectionClick(); sendKey('KeyX', 'keydown'); }}
                 onTouchEnd={(e) => { e.preventDefault(); sendKey('KeyX', 'keyup'); }}
-                className="w-14 h-14 rounded-full bg-gradient-to-br from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 active:scale-95 text-white font-black text-sm shadow-lg shadow-cyan-900/40 border-2 border-cyan-400 flex items-center justify-center cursor-pointer transition-transform"
+                className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 active:scale-95 text-white font-black text-sm shadow-md shadow-indigo-500/20 border-2 border-white flex items-center justify-center cursor-pointer transition-transform"
               >
                 JUMP
               </button>
             </div>
 
             {/* 4. Turbo / Rapid Fire */}
-            <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-2.5 flex flex-col items-center justify-between gap-1.5 shadow-sm">
-              <div className="text-[10px] uppercase font-bold text-purple-400 tracking-wider">
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-between gap-1.5 shadow-sm">
+              <div className="text-[10px] uppercase font-bold text-purple-700 tracking-wider">
                 ⚡ Turbo Rapid
               </div>
               <div className="flex items-center gap-1 font-mono text-[11px]">
-                <kbd className="px-1.5 py-0.5 bg-purple-950/80 border border-purple-600/70 rounded text-purple-300 font-bold">A</kbd>
-                <span className="text-slate-500">/</span>
-                <kbd className="px-1.5 py-0.5 bg-purple-950/80 border border-purple-600/70 rounded text-purple-300 font-bold">S</kbd>
+                <kbd className="px-1.5 py-0.5 bg-purple-50 border border-purple-200 rounded text-purple-700 font-bold shadow-sm">A</kbd>
+                <span className="text-slate-400">/</span>
+                <kbd className="px-1.5 py-0.5 bg-purple-50 border border-purple-200 rounded text-purple-700 font-bold shadow-sm">S</kbd>
               </div>
               <div className="flex gap-1.5 mt-1">
                 <button
@@ -1484,24 +1484,24 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
                   onMouseUp={() => sendKey('KeyA', 'keyup')}
                   onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('KeyA', 'keydown'); }}
                   onTouchEnd={(e) => { e.preventDefault(); sendKey('KeyA', 'keyup'); }}
-                  className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 active:bg-purple-600 border border-purple-500/50 text-purple-300 active:text-white font-bold text-xs flex items-center justify-center cursor-pointer"
+                  className="w-10 h-10 rounded-full bg-white hover:bg-purple-50 active:bg-purple-600 border border-purple-300 text-purple-700 active:text-white font-bold text-xs flex items-center justify-center cursor-pointer shadow-sm"
                 >TA</button>
                 <button
                   onMouseDown={() => { HapticEngine.lightTick(); sendKey('KeyS', 'keydown'); }}
                   onMouseUp={() => sendKey('KeyS', 'keyup')}
                   onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('KeyS', 'keydown'); }}
                   onTouchEnd={(e) => { e.preventDefault(); sendKey('KeyS', 'keyup'); }}
-                  className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 active:bg-purple-600 border border-purple-500/50 text-purple-300 active:text-white font-bold text-xs flex items-center justify-center cursor-pointer"
+                  className="w-10 h-10 rounded-full bg-white hover:bg-purple-50 active:bg-purple-600 border border-purple-300 text-purple-700 active:text-white font-bold text-xs flex items-center justify-center cursor-pointer shadow-sm"
                 >TB</button>
               </div>
             </div>
 
             {/* 5. Start & Select Controls */}
-            <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-2.5 flex flex-col items-center justify-between gap-1.5 shadow-sm">
-              <div className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-between gap-1.5 shadow-sm">
+              <div className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider">
                 ▶ Start / Select
               </div>
-              <div className="flex items-center gap-1 font-mono text-[10px] text-slate-300">
+              <div className="flex items-center gap-1 font-mono text-[10px] text-slate-600">
                 <span>Enter / V</span>
               </div>
               <div className="flex flex-col gap-1.5 w-full mt-1">
@@ -1510,7 +1510,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
                   onMouseUp={() => sendKey('Enter', 'keyup')}
                   onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('Enter', 'keydown'); }}
                   onTouchEnd={(e) => { e.preventDefault(); sendKey('Enter', 'keyup'); }}
-                  className="w-full py-1.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/60 text-emerald-300 font-bold font-mono text-[11px] shadow flex items-center justify-center cursor-pointer"
+                  className="w-full py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold font-mono text-[11px] shadow-sm flex items-center justify-center cursor-pointer"
                 >
                   START (Enter)
                 </button>
@@ -1519,7 +1519,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
                   onMouseUp={() => sendKey('KeyV', 'keyup')}
                   onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('KeyV', 'keydown'); }}
                   onTouchEnd={(e) => { e.preventDefault(); sendKey('KeyV', 'keyup'); }}
-                  className="w-full py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-bold font-mono text-[10px] shadow flex items-center justify-center cursor-pointer"
+                  className="w-full py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 font-bold font-mono text-[10px] shadow-sm flex items-center justify-center cursor-pointer"
                 >
                   SELECT (V)
                 </button>

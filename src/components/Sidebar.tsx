@@ -95,18 +95,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   const content = (
-    <div className="flex flex-col h-full bg-slate-900 border-r border-slate-800 text-slate-300 select-none">
+    <div className="flex flex-col h-full bg-white border-r border-slate-200 text-slate-800 select-none">
       {/* Header & Collapse Toggle */}
-      <div className="p-3 border-b border-slate-800/80 flex items-center justify-between">
+      <div className="p-3 border-b border-slate-200 flex items-center justify-between">
         {!isCollapsed && (
-          <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 px-2 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+          <span className="text-[11px] font-black uppercase tracking-wider text-slate-600 px-2 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
             ARCADE DISCOVERY
           </span>
         )}
         <button
           onClick={onToggleCollapse}
-          className="hidden md:flex p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors mx-auto cursor-pointer"
+          className="hidden md:flex p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors mx-auto cursor-pointer"
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -115,7 +115,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Mobile close button */}
         <button
           onClick={onCloseMobile}
-          className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 ml-auto cursor-pointer"
+          className="md:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 ml-auto cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -132,16 +132,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
               currentCategory === 'all' 
-                ? 'bg-cyan-500/20 text-cyan-300 shadow-sm border border-cyan-500/40' 
-                : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
+                ? 'bg-indigo-50 text-indigo-700 shadow-sm border border-indigo-200 font-bold' 
+                : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
             }`}
           >
             <div className="flex items-center gap-3">
-              <Gamepad2 className="w-5 h-5 text-cyan-400 shrink-0" />
+              <Gamepad2 className="w-5 h-5 text-indigo-600 shrink-0" />
               {!isCollapsed && <span className="truncate">Featured / All Games</span>}
             </div>
             {!isCollapsed && (
-              <span className="text-[10px] font-black w-6 h-5 flex items-center justify-center bg-cyan-500/20 text-cyan-400 rounded-md border border-cyan-500/30">
+              <span className="text-[10px] font-black w-6 h-5 flex items-center justify-center bg-indigo-100 text-indigo-700 rounded-md border border-indigo-200">
                 {getCategoryCount('all')}
               </span>
             )}
@@ -154,16 +154,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
               currentCategory === 'favorites' 
-                ? 'bg-rose-500/20 text-rose-300 shadow-sm border border-rose-500/30' 
-                : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
+                ? 'bg-rose-50 text-rose-700 shadow-sm border border-rose-200 font-bold' 
+                : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
             }`}
           >
             <div className="flex items-center gap-3">
-              <Heart className="w-5 h-5 text-rose-400 shrink-0" />
+              <Heart className="w-5 h-5 text-rose-500 shrink-0" />
               {!isCollapsed && <span className="truncate">My Favorites</span>}
             </div>
             {!isCollapsed && favoritesCount > 0 && (
-              <span className="text-[10px] font-black w-5 h-5 flex items-center justify-center bg-rose-500/20 text-rose-400 rounded-md border border-rose-500/30">
+              <span className="text-[10px] font-black w-5 h-5 flex items-center justify-center bg-rose-100 text-rose-700 rounded-md border border-rose-200">
                 {favoritesCount}
               </span>
             )}
@@ -173,7 +173,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Categories Section */}
         <div>
           {!isCollapsed && (
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 px-3 block mb-1">
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3 block mb-1">
               Top Categories
             </span>
           )}
@@ -186,8 +186,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 currentCategory === cat.id 
-                  ? 'bg-cyan-500/20 text-cyan-300 shadow-sm border border-cyan-500/40' 
-                  : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
+                  ? 'bg-indigo-50 text-indigo-700 shadow-sm border border-indigo-200 font-bold' 
+                  : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
               }`}
               title={isCollapsed ? cat.label : undefined}
             >
@@ -204,8 +204,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Trending Tags (Only visible when expanded) */}
         {!isCollapsed && (
-          <div className="space-y-2 pt-2 border-t border-slate-800/80">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 px-3 block">
+          <div className="space-y-2 pt-2 border-t border-slate-200">
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3 block">
               Trending Tags
             </span>
             <div className="flex flex-wrap gap-1.5 px-2">
@@ -216,7 +216,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     if (onSelectTag) onSelectTag(tag.replace('#', '').toLowerCase());
                     onCloseMobile();
                   }}
-                  className="text-[11px] font-medium text-slate-400 hover:text-cyan-300 hover:bg-slate-800 bg-slate-800/50 border border-slate-700/40 px-2 py-1 rounded-lg transition-colors cursor-pointer"
+                  className="text-[11px] font-medium text-slate-600 hover:text-indigo-700 hover:bg-indigo-50 bg-slate-100 border border-slate-200 px-2 py-1 rounded-lg transition-colors cursor-pointer"
                 >
                   {tag}
                 </button>
@@ -228,15 +228,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Footer Legal Links */}
       {!isCollapsed && (
-        <div className="p-3 border-t border-slate-800/80 bg-slate-950/60 space-y-2">
+        <div className="p-3 border-t border-slate-200 bg-slate-50 space-y-2">
           <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-slate-500 font-medium">
-            <button onClick={() => onOpenLegal('privacy')} className="hover:text-slate-300 cursor-pointer">Privacy</button>
-            <button onClick={() => onOpenLegal('terms')} className="hover:text-slate-300 cursor-pointer">Terms</button>
-            <button onClick={() => onOpenLegal('dmca')} className="hover:text-slate-300 cursor-pointer">DMCA</button>
-            <button onClick={() => onOpenLegal('about')} className="hover:text-slate-300 cursor-pointer">About</button>
-            <button onClick={() => onOpenLegal('contact')} className="hover:text-slate-300 cursor-pointer">Contact</button>
+            <button onClick={() => onOpenLegal('privacy')} className="hover:text-slate-900 cursor-pointer">Privacy</button>
+            <button onClick={() => onOpenLegal('terms')} className="hover:text-slate-900 cursor-pointer">Terms</button>
+            <button onClick={() => onOpenLegal('dmca')} className="hover:text-slate-900 cursor-pointer">DMCA</button>
+            <button onClick={() => onOpenLegal('about')} className="hover:text-slate-900 cursor-pointer">About</button>
+            <button onClick={() => onOpenLegal('contact')} className="hover:text-slate-900 cursor-pointer">Contact</button>
           </div>
-          <div className="text-[10px] text-slate-600">
+          <div className="text-[10px] text-slate-400">
             © 2026 Arcadex. 100% Client-Side WebGL.
           </div>
         </div>
@@ -257,10 +257,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {isMobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden flex">
           <div 
-            className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
             onClick={onCloseMobile}
           />
-          <div className="relative w-72 max-w-[80vw] h-full bg-slate-900 z-10 shadow-2xl">
+          <div className="relative w-72 max-w-[80vw] h-full bg-white z-10 shadow-2xl">
             {content}
           </div>
         </div>
