@@ -84,14 +84,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const categories: { id: GameCategory; label: string; icon: React.ReactNode; count: number }[] = [
-    { id: 'all', label: 'All Games', icon: <Gamepad2 className="w-5 h-5 text-cyan-400" />, count: getCategoryCount('all') },
-    { id: 'playstation', label: 'PlayStation (PS1/PS2/PSP)', icon: <Gamepad2 className="w-5 h-5 text-indigo-400" />, count: getCategoryCount('playstation') },
-    { id: 'action', label: 'Action & 3D', icon: <Swords className="w-5 h-5 text-rose-400" />, count: getCategoryCount('action') },
-    { id: 'driving', label: 'Driving & Cars', icon: <Car className="w-5 h-5 text-amber-400" />, count: getCategoryCount('driving') },
-    { id: 'shooting', label: 'Shooting & FPS', icon: <Crosshair className="w-5 h-5 text-cyan-400" />, count: getCategoryCount('shooting') },
-    { id: 'arcade', label: 'Arcade & Skill', icon: <Zap className="w-5 h-5 text-purple-400" />, count: getCategoryCount('arcade') },
-    { id: 'puzzle', label: 'Puzzle & Logic', icon: <Puzzle className="w-5 h-5 text-emerald-400" />, count: getCategoryCount('puzzle') },
-    { id: 'strategy', label: 'Strategy & Brain', icon: <Brain className="w-5 h-5 text-blue-400" />, count: getCategoryCount('strategy') },
+    { id: 'all', label: 'All Games', icon: <Gamepad2 className="w-5 h-5 text-indigo-600" />, count: getCategoryCount('all') },
+    { id: 'playstation', label: 'PlayStation (PS1/PS2/PSP)', icon: <Gamepad2 className="w-5 h-5 text-indigo-500" />, count: getCategoryCount('playstation') },
+    { id: 'action', label: 'Action & 3D', icon: <Swords className="w-5 h-5 text-rose-500" />, count: getCategoryCount('action') },
+    { id: 'driving', label: 'Driving & Cars', icon: <Car className="w-5 h-5 text-amber-500" />, count: getCategoryCount('driving') },
+    { id: 'shooting', label: 'Shooting & FPS', icon: <Crosshair className="w-5 h-5 text-cyan-600" />, count: getCategoryCount('shooting') },
+    { id: 'arcade', label: 'Arcade & Skill', icon: <Zap className="w-5 h-5 text-purple-600" />, count: getCategoryCount('arcade') },
+    { id: 'puzzle', label: 'Puzzle & Logic', icon: <Puzzle className="w-5 h-5 text-emerald-600" />, count: getCategoryCount('puzzle') },
+    { id: 'strategy', label: 'Strategy & Brain', icon: <Brain className="w-5 h-5 text-blue-600" />, count: getCategoryCount('strategy') },
   ];
 
   const content = (
@@ -135,16 +135,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
             aria-label="Browse all games"
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
               currentCategory === 'all'
-                ? 'bg-indigo-50 text-indigo-700 shadow-sm border border-indigo-200 font-bold'
+                ? 'bg-slate-900 text-white shadow-xs font-black'
                 : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
             }`}
           >
             <div className="flex items-center gap-3">
-              <Gamepad2 className="w-5 h-5 text-indigo-600 shrink-0" />
+              <Gamepad2 className={`w-5 h-5 shrink-0 ${currentCategory === 'all' ? 'text-white' : 'text-indigo-600'}`} />
               {!isCollapsed && <span className="truncate">Featured / All Games</span>}
             </div>
             {!isCollapsed && (
-              <span className="text-[10px] font-black w-6 h-5 flex items-center justify-center bg-indigo-100 text-indigo-700 rounded-md border border-indigo-200">
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono ${
+                currentCategory === 'all' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+              }`}>
                 {getCategoryCount('all')}
               </span>
             )}
@@ -158,16 +160,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
             aria-label="View favorite games"
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
               currentCategory === 'favorites'
-                ? 'bg-rose-50 text-rose-700 shadow-sm border border-rose-200 font-bold'
+                ? 'bg-rose-500 text-white shadow-xs font-black'
                 : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
             }`}
           >
             <div className="flex items-center gap-3">
-              <Heart className="w-5 h-5 text-rose-500 shrink-0" />
+              <Heart className={`w-5 h-5 shrink-0 ${currentCategory === 'favorites' ? 'fill-white text-white' : 'text-rose-500'}`} />
               {!isCollapsed && <span className="truncate">My Favorites</span>}
             </div>
             {!isCollapsed && favoritesCount > 0 && (
-              <span className="text-[10px] font-black w-5 h-5 flex items-center justify-center bg-rose-100 text-rose-700 rounded-md border border-rose-200">
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono ${
+                currentCategory === 'favorites' ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-700'
+              }`}>
                 {favoritesCount}
               </span>
             )}
@@ -181,30 +185,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
               Top Categories
             </span>
           )}
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => {
-                onSelectCategory(cat.id);
-                onCloseMobile();
-              }}
-              aria-label={`Browse ${cat.label}`}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                currentCategory === cat.id
-                  ? 'bg-indigo-50 text-indigo-700 shadow-sm border border-indigo-200 font-bold'
-                  : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
-              }`}
-              title={isCollapsed ? cat.label : undefined}
-            >
-              <div className="shrink-0">{cat.icon}</div>
-              {!isCollapsed && (
-                <div className="flex items-center justify-between w-full">
-                  <span className="truncate">{cat.label}</span>
-                  <span className="text-[11px] text-slate-500 font-bold">{cat.count}</span>
-                </div>
-              )}
-            </button>
-          ))}
+          {categories.map((cat) => {
+            const isActive = currentCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => {
+                  onSelectCategory(cat.id);
+                  onCloseMobile();
+                }}
+                aria-label={`Browse ${cat.label}`}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                  isActive
+                    ? 'bg-slate-900 text-white shadow-xs font-black'
+                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                }`}
+                title={isCollapsed ? cat.label : undefined}
+              >
+                <div className={`shrink-0 ${isActive ? 'text-white' : ''}`}>{cat.icon}</div>
+                {!isCollapsed && (
+                  <div className="flex items-center justify-between w-full">
+                    <span className="truncate">{cat.label}</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono ${
+                      isActive ? 'bg-white/20 text-white' : 'text-slate-500 bg-slate-100'
+                    }`}>
+                      {cat.count}
+                    </span>
+                  </div>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* Trending Tags (Only visible when expanded) */}

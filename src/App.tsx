@@ -367,6 +367,7 @@ export const App: React.FC = () => {
                 games={allGames}
                 onSelectGame={handleSelectGame}
                 activeCategory={activeCategory}
+                onSelectCategory={handleSelectCategory}
                 favorites={favorites}
                 onToggleFavorite={handleToggleFavorite}
                 selectedTag={selectedTag}
