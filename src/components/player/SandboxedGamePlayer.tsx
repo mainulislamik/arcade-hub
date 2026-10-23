@@ -59,6 +59,7 @@ import { CyberKnife3DGame } from '../games/CyberKnife3DGame';
 import { VoxelShooter3DGame } from '../games/VoxelShooter3DGame';
 import { UniversalProceduralCore } from './UniversalProceduralCore';
 import { UniversalWasmRunner } from './UniversalWasmRunner';
+import { UniversalMouseOverlay } from './UniversalMouseOverlay';
 
 // Complete registry of all 37 rich native React/Canvas games
 export const NATIVE_GAME_IDS = new Set([
@@ -113,6 +114,76 @@ export const NATIVE_ID_ALIASES: Record<string, string> = {
   'chess': 'cyber-chess',
   'stack': 'cyber-stack',
   'knife': 'knife-3d',
+  'cyber-knife-3d': 'knife-3d',
+  'knife-hit': 'knife-3d',
+  // Popular Android Games ID Mappings
+  'subway-surfers': 'subway-surfer',
+  'temple-run': 'temple-dash',
+  'fruit-ninja': 'fruit-slash',
+  'hill-climb-racing': 'hill-climb',
+  'geometry-dash': 'slope-3d',
+  'stickman-hook': 'stickman-runner',
+  'bowmasters': 'stickman-archer',
+  'sniper-3d': 'stickman-sniper',
+  'shadow-fight': 'stickman-fighter',
+  'vector': 'stickman-runner',
+  'pixel-gun-3d': 'voxel-3d',
+  'drift-max': 'drift-3d',
+  'crossy-road': 'subway-3d',
+  'bad-piggies': 'hill-climb',
+  'cut-the-rope': 'fruit-slash',
+  'doodle-jump': 'cyber-stack',
+  'jetpack-joyride': 'stickman-runner',
+  'angry-birds': 'stickman-archer',
+  'plants-vs-zombies': 'galaxy-defender'
+};
+
+/**
+ * Resolves the primary native ID (handling aliases and Android prefixes)
+ */
+export const getResolvedNativeId = (game: GameItem): string => {
+  if (!game) return '';
+
+  if (game.romUrl && game.romUrl.startsWith('native:')) {
+    const rawNative = game.romUrl.replace('native:', '').trim().toLowerCase();
+    if (NATIVE_GAME_IDS.has(rawNative)) return rawNative;
+    if (NATIVE_ID_ALIASES[rawNative]) return NATIVE_ID_ALIASES[rawNative];
+  }
+
+  const id = game.id?.toLowerCase() || '';
+  const normalizedId = id.replace(/_/g, '-');
+
+  // Direct alias match
+  if (NATIVE_ID_ALIASES[id]) return NATIVE_ID_ALIASES[id];
+  if (NATIVE_ID_ALIASES[normalizedId]) return NATIVE_ID_ALIASES[normalizedId];
+
+  // Prefix matching for Android mobile games
+  if (normalizedId.startsWith('android-subway-surfers')) return 'subway-surfer';
+  if (normalizedId.startsWith('android-temple-run')) return 'temple-dash';
+  if (normalizedId.startsWith('android-fruit-ninja')) return 'fruit-slash';
+  if (normalizedId.startsWith('android-hill-climb')) return 'hill-climb';
+  if (normalizedId.startsWith('android-flappy-bird')) return 'flappy-bird';
+  if (normalizedId.startsWith('android-2048')) return 'game-2048';
+  if (normalizedId.startsWith('android-shadow-fight')) return 'stickman-fighter';
+  if (normalizedId.startsWith('android-geometry-dash')) return 'slope-3d';
+  if (normalizedId.startsWith('android-cut-the-rope')) return 'fruit-slash';
+  if (normalizedId.startsWith('android-doodle-jump')) return 'cyber-stack';
+  if (normalizedId.startsWith('android-jetpack-joyride')) return 'stickman-runner';
+  if (normalizedId.startsWith('android-angry-birds')) return 'stickman-archer';
+  if (normalizedId.startsWith('android-crossy-road')) return 'subway-3d';
+  if (normalizedId.startsWith('android-plants-vs-zombies')) return 'galaxy-defender';
+  if (normalizedId.startsWith('android-bad-piggies')) return 'hill-climb';
+  if (normalizedId.startsWith('android-knife-hit')) return 'knife-3d';
+  if (normalizedId.startsWith('android-stickman-hook')) return 'stickman-runner';
+  if (normalizedId.startsWith('android-vector')) return 'stickman-runner';
+  if (normalizedId.startsWith('android-bowmasters')) return 'stickman-archer';
+  if (normalizedId.startsWith('android-sniper-3d')) return 'stickman-sniper';
+  if (normalizedId.startsWith('android-pixel-gun')) return 'voxel-3d';
+  if (normalizedId.startsWith('android-drift-max')) return 'drift-3d';
+  if (normalizedId.startsWith('android-slope')) return 'slope-3d';
+  if (normalizedId.startsWith('android-bubble-shooter')) return 'bubble-shooter';
+
+  return NATIVE_ID_ALIASES[id] || NATIVE_ID_ALIASES[normalizedId] || normalizedId;
 };
 
 /**
@@ -127,30 +198,26 @@ export const isNativeGame = (game: GameItem): boolean => {
   const id = game.id?.toLowerCase() || '';
   const normalizedId = id.replace(/_/g, '-');
 
+  if (game.romUrl?.startsWith('native:')) return true;
+
+  const resolved = getResolvedNativeId(game);
+  if (NATIVE_GAME_IDS.has(resolved)) return true;
+
   // Direct match or alias match
   if (NATIVE_GAME_IDS.has(id) || NATIVE_GAME_IDS.has(normalizedId)) return true;
   if (NATIVE_ID_ALIASES[id] || NATIVE_ID_ALIASES[normalizedId]) return true;
 
   // Engine type explicitly specifying native canvas
-  if (['native_canvas', 'canvas', 'native', 'react_canvas'].includes(game.engineType || '')) {
+  if (['native_canvas', 'canvas_native', 'canvas', 'native', 'react_canvas'].includes(game.engineType || '')) {
     return true;
   }
 
   // Fallback web-runner games with no heavy emulator engine
-  if (game.romUrl === '/games/web-runner.html' && (!game.engineType || game.engineType === 'iframe_web' || game.engineType === 'native_canvas')) {
+  if (game.romUrl === '/games/web-runner.html' && (!game.engineType || game.engineType === 'iframe_web' || game.engineType === 'native_canvas' || game.engineType === 'canvas_native')) {
     return true;
   }
 
   return false;
-};
-
-/**
- * Resolves the primary native ID (handling aliases)
- */
-export const getResolvedNativeId = (game: GameItem): string => {
-  const id = game.id?.toLowerCase() || '';
-  const normalizedId = id.replace(/_/g, '-');
-  return NATIVE_ID_ALIASES[id] || NATIVE_ID_ALIASES[normalizedId] || id;
 };
 
 interface SandboxedGamePlayerProps {
@@ -488,7 +555,9 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
         {isStreamingReady && (
           <div className="w-full h-full flex flex-col items-center justify-center">
             {isNative ? (
-              renderNativeGame()
+              <UniversalMouseOverlay onSendKey={sendKey} className="w-full h-full flex items-center justify-center">
+                {renderNativeGame()}
+              </UniversalMouseOverlay>
             ) : game.isCustomUpload || Boolean(game.romUrl) || ['j2me_wasm', 'emulatorjs', 'ruffle_flash', 'symbian_sis', 'html5_zip', 'dosbox_wasm', 'scummvm_wasm', 'wasm_emscripten', 'ps2_wasm'].includes(game.engineType || '') ? (
               <UniversalWasmRunner
                 game={game}
@@ -499,19 +568,23 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
                 aspectRatio={aspectRatio}
               />
             ) : (!game.engineType || game.engineType === 'native_canvas') ? (
-              renderNativeGame()
+              <UniversalMouseOverlay onSendKey={sendKey} className="w-full h-full flex items-center justify-center">
+                {renderNativeGame()}
+              </UniversalMouseOverlay>
             ) : (
-              <div className="w-full h-full min-h-[560px] bg-black rounded-xl border border-slate-800 relative flex items-center justify-center overflow-hidden shadow-2xl">
-                {/* Embedded Real Game Frame */}
-                <iframe
-                  ref={iframeRef}
-                  title={game.title}
-                  src={game.binaryUrl || (game.romUrl && game.romUrl.startsWith('http') ? game.romUrl : `/games/web-runner.html?game=${encodeURIComponent(game.title)}`)}
-                  className="w-full h-full min-h-[560px] border-0 rounded-xl"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                  sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups"
-                />
-              </div>
+              <UniversalMouseOverlay onSendKey={sendKey} className="w-full h-full min-h-[560px]">
+                <div className="w-full h-full min-h-[560px] bg-black rounded-xl border border-slate-800 relative flex items-center justify-center overflow-hidden shadow-2xl">
+                  {/* Embedded Real Game Frame */}
+                  <iframe
+                    ref={iframeRef}
+                    title={game.title}
+                    src={game.binaryUrl || (game.romUrl && game.romUrl.startsWith('http') ? game.romUrl : `/games/web-runner.html?game=${encodeURIComponent(game.title)}`)}
+                    className="w-full h-full min-h-[560px] border-0 rounded-xl"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                    sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups"
+                  />
+                </div>
+              </UniversalMouseOverlay>
             )}
           </div>
         )}

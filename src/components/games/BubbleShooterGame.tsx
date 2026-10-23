@@ -64,7 +64,7 @@ export const BubbleShooterGame: React.FC<BubbleShooterProps> = ({ onScoreUpdate,
   }, []);
 
   // Aiming logic
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (gameState !== 'playing') return;
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -250,6 +250,17 @@ export const BubbleShooterGame: React.FC<BubbleShooterProps> = ({ onScoreUpdate,
       const sy = canvas.height - 30;
       const angle = shooterRef.current.angle;
 
+      // Trajectory Guide Line
+      ctx.save();
+      ctx.setLineDash([4, 6]);
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(sx + Math.cos(angle) * 160, sy - Math.sin(angle) * 160);
+      ctx.stroke();
+      ctx.restore();
+
       ctx.strokeStyle = '#38bdf8';
       ctx.lineWidth = 4;
       ctx.beginPath();
@@ -310,9 +321,10 @@ export const BubbleShooterGame: React.FC<BubbleShooterProps> = ({ onScoreUpdate,
           ref={canvasRef}
           width={320}
           height={460}
-          onMouseMove={handleMouseMove}
+          onPointerMove={handlePointerMove}
+          onPointerDown={handlePointerMove}
           onClick={handleShoot}
-          className="w-[300px] h-[430px] sm:w-[320px] sm:h-[460px] block cursor-crosshair"
+          className="w-[300px] h-[430px] sm:w-[320px] sm:h-[460px] block cursor-crosshair touch-none select-none"
         />
 
         {gameState !== 'playing' && (

@@ -142,8 +142,8 @@ export const StickmanArcherGame: React.FC<StickmanArcherGameProps> = ({
     sounds.playVictory();
   };
 
-  // Mouse & Touch Controls for Bow Aiming
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  // Mouse & Touch Pointer Controls for Bow Aiming
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!isPlaying || isGameOver) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -159,7 +159,7 @@ export const StickmanArcherGame: React.FC<StickmanArcherGameProps> = ({
     gameState.current.player.isAiming = true;
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!gameState.current.isDragging) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -177,7 +177,7 @@ export const StickmanArcherGame: React.FC<StickmanArcherGameProps> = ({
     gameState.current.player.power = Math.min(22, Math.hypot(dx, dy) * 0.18);
   };
 
-  const handleMouseUp = () => {
+  const handlePointerUp = () => {
     if (!gameState.current.isDragging) return;
     gameState.current.isDragging = false;
     gameState.current.player.isAiming = false;
@@ -524,10 +524,10 @@ export const StickmanArcherGame: React.FC<StickmanArcherGameProps> = ({
         ref={canvasRef}
         width={800}
         height={450}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        className="w-full h-full max-w-[800px] max-h-[450px] object-contain rounded-xl shadow-2xl cursor-crosshair"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        className="w-full h-full max-w-[800px] max-h-[450px] object-contain rounded-xl shadow-2xl cursor-crosshair touch-none select-none"
       />
 
       {(!isPlaying || isGameOver) && (

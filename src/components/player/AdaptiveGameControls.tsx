@@ -3,15 +3,16 @@ import {
   Gamepad2, 
   Smartphone, 
   Monitor, 
-  Sliders, 
-  RotateCcw, 
-  Check, 
-  Volume2, 
+  Sliders,
+  RotateCcw,
+  Check,
+  Volume2,
   VolumeX,
   Target,
   Sparkles,
   Zap,
-  Info
+  Info,
+  Mouse
 } from 'lucide-react';
 import { GameItem } from '../../types/game';
 import { useDeviceDetection } from '../../hooks/useDeviceDetection';
@@ -28,7 +29,7 @@ interface AdaptiveGameControlsProps {
   soundEnabled?: boolean;
 }
 
-type ControlMode = 'auto' | 'desktop' | 'gamepad' | 'mobile_keypad';
+type ControlMode = 'auto' | 'desktop' | 'gamepad' | 'mouse' | 'mobile_keypad';
 
 export const AdaptiveGameControls: React.FC<AdaptiveGameControlsProps> = ({
   game,
@@ -42,11 +43,11 @@ export const AdaptiveGameControls: React.FC<AdaptiveGameControlsProps> = ({
   const [selectedMode, setSelectedMode] = useState<ControlMode>('auto');
 
   // Determine effective mode based on auto-detection or manual user override
-  const isMobileFormat = ['jar', 'sis', 'j2me', 'symbian'].includes(format) || 
-                         game.engineType === 'j2me_wasm' || 
+  const isMobileFormat = ['jar', 'sis', 'j2me', 'symbian'].includes(format) ||
+                         game.engineType === 'j2me_wasm' ||
                          game.engineType === 'symbian_sis';
 
-  const effectiveMode: 'desktop' | 'gamepad' | 'mobile_keypad' = (() => {
+  const effectiveMode: 'desktop' | 'gamepad' | 'mouse' | 'mobile_keypad' = (() => {
     if (selectedMode !== 'auto') {
       return selectedMode;
     }
@@ -448,6 +449,18 @@ export const AdaptiveGameControls: React.FC<AdaptiveGameControlsProps> = ({
             >
               Gamepad
             </button>
+            <button
+              onClick={() => setSelectedMode('mouse')}
+              className={`px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                selectedMode === 'mouse'
+                  ? 'bg-white text-indigo-600 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+              title="Mouse gesture guide & clickable on-screen buttons"
+            >
+              <Mouse className="w-3 h-3" />
+              <span>Mouse</span>
+            </button>
             {isMobileFormat && (
               <button
                 onClick={() => setSelectedMode('mobile_keypad')}
@@ -507,6 +520,38 @@ export const AdaptiveGameControls: React.FC<AdaptiveGameControlsProps> = ({
             onButtonRelease={handleVirtualGamepadRelease}
             soundEnabled={soundEnabled}
           />
+        </div>
+      )}
+
+      {effectiveMode === 'mouse' && (
+        <div className="w-full max-w-4xl flex flex-col items-center gap-3 animate-in fade-in zoom-in duration-200">
+          {/* Mouse Play Guide */}
+          <div className="w-full bg-slate-50 border border-indigo-200/80 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-sm">
+                <Mouse className="w-4 h-4" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-800">Mouse Play Guide</h4>
+                <p className="text-[11px] text-slate-600 font-medium">
+                  🖱️ Click & Drag to Swipe/Steer | Left Click: Jump/Action | Right Click: Back
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-200">
+              <Sparkles className="w-3 h-3 text-indigo-500" />
+              <span>Drag screen or click on-screen buttons below</span>
+            </div>
+          </div>
+
+          {/* On-screen clickable Virtual Gamepad / Buttons for Mouse Users on Desktop */}
+          <div className="w-full max-w-3xl flex justify-center">
+            <VirtualGamepad
+              onButtonPress={handleVirtualGamepadPress}
+              onButtonRelease={handleVirtualGamepadRelease}
+              soundEnabled={soundEnabled}
+            />
+          </div>
         </div>
       )}
 

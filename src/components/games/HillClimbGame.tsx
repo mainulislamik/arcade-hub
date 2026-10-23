@@ -150,6 +150,59 @@ export const HillClimbGame: React.FC<HillClimbGameProps> = ({
     };
   }, [startGame]);
 
+  // Canvas Mouse & Pointer Controls (Left side = Brake, Right side = Gas)
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    let isPointerActive = false;
+
+    const updateControlsFromPointer = (clientX: number) => {
+      const rect = canvas.getBoundingClientRect();
+      const relativeX = clientX - rect.left;
+      if (relativeX < rect.width * 0.5) {
+        stateRef.current.brake = true;
+        stateRef.current.gas = false;
+      } else {
+        stateRef.current.gas = true;
+        stateRef.current.brake = false;
+      }
+    };
+
+    const handlePointerDown = (e: PointerEvent) => {
+      if (stateRef.current.gameState !== 'playing') {
+        startGame();
+        return;
+      }
+      isPointerActive = true;
+      updateControlsFromPointer(e.clientX);
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
+      if (!isPointerActive || stateRef.current.gameState !== 'playing') return;
+      updateControlsFromPointer(e.clientX);
+    };
+
+    const handlePointerUp = () => {
+      if (!isPointerActive) return;
+      isPointerActive = false;
+      stateRef.current.gas = false;
+      stateRef.current.brake = false;
+    };
+
+    canvas.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
+
+    return () => {
+      canvas.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
+    };
+  }, [startGame]);
+
   // Physics Simulation Loop
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -422,22 +475,32 @@ export const HillClimbGame: React.FC<HillClimbGameProps> = ({
         className="w-full h-full max-w-4xl max-h-[560px] object-contain rounded-2xl shadow-2xl"
       />
 
-      {/* Touch Pedals for Mobile / Touch Devices */}
+      {/* Pedals for Mouse & Touch Devices */}
       {gameState === 'playing' && (
         <div className="absolute bottom-4 left-4 right-4 z-20 flex justify-between pointer-events-auto">
           <button
-            onPointerDown={() => (stateRef.current.brake = true)}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              stateRef.current.brake = true;
+            }}
             onPointerUp={() => (stateRef.current.brake = false)}
-            className="w-24 h-24 rounded-3xl bg-rose-600/80 active:bg-rose-500 backdrop-blur-md flex flex-col items-center justify-center text-white text-xs font-black shadow-xl border-2 border-white/20 active:scale-95 transition-all"
+            onPointerLeave={() => (stateRef.current.brake = false)}
+            onPointerCancel={() => (stateRef.current.brake = false)}
+            className="w-24 h-24 rounded-3xl bg-rose-600/90 hover:bg-rose-500 active:bg-rose-400 backdrop-blur-md flex flex-col items-center justify-center text-white text-xs font-black shadow-2xl border-2 border-white/30 active:scale-95 transition-all select-none cursor-pointer"
           >
-            <Gauge className="w-6 h-6 mb-1" /> BRAKE
+            <Gauge className="w-7 h-7 mb-1" /> BRAKE
           </button>
           <button
-            onPointerDown={() => (stateRef.current.gas = true)}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              stateRef.current.gas = true;
+            }}
             onPointerUp={() => (stateRef.current.gas = false)}
-            className="w-24 h-24 rounded-3xl bg-emerald-600/80 active:bg-emerald-500 backdrop-blur-md flex flex-col items-center justify-center text-white text-xs font-black shadow-xl border-2 border-white/20 active:scale-95 transition-all"
+            onPointerLeave={() => (stateRef.current.gas = false)}
+            onPointerCancel={() => (stateRef.current.gas = false)}
+            className="w-24 h-24 rounded-3xl bg-emerald-600/90 hover:bg-emerald-500 active:bg-emerald-400 backdrop-blur-md flex flex-col items-center justify-center text-white text-xs font-black shadow-2xl border-2 border-white/30 active:scale-95 transition-all select-none cursor-pointer"
           >
-            <Zap className="w-6 h-6 mb-1" /> GAS
+            <Zap className="w-7 h-7 mb-1" /> GAS
           </button>
         </div>
       )}

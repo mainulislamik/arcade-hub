@@ -233,21 +233,19 @@ export const Game2048: React.FC<Game2048Props> = ({ onScoreUpdate }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [move]);
 
-  // Touch Swipe
-  const handleTouchStart = (e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  // Touch & Mouse Pointer Swipe
+  const handlePointerDown = (e: React.PointerEvent) => {
+    touchStartRef.current = { x: e.clientX, y: e.clientY };
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handlePointerUp = (e: React.PointerEvent) => {
     if (!touchStartRef.current) return;
-    const touch = e.changedTouches[0];
-    const dx = touch.clientX - touchStartRef.current.x;
-    const dy = touch.clientY - touchStartRef.current.y;
+    const dx = e.clientX - touchStartRef.current.x;
+    const dy = e.clientY - touchStartRef.current.y;
     const absX = Math.abs(dx);
     const absY = Math.abs(dy);
 
-    if (Math.max(absX, absY) > 30) {
+    if (Math.max(absX, absY) > 20) {
       if (absX > absY) {
         move(dx > 0 ? 'RIGHT' : 'LEFT');
       } else {
@@ -275,14 +273,14 @@ export const Game2048: React.FC<Game2048Props> = ({ onScoreUpdate }) => {
           <button
             onClick={undo}
             disabled={history.length === 0}
-            className="p-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-200 rounded-lg transition"
+            className="p-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-200 rounded-lg transition cursor-pointer"
             title="Undo"
           >
             <Undo2 className="w-4 h-4" />
           </button>
           <button
             onClick={initGame}
-            className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg transition"
+            className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg transition cursor-pointer"
             title="Restart"
           >
             <RotateCcw className="w-4 h-4" />
@@ -292,9 +290,9 @@ export const Game2048: React.FC<Game2048Props> = ({ onScoreUpdate }) => {
 
       {/* 2048 Grid Container */}
       <div
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        className="relative w-[340px] h-[340px] sm:w-[380px] sm:h-[380px] bg-slate-950 p-3 rounded-2xl border-2 border-slate-800 shadow-2xl flex flex-col justify-between"
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        className="relative w-[340px] h-[340px] sm:w-[380px] sm:h-[380px] bg-slate-950 p-3 rounded-2xl border-2 border-slate-800 shadow-2xl flex flex-col justify-between cursor-grab active:cursor-grabbing touch-none select-none"
       >
         {board.map((row, r) => (
           <div key={r} className="flex justify-between gap-2.5 h-[22%]">

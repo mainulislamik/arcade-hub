@@ -179,6 +179,94 @@ export const TempleDashGame: React.FC<TempleDashGameProps> = ({
     };
   }, []);
 
+  // Mouse & Pointer Drag/Click Controls
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    let startX = 0;
+    let startY = 0;
+    let isDragging = false;
+    let startTime = 0;
+
+    const handlePointerDown = (e: PointerEvent) => {
+      startX = e.clientX;
+      startY = e.clientY;
+      startTime = performance.now();
+      isDragging = true;
+    };
+
+    const handlePointerUp = (e: PointerEvent) => {
+      if (!isDragging) return;
+      isDragging = false;
+
+      if (stateRef.current.gameState !== 'playing') {
+        startGame();
+        return;
+      }
+
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      const dist = Math.hypot(dx, dy);
+      const duration = performance.now() - startTime;
+      const s = stateRef.current;
+
+      if (dist >= 20) {
+        if (Math.abs(dx) > Math.abs(dy)) {
+          // Horizontal drag: left/right lane
+          if (dx < 0 && s.playerLane > -1) {
+            s.playerLane--;
+            if (soundEnabled) sounds.playClick();
+          } else if (dx > 0 && s.playerLane < 1) {
+            s.playerLane++;
+            if (soundEnabled) sounds.playClick();
+          }
+        } else {
+          // Vertical drag: up jump, down slide
+          if (dy < 0 && !s.isJumping) {
+            s.isJumping = true;
+            s.velocityY = -16;
+            s.isSliding = false;
+            s.slideTimer = 0;
+            if (soundEnabled) sounds.playLaser();
+          } else if (dy > 0 && !s.isSliding) {
+            if (s.isJumping) {
+              s.velocityY = 18;
+            } else {
+              s.isSliding = true;
+              s.slideTimer = 35;
+              if (soundEnabled) sounds.playHit();
+            }
+          }
+        }
+      } else if (duration < 400) {
+        // Quick click tap without drag
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        if (clickX < rect.width * 0.42 && s.playerLane > -1) {
+          s.playerLane--;
+          if (soundEnabled) sounds.playClick();
+        } else if (clickX > rect.width * 0.58 && s.playerLane < 1) {
+          s.playerLane++;
+          if (soundEnabled) sounds.playClick();
+        } else if (!s.isJumping) {
+          s.isJumping = true;
+          s.velocityY = -16;
+          s.isSliding = false;
+          s.slideTimer = 0;
+          if (soundEnabled) sounds.playLaser();
+        }
+      }
+    };
+
+    canvas.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointerup', handlePointerUp);
+    return () => {
+      canvas.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('pointerup', handlePointerUp);
+    };
+  }, [startGame, soundEnabled]);
+
   // Main 3D Temple Loop
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -450,6 +538,62 @@ export const TempleDashGame: React.FC<TempleDashGameProps> = ({
         height={480}
         className="w-full h-full max-w-4xl max-h-[560px] object-contain rounded-2xl shadow-2xl"
       />
+
+      {/* On-Screen Clickable Game Controls for Mouse & Touch */}
+      {gameState === 'playing' && (
+        <div className="absolute bottom-4 left-4 right-4 z-20 flex justify-between pointer-events-auto opacity-80 hover:opacity-100 transition-opacity">
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                if (stateRef.current.playerLane > -1) {
+                  stateRef.current.playerLane--;
+                  if (soundEnabled) sounds.playClick();
+                }
+              }}
+              className="w-14 h-14 rounded-2xl bg-white/20 active:bg-white/40 backdrop-blur-md flex items-center justify-center text-white text-xl font-bold shadow-lg"
+            >
+              ◀
+            </button>
+            <button
+              onClick={() => {
+                if (stateRef.current.playerLane < 1) {
+                  stateRef.current.playerLane++;
+                  if (soundEnabled) sounds.playClick();
+                }
+              }}
+              className="w-14 h-14 rounded-2xl bg-white/20 active:bg-white/40 backdrop-blur-md flex items-center justify-center text-white text-xl font-bold shadow-lg"
+            >
+              ▶
+            </button>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                if (!stateRef.current.isJumping) {
+                  stateRef.current.isJumping = true;
+                  stateRef.current.velocityY = -16;
+                  if (soundEnabled) sounds.playLaser();
+                }
+              }}
+              className="w-14 h-14 rounded-2xl bg-emerald-600/80 active:bg-emerald-500 backdrop-blur-md flex items-center justify-center text-white text-sm font-black shadow-lg"
+            >
+              JUMP
+            </button>
+            <button
+              onClick={() => {
+                if (!stateRef.current.isSliding) {
+                  stateRef.current.isSliding = true;
+                  stateRef.current.slideTimer = 35;
+                  if (soundEnabled) sounds.playHit();
+                }
+              }}
+              className="w-14 h-14 rounded-2xl bg-teal-600/80 active:bg-teal-500 backdrop-blur-md flex items-center justify-center text-white text-sm font-black shadow-lg"
+            >
+              SLIDE
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Start / Game Over Overlay */}
       {gameState === 'menu' && (

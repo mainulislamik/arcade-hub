@@ -380,12 +380,72 @@ export const StickmanRunnerGame: React.FC<StickmanRunnerGameProps> = ({
         </div>
       </div>
 
+      {/* Main Canvas */}
       <canvas
         ref={canvasRef}
         width={800}
         height={450}
-        className="w-full h-full max-w-[800px] max-h-[450px] object-contain rounded-xl shadow-2xl"
+        onContextMenu={(e) => e.preventDefault()}
+        onPointerDown={(e) => {
+          if (!isPlaying || isGameOver) {
+            startGame();
+            return;
+          }
+          const state = gameState.current;
+          if (e.button === 2) {
+            // Right click = Slide
+            if (state.isGrounded) {
+              state.isSliding = true;
+              state.slideTimer = 25;
+              sounds.playClick();
+            }
+          } else {
+            // Left click = Jump / Double Jump
+            if (state.jumpCount < 2) {
+              state.playerVy = -13;
+              state.isGrounded = false;
+              state.isSliding = false;
+              state.jumpCount++;
+              sounds.playJump();
+            }
+          }
+        }}
+        className="w-full h-full max-w-[800px] max-h-[450px] object-contain rounded-xl shadow-2xl cursor-pointer touch-none select-none"
       />
+
+      {/* On-Screen Jump and Slide Controls */}
+      {isPlaying && !isGameOver && (
+        <div className="absolute bottom-4 left-6 right-6 z-10 flex justify-between pointer-events-auto opacity-80 hover:opacity-100 transition-opacity">
+          <button
+            onClick={() => {
+              const state = gameState.current;
+              if (state.isGrounded) {
+                state.isSliding = true;
+                state.slideTimer = 25;
+                sounds.playClick();
+              }
+            }}
+            className="w-16 h-16 rounded-2xl bg-teal-600/80 active:bg-teal-500 backdrop-blur-md flex items-center justify-center text-white text-sm font-black shadow-lg cursor-pointer"
+          >
+            SLIDE
+          </button>
+          <button
+            onClick={() => {
+              const state = gameState.current;
+              if (state.jumpCount < 2) {
+                state.playerVy = -13;
+                state.isGrounded = false;
+                state.isSliding = false;
+                state.jumpCount++;
+                sounds.playJump();
+              }
+            }}
+            className="w-16 h-16 rounded-2xl bg-cyan-600/80 active:bg-cyan-500 backdrop-blur-md flex items-center justify-center text-white text-sm font-black shadow-lg cursor-pointer"
+          >
+            JUMP
+          </button>
+        </div>
+      )}
 
       {(!isPlaying || isGameOver) && (
         <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center z-20 p-6 text-center animate-in fade-in duration-200">

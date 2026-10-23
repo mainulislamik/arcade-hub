@@ -235,6 +235,85 @@ export const Drift3DGame: React.FC<Drift3DGameProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
 
+    // Mouse & Pointer Drag/Move Controls
+    let isPointerDown = false;
+    let pointerStartX = 0;
+    let pointerStartY = 0;
+
+    const handlePointerDown = (e: PointerEvent) => {
+      if ((e.target as HTMLElement)?.closest('button, [role="button"]')) return;
+      isPointerDown = true;
+      pointerStartX = e.clientX;
+      pointerStartY = e.clientY;
+      if (stateRef.current.gameState !== 'playing') {
+        startGame();
+        return;
+      }
+      if (e.button === 0) {
+        stateRef.current.keys.forward = true;
+      } else if (e.button === 2) {
+        stateRef.current.keys.handbrake = true;
+      }
+    };
+
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
+      if (stateRef.current.gameState !== 'playing') return;
+      const rect = container.getBoundingClientRect();
+      const normalizedX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+
+      if (isPointerDown) {
+        const dx = e.clientX - pointerStartX;
+        const dy = e.clientY - pointerStartY;
+        if (dx < -15 || normalizedX < -0.2) {
+          stateRef.current.keys.left = true;
+          stateRef.current.keys.right = false;
+        } else if (dx > 15 || normalizedX > 0.2) {
+          stateRef.current.keys.right = true;
+          stateRef.current.keys.left = false;
+        } else {
+          stateRef.current.keys.left = false;
+          stateRef.current.keys.right = false;
+        }
+        if (dy > 30) {
+          stateRef.current.keys.backward = true;
+          stateRef.current.keys.forward = false;
+        } else if (dy < -20) {
+          stateRef.current.keys.forward = true;
+          stateRef.current.keys.backward = false;
+        }
+      } else {
+        if (normalizedX < -0.3) {
+          stateRef.current.keys.left = true;
+          stateRef.current.keys.right = false;
+        } else if (normalizedX > 0.3) {
+          stateRef.current.keys.right = true;
+          stateRef.current.keys.left = false;
+        } else {
+          stateRef.current.keys.left = false;
+          stateRef.current.keys.right = false;
+        }
+      }
+    };
+
+    const handlePointerUp = () => {
+      isPointerDown = false;
+      stateRef.current.keys.left = false;
+      stateRef.current.keys.right = false;
+      stateRef.current.keys.forward = false;
+      stateRef.current.keys.backward = false;
+      stateRef.current.keys.handbrake = false;
+    };
+
+    container.addEventListener('pointerdown', handlePointerDown);
+    container.addEventListener('contextmenu', handleContextMenu);
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
+
     // Animation Loop
     let animationFrameId: number;
     let lastTime = performance.now();
@@ -359,6 +438,11 @@ export const Drift3DGame: React.FC<Drift3DGameProps> = ({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('resize', handleResize);
+      container.removeEventListener('pointerdown', handlePointerDown);
+      container.removeEventListener('contextmenu', handleContextMenu);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
       renderer.dispose();
     };
   }, [startGame, onScoreUpdate]);
@@ -403,21 +487,23 @@ export const Drift3DGame: React.FC<Drift3DGameProps> = ({
         </div>
       </div>
 
-      {/* Touch On-Screen Controls for Mobile */}
+      {/* Clickable On-Screen Controls for Mouse & Touch */}
       {gameState === 'playing' && (
-        <div className="md:hidden absolute bottom-6 left-0 right-0 px-6 flex justify-between pointer-events-auto z-10">
+        <div className="absolute bottom-6 left-0 right-0 px-6 flex justify-between pointer-events-auto z-10 opacity-80 hover:opacity-100 transition-opacity">
           <div className="flex gap-2">
             <button
               onPointerDown={() => { stateRef.current.keys.left = true; }}
               onPointerUp={() => { stateRef.current.keys.left = false; }}
-              className="w-16 h-16 bg-slate-900/80 border border-cyan-500/40 rounded-2xl text-cyan-400 text-xl font-black"
+              onPointerLeave={() => { stateRef.current.keys.left = false; }}
+              className="w-16 h-16 bg-slate-900/80 hover:bg-slate-800 border border-cyan-500/40 rounded-2xl text-cyan-400 text-xl font-black active:scale-95 transition-all cursor-pointer select-none shadow-lg"
             >
               ◀
             </button>
             <button
               onPointerDown={() => { stateRef.current.keys.right = true; }}
               onPointerUp={() => { stateRef.current.keys.right = false; }}
-              className="w-16 h-16 bg-slate-900/80 border border-cyan-500/40 rounded-2xl text-cyan-400 text-xl font-black"
+              onPointerLeave={() => { stateRef.current.keys.right = false; }}
+              className="w-16 h-16 bg-slate-900/80 hover:bg-slate-800 border border-cyan-500/40 rounded-2xl text-cyan-400 text-xl font-black active:scale-95 transition-all cursor-pointer select-none shadow-lg"
             >
               ▶
             </button>
@@ -426,14 +512,16 @@ export const Drift3DGame: React.FC<Drift3DGameProps> = ({
             <button
               onPointerDown={() => { stateRef.current.keys.forward = true; }}
               onPointerUp={() => { stateRef.current.keys.forward = false; }}
-              className="w-16 h-16 bg-emerald-950/80 border border-emerald-500/40 rounded-2xl text-emerald-400 text-sm font-black"
+              onPointerLeave={() => { stateRef.current.keys.forward = false; }}
+              className="w-16 h-16 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 rounded-2xl text-emerald-400 text-sm font-black active:scale-95 transition-all cursor-pointer select-none shadow-lg"
             >
               GAS
             </button>
             <button
               onPointerDown={() => { stateRef.current.keys.handbrake = true; }}
               onPointerUp={() => { stateRef.current.keys.handbrake = false; }}
-              className="w-16 h-16 bg-red-950/80 border border-red-500/40 rounded-2xl text-red-400 text-xs font-black"
+              onPointerLeave={() => { stateRef.current.keys.handbrake = false; }}
+              className="w-16 h-16 bg-red-950/80 hover:bg-red-900 border border-red-500/40 rounded-2xl text-red-400 text-xs font-black active:scale-95 transition-all cursor-pointer select-none shadow-lg"
             >
               DRIFT
             </button>

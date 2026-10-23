@@ -693,8 +693,123 @@ export const StickmanFighterGame: React.FC<StickmanFighterGameProps> = ({
         ref={canvasRef}
         width={800}
         height={450}
-        className="w-full h-full max-w-[800px] max-h-[450px] object-contain rounded-xl shadow-2xl"
+        onContextMenu={(e) => e.preventDefault()}
+        onPointerDown={(e) => {
+          if (!isPlaying || isGameOver) return;
+          const player = gameState.current.player;
+          if (player.state === 'dead' || player.state === 'hit' || player.isAttacking) return;
+
+          if (e.button === 2) {
+            // Right click = Kick
+            player.isAttacking = true;
+            player.state = 'kick';
+            player.animTimer = 16;
+            player.vx = player.facing === 'right' ? 6 : -6;
+            sounds.playLaser();
+          } else {
+            // Left click = Punch
+            player.isAttacking = true;
+            player.state = 'punch';
+            player.animTimer = 12;
+            player.comboStep = (player.comboStep % 3) + 1;
+            player.vx = player.facing === 'right' ? 4 : -4;
+            sounds.playShoot();
+          }
+        }}
+        className="w-full h-full max-w-[800px] max-h-[450px] object-contain rounded-xl shadow-2xl cursor-pointer touch-none select-none"
       />
+
+      {/* On-Screen Clickable Controls for Mouse & Touch */}
+      {isPlaying && !isGameOver && (
+        <div className="absolute bottom-3 left-4 right-4 z-10 flex justify-between pointer-events-auto opacity-80 hover:opacity-100 transition-opacity">
+          {/* Movement */}
+          <div className="flex gap-2">
+            <button
+              onPointerDown={() => { gameState.current.keys['a'] = true; }}
+              onPointerUp={() => { gameState.current.keys['a'] = false; }}
+              onPointerLeave={() => { gameState.current.keys['a'] = false; }}
+              className="w-12 h-12 rounded-xl bg-slate-900/80 active:bg-slate-700 border border-slate-700 flex items-center justify-center text-white text-lg font-bold shadow-lg cursor-pointer"
+            >
+              ◀
+            </button>
+            <button
+              onPointerDown={() => { gameState.current.keys['d'] = true; }}
+              onPointerUp={() => { gameState.current.keys['d'] = false; }}
+              onPointerLeave={() => { gameState.current.keys['d'] = false; }}
+              className="w-12 h-12 rounded-xl bg-slate-900/80 active:bg-slate-700 border border-slate-700 flex items-center justify-center text-white text-lg font-bold shadow-lg cursor-pointer"
+            >
+              ▶
+            </button>
+            <button
+              onClick={() => {
+                const player = gameState.current.player;
+                if (player.isGrounded) {
+                  player.vy = -13;
+                  player.isGrounded = false;
+                  player.state = 'jump';
+                  sounds.playJump();
+                }
+              }}
+              className="w-12 h-12 rounded-xl bg-slate-900/80 active:bg-slate-700 border border-slate-700 flex items-center justify-center text-white text-xs font-bold shadow-lg cursor-pointer"
+            >
+              JUMP
+            </button>
+          </div>
+
+          {/* Attacks */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                const player = gameState.current.player;
+                if (!player.isAttacking) {
+                  player.isAttacking = true;
+                  player.state = 'punch';
+                  player.animTimer = 12;
+                  player.comboStep = (player.comboStep % 3) + 1;
+                  player.vx = player.facing === 'right' ? 4 : -4;
+                  sounds.playShoot();
+                }
+              }}
+              className="w-12 h-12 rounded-xl bg-amber-600/80 active:bg-amber-500 border border-amber-400/50 flex items-center justify-center text-white text-xs font-bold shadow-lg cursor-pointer"
+            >
+              PUNCH
+            </button>
+            <button
+              onClick={() => {
+                const player = gameState.current.player;
+                if (!player.isAttacking) {
+                  player.isAttacking = true;
+                  player.state = 'kick';
+                  player.animTimer = 16;
+                  player.vx = player.facing === 'right' ? 6 : -6;
+                  sounds.playLaser();
+                }
+              }}
+              className="w-12 h-12 rounded-xl bg-rose-600/80 active:bg-rose-500 border border-rose-400/50 flex items-center justify-center text-white text-xs font-bold shadow-lg cursor-pointer"
+            >
+              KICK
+            </button>
+            <button
+              onClick={() => {
+                const player = gameState.current.player;
+                if (gameState.current.specialEnergy >= 50) {
+                  player.isAttacking = true;
+                  player.state = 'slash';
+                  player.animTimer = 22;
+                  gameState.current.specialEnergy = Math.max(0, gameState.current.specialEnergy - 50);
+                  setSpecialEnergy(gameState.current.specialEnergy);
+                  gameState.current.screenShake = 15;
+                  sounds.playExplosion();
+                  sounds.announceVoice('DRAGON SLASH!');
+                }
+              }}
+              className="w-12 h-12 rounded-xl bg-sky-600/80 active:bg-sky-500 border border-sky-400/50 flex items-center justify-center text-white text-[10px] font-black shadow-lg cursor-pointer"
+            >
+              SLASH
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Start / Game Over Overlay */}
       {(!isPlaying || isGameOver) && (

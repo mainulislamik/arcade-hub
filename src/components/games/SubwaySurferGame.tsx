@@ -222,6 +222,110 @@ export const SubwaySurferGame: React.FC<SubwaySurferGameProps> = ({
     };
   }, [soundEnabled]);
 
+  // Mouse & Pointer Drag/Click Controls
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    let startX = 0;
+    let startY = 0;
+    let startTime = 0;
+    let isDragging = false;
+    let lastClickTime = 0;
+
+    const handlePointerDown = (e: PointerEvent) => {
+      startX = e.clientX;
+      startY = e.clientY;
+      startTime = performance.now();
+      isDragging = true;
+    };
+
+    const handlePointerUp = (e: PointerEvent) => {
+      if (!isDragging) return;
+      isDragging = false;
+
+      if (stateRef.current.gameState !== 'playing') {
+        startGame();
+        return;
+      }
+
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      const dist = Math.hypot(dx, dy);
+      const duration = performance.now() - startTime;
+      const s = stateRef.current;
+
+      // Drag gesture (> 20px)
+      if (dist >= 20) {
+        if (Math.abs(dx) > Math.abs(dy)) {
+          // Horizontal drag: left or right lane switch
+          if (dx < 0 && s.playerTrack > 0) {
+            s.playerTrack--;
+            if (soundEnabled) sounds.playClick();
+          } else if (dx > 0 && s.playerTrack < 2) {
+            s.playerTrack++;
+            if (soundEnabled) sounds.playClick();
+          }
+        } else {
+          // Vertical drag: up jump, down roll
+          if (dy < 0 && !s.isJumping) {
+            s.isJumping = true;
+            s.velocityY = -16;
+            s.isRolling = false;
+            s.rollTimer = 0;
+            if (soundEnabled) sounds.playLaser();
+          } else if (dy > 0 && !s.isRolling) {
+            if (s.isJumping) {
+              s.velocityY = 18;
+            } else {
+              s.isRolling = true;
+              s.rollTimer = 35;
+              if (soundEnabled) sounds.playHit();
+            }
+          }
+        }
+      } else if (duration < 400) {
+        // Quick click tap without drag
+        const now = performance.now();
+        const isDoubleClick = now - lastClickTime < 320;
+        lastClickTime = now;
+
+        if (isDoubleClick && !s.isJumping) {
+          // Double-click jumps
+          s.isJumping = true;
+          s.velocityY = -16;
+          s.isRolling = false;
+          s.rollTimer = 0;
+          if (soundEnabled) sounds.playLaser();
+        } else {
+          // Single click: left half moves left, right half moves right, center jumps
+          const rect = canvas.getBoundingClientRect();
+          const clickX = e.clientX - rect.left;
+          if (clickX < rect.width * 0.42 && s.playerTrack > 0) {
+            s.playerTrack--;
+            if (soundEnabled) sounds.playClick();
+          } else if (clickX > rect.width * 0.58 && s.playerTrack < 2) {
+            s.playerTrack++;
+            if (soundEnabled) sounds.playClick();
+          } else if (!s.isJumping) {
+            s.isJumping = true;
+            s.velocityY = -16;
+            s.isRolling = false;
+            s.rollTimer = 0;
+            if (soundEnabled) sounds.playLaser();
+          }
+        }
+      }
+    };
+
+    canvas.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointerup', handlePointerUp);
+    return () => {
+      canvas.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('pointerup', handlePointerUp);
+    };
+  }, [startGame, soundEnabled]);
+
   // Main 3D Subway Game Loop
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -728,9 +832,9 @@ export const SubwaySurferGame: React.FC<SubwaySurferGameProps> = ({
         className="w-full h-full max-w-4xl max-h-[560px] object-contain rounded-2xl shadow-2xl"
       />
 
-      {/* Touch D-Pad / Buttons for Mobile */}
+      {/* On-Screen Clickable Game Controls for Mouse & Touch */}
       {gameState === 'playing' && (
-        <div className="absolute bottom-4 left-4 right-4 z-20 flex justify-between pointer-events-auto md:hidden">
+        <div className="absolute bottom-4 left-4 right-4 z-20 flex justify-between pointer-events-auto opacity-80 hover:opacity-100 transition-opacity">
           <div className="flex gap-2">
             <button
               onClick={() => {

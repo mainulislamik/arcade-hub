@@ -235,20 +235,43 @@ export const Slope3DGame: React.FC<Slope3DGameProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
 
-    // Touch Controls
-    let touchStartX = 0;
-    const handleTouchStart = (e: TouchEvent) => {
-      if (e.touches.length > 0) {
-        touchStartX = e.touches[0].clientX;
+    // Pointer & Mouse Controls for Steering
+    let isPointerDown = false;
+    let pointerStartX = 0;
+
+    const handlePointerDown = (e: PointerEvent) => {
+      // Don't intercept UI clicks
+      if ((e.target as HTMLElement)?.closest('button, [role="button"]')) return;
+      isPointerDown = true;
+      pointerStartX = e.clientX;
+      if (stateRef.current.gameState !== 'playing') {
+        startGame();
       }
     };
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length > 0) {
-        const dx = e.touches[0].clientX - touchStartX;
-        if (dx < -15) {
+
+    const handlePointerMove = (e: PointerEvent) => {
+      if (stateRef.current.gameState !== 'playing') return;
+      const rect = container.getBoundingClientRect();
+      const normalizedX = ((e.clientX - rect.left) / rect.width) * 2 - 1; // -1 to +1
+
+      if (isPointerDown) {
+        const dx = e.clientX - pointerStartX;
+        if (dx < -15 || normalizedX < -0.2) {
           stateRef.current.keys.left = true;
           stateRef.current.keys.right = false;
-        } else if (dx > 15) {
+        } else if (dx > 15 || normalizedX > 0.2) {
+          stateRef.current.keys.right = true;
+          stateRef.current.keys.left = false;
+        } else {
+          stateRef.current.keys.left = false;
+          stateRef.current.keys.right = false;
+        }
+      } else {
+        // Hover steering when mouse moves across canvas
+        if (normalizedX < -0.25) {
+          stateRef.current.keys.left = true;
+          stateRef.current.keys.right = false;
+        } else if (normalizedX > 0.25) {
           stateRef.current.keys.right = true;
           stateRef.current.keys.left = false;
         } else {
@@ -257,14 +280,17 @@ export const Slope3DGame: React.FC<Slope3DGameProps> = ({
         }
       }
     };
-    const handleTouchEnd = () => {
+
+    const handlePointerUp = () => {
+      isPointerDown = false;
       stateRef.current.keys.left = false;
       stateRef.current.keys.right = false;
     };
 
-    container.addEventListener('touchstart', handleTouchStart);
-    container.addEventListener('touchmove', handleTouchMove);
-    container.addEventListener('touchend', handleTouchEnd);
+    container.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
 
     // Game Loop
     let animationFrameId: number;
@@ -426,9 +452,10 @@ export const Slope3DGame: React.FC<Slope3DGameProps> = ({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('resize', handleResize);
-      container.removeEventListener('touchstart', handleTouchStart);
-      container.removeEventListener('touchmove', handleTouchMove);
-      container.removeEventListener('touchend', handleTouchEnd);
+      container.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
       renderer.dispose();
     };
   }, [startGame, onScoreUpdate, onGameOver]);
@@ -466,14 +493,14 @@ export const Slope3DGame: React.FC<Slope3DGameProps> = ({
         </div>
       </div>
 
-      {/* Touch On-Screen Controls for Mobile */}
+      {/* Clickable On-Screen Controls for Mouse & Touch */}
       {gameState === 'playing' && (
-        <div className="md:hidden absolute bottom-6 left-0 right-0 px-6 flex justify-between pointer-events-auto z-10">
+        <div className="absolute bottom-6 left-0 right-0 px-6 flex justify-between pointer-events-auto z-10 opacity-75 hover:opacity-100 transition-opacity">
           <button
             onPointerDown={() => { stateRef.current.keys.left = true; }}
             onPointerUp={() => { stateRef.current.keys.left = false; }}
             onPointerLeave={() => { stateRef.current.keys.left = false; }}
-            className="w-20 h-20 bg-slate-900/80 backdrop-blur-md border-2 border-cyan-500/50 rounded-2xl flex items-center justify-center text-cyan-400 text-2xl font-black active:scale-95 shadow-xl shadow-cyan-500/20"
+            className="w-20 h-20 bg-slate-900/80 hover:bg-slate-800 backdrop-blur-md border-2 border-cyan-500/50 rounded-2xl flex items-center justify-center text-cyan-400 text-2xl font-black active:scale-95 shadow-xl shadow-cyan-500/20 cursor-pointer select-none"
           >
             ◀
           </button>
@@ -481,7 +508,7 @@ export const Slope3DGame: React.FC<Slope3DGameProps> = ({
             onPointerDown={() => { stateRef.current.keys.right = true; }}
             onPointerUp={() => { stateRef.current.keys.right = false; }}
             onPointerLeave={() => { stateRef.current.keys.right = false; }}
-            className="w-20 h-20 bg-slate-900/80 backdrop-blur-md border-2 border-cyan-500/50 rounded-2xl flex items-center justify-center text-cyan-400 text-2xl font-black active:scale-95 shadow-xl shadow-cyan-500/20"
+            className="w-20 h-20 bg-slate-900/80 hover:bg-slate-800 backdrop-blur-md border-2 border-cyan-500/50 rounded-2xl flex items-center justify-center text-cyan-400 text-2xl font-black active:scale-95 shadow-xl shadow-cyan-500/20 cursor-pointer select-none"
           >
             ▶
           </button>

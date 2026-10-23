@@ -1,8 +1,9 @@
 export type GameCategory = 'all' | 'arcade' | 'puzzle' | 'retro' | 'action' | 'strategy' | 'word' | 'driving' | 'shooting' | 'favorites' | 'playstation' | 'ps2' | 'ps3' | 'psp';
 
-export type GameEngineType = 
-  | 'native_canvas' 
-  | 'java_j2me' 
+export type GameEngineType =
+  | 'native_canvas'
+  | 'canvas_native'
+  | 'java_j2me'
   | 'retro_dos' 
   | 'wasm_emulator' 
   | 'iframe_web'

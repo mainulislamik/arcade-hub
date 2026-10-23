@@ -18,6 +18,7 @@ import { sounds } from '../../utils/soundEngine';
 import { HapticEngine } from '../../utils/hapticEngine';
 import { EcoEngine } from '../../utils/ecoEngine';
 import { AdaptiveGameControls } from './AdaptiveGameControls';
+import { UniversalMouseOverlay } from './UniversalMouseOverlay';
 import {
   resolveRomWithMirrors,
   revokeRomBlobUrl,
@@ -1206,131 +1207,133 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
       onPointerDown={ensureAudioAndFocus}
       onClick={ensureAudioAndFocus}
     >
-      {/* Emulator Canvas Display Area */}
-      <div
-        className="w-full flex-1 h-full min-h-[580px] flex items-center justify-center relative overflow-hidden bg-black"
-        onPointerDown={ensureAudioAndFocus}
-        onClick={ensureAudioAndFocus}
-      >
+      {/* Emulator Canvas Display Area with Universal Mouse & Gesture Overlay */}
+      <UniversalMouseOverlay onSendKey={sendKey} className="w-full flex-1 h-full min-h-[580px]">
         <div
-          style={getAspectRatioStyle(selectedRatio)}
-          className="w-full h-full flex items-center justify-center relative [image-rendering:pixelated] [image-rendering:crisp-edges]"
+          className="w-full h-full min-h-[580px] flex items-center justify-center relative overflow-hidden bg-black"
+          onPointerDown={ensureAudioAndFocus}
+          onClick={ensureAudioAndFocus}
         >
-          <iframe
-            key={`${game.id}-${selectedRatio}-${reloadKey}`}
-            ref={iframeRef}
-            srcDoc={buildEmulatorDoc()}
-            title={game.title}
-            className="w-full h-full border-0 bg-slate-950 [image-rendering:pixelated] [image-rendering:crisp-edges]"
-            allow="autoplay; fullscreen; gamepad; accelerometer; gyroscope"
-            sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-forms allow-modals"
-            onLoad={() => {
-              setIsLoading(false);
-              ensureAudioAndFocus();
-            }}
-          />
-        </div>
-
-        {isLoading && (
-          <div className="absolute inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center z-20 p-6">
-            {(format === 'jar' || game.engineType === 'j2me_wasm' || game.engineType === 'java_j2me') ? (
-              <div className="flex flex-col items-center max-w-sm w-full bg-slate-900/90 border border-amber-500/40 rounded-2xl p-6 shadow-2xl text-center">
-                <div className="w-12 h-12 rounded-full border-4 border-amber-500/20 border-t-amber-500 animate-spin mb-4" />
-                <h4 className="text-base font-bold text-amber-400 mb-1">Initializing Java Virtual Machine (CheerpJ)...</h4>
-                <p className="text-xs text-slate-300 font-mono mb-4">
-                  {downloadStatus || 'Booting FreeJ2ME Java runtime and compiling bytecode...'}
-                </p>
-                <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
-                  <div className="h-full bg-gradient-to-r from-amber-500 to-rose-500 rounded-full animate-pulse w-full" />
-                </div>
-                <span className="text-[11px] text-slate-400 mt-3">Authentic Nokia / Symbian Java Engine</span>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center max-w-sm w-full bg-slate-900/90 border border-cyan-500/40 rounded-2xl p-6 shadow-2xl text-center">
-                <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4" />
-                <span className="text-sm font-bold text-cyan-400">Booting Multi-Core WASM Runtime...</span>
-                {downloadStatus && (
-                  <span className="text-xs text-slate-300 mt-2 font-mono animate-pulse">{downloadStatus}</span>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Floating Quick Controls inside Player */}
-        <div className="absolute top-4 right-4 flex items-center gap-2 z-10 opacity-80 hover:opacity-100 transition-opacity flex-wrap justify-end">
-          {/* Quick Control: Switch Mirror */}
-          <button
-            onClick={handleSwitchMirror}
-            disabled={totalMirrors <= 1 && !isFromCache}
-            className="bg-white/95 backdrop-blur-md hover:bg-slate-100 disabled:opacity-50 text-slate-700 hover:text-indigo-600 rounded-lg px-2.5 py-1.5 text-xs font-bold border border-slate-300 hover:border-indigo-400 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm disabled:cursor-not-allowed"
-            title={
-              isFromCache
-                ? 'Stored in IndexedDB (Click to switch to fresh mirror)'
-                : totalMirrors > 1
-                  ? `Switch to next mirror (${mirrorIndex + 1}/${totalMirrors})`
-                  : 'Single mirror source'
-            }
+          <div
+            style={getAspectRatioStyle(selectedRatio)}
+            className="w-full h-full flex items-center justify-center relative [image-rendering:pixelated] [image-rendering:crisp-edges]"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>{isFromCache ? 'Cached ROM' : `Mirror ${mirrorIndex + 1}/${totalMirrors}`}</span>
-          </button>
-
-          {/* Quick Control: Reload / Reset Game */}
-          <button
-            onClick={handleResetGame}
-            className="bg-white/95 backdrop-blur-md hover:bg-slate-100 text-slate-700 hover:text-indigo-600 rounded-lg px-2.5 py-1.5 text-xs font-bold border border-slate-300 hover:border-indigo-400 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
-            title="Reload / Reset Game"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Reset</span>
-          </button>
-
-          {['jar', 'sis'].includes(format) && (
-            <button
-              onClick={() => {
-                HapticEngine.lightTick();
-                setShowTouchKeypad(!showTouchKeypad);
+            <iframe
+              key={`${game.id}-${selectedRatio}-${reloadKey}`}
+              ref={iframeRef}
+              srcDoc={buildEmulatorDoc()}
+              title={game.title}
+              className="w-full h-full border-0 bg-slate-950 [image-rendering:pixelated] [image-rendering:crisp-edges]"
+              allow="autoplay; fullscreen; gamepad; accelerometer; gyroscope"
+              sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-forms allow-modals"
+              onLoad={() => {
+                setIsLoading(false);
+                ensureAudioAndFocus();
               }}
-              className={`backdrop-blur-md rounded-lg px-2.5 py-1.5 text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${
-                showTouchKeypad
-                  ? 'bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/30'
-                  : 'bg-white/95 hover:bg-slate-100 text-slate-700 border-slate-300 shadow-sm'
-              }`}
-              title="Toggle Virtual Phone Keypad"
-            >
-              <Smartphone className="w-3.5 h-3.5" />
-              <span>{showTouchKeypad ? 'Hide Keypad' : 'Virtual Keypad'}</span>
-            </button>
+            />
+          </div>
+
+          {isLoading && (
+            <div className="absolute inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center z-20 p-6">
+              {(format === 'jar' || game.engineType === 'j2me_wasm' || game.engineType === 'java_j2me') ? (
+                <div className="flex flex-col items-center max-w-sm w-full bg-slate-900/90 border border-amber-500/40 rounded-2xl p-6 shadow-2xl text-center">
+                  <div className="w-12 h-12 rounded-full border-4 border-amber-500/20 border-t-amber-500 animate-spin mb-4" />
+                  <h4 className="text-base font-bold text-amber-400 mb-1">Initializing Java Virtual Machine (CheerpJ)...</h4>
+                  <p className="text-xs text-slate-300 font-mono mb-4">
+                    {downloadStatus || 'Booting FreeJ2ME Java runtime and compiling bytecode...'}
+                  </p>
+                  <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
+                    <div className="h-full bg-gradient-to-r from-amber-500 to-rose-500 rounded-full animate-pulse w-full" />
+                  </div>
+                  <span className="text-[11px] text-slate-400 mt-3">Authentic Nokia / Symbian Java Engine</span>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center max-w-sm w-full bg-slate-900/90 border border-cyan-500/40 rounded-2xl p-6 shadow-2xl text-center">
+                  <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4" />
+                  <span className="text-sm font-bold text-cyan-400">Booting Multi-Core WASM Runtime...</span>
+                  {downloadStatus && (
+                    <span className="text-xs text-slate-300 mt-2 font-mono animate-pulse">{downloadStatus}</span>
+                  )}
+                </div>
+              )}
+            </div>
           )}
 
-          <select
-            value={selectedRatio}
-            onChange={(e) => {
-              HapticEngine.lightTick();
-              setSelectedRatio(e.target.value);
-            }}
-            className="bg-white/95 backdrop-blur-md text-slate-800 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-indigo-500 cursor-pointer font-bold shadow-sm"
-          >
-            <option value="16:9">🖥️ Widescreen HD (16:9)</option>
-            <option value="4:3">🕹️ Classic Arcade (4:3)</option>
-            <option value="3:2">🎮 Handheld GBA (3:2)</option>
-            <option value="fill">🔲 Stretch Fill (100%)</option>
-            <option value="3:4">📱 Retro Nokia (3:4)</option>
-            <option value="auto">⚡ Auto Fit</option>
-          </select>
-          <button
-            onClick={() => {
-              HapticEngine.selectionClick();
-              toggleFullscreen();
-            }}
-            className="bg-white/95 backdrop-blur-md hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 rounded-lg p-2 border border-slate-300 hover:border-indigo-400 transition-all cursor-pointer shadow-sm"
-            title="Toggle Fullscreen"
-          >
-            <Maximize2 className="w-4 h-4" />
-          </button>
+          {/* Floating Quick Controls inside Player */}
+          <div className="absolute top-4 right-4 flex items-center gap-2 z-10 opacity-80 hover:opacity-100 transition-opacity flex-wrap justify-end">
+            {/* Quick Control: Switch Mirror */}
+            <button
+              onClick={handleSwitchMirror}
+              disabled={totalMirrors <= 1 && !isFromCache}
+              className="bg-white/95 backdrop-blur-md hover:bg-slate-100 disabled:opacity-50 text-slate-700 hover:text-indigo-600 rounded-lg px-2.5 py-1.5 text-xs font-bold border border-slate-300 hover:border-indigo-400 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm disabled:cursor-not-allowed"
+              title={
+                isFromCache
+                  ? 'Stored in IndexedDB (Click to switch to fresh mirror)'
+                  : totalMirrors > 1
+                    ? `Switch to next mirror (${mirrorIndex + 1}/${totalMirrors})`
+                    : 'Single mirror source'
+              }
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>{isFromCache ? 'Cached ROM' : `Mirror ${mirrorIndex + 1}/${totalMirrors}`}</span>
+            </button>
+
+            {/* Quick Control: Reload / Reset Game */}
+            <button
+              onClick={handleResetGame}
+              className="bg-white/95 backdrop-blur-md hover:bg-slate-100 text-slate-700 hover:text-indigo-600 rounded-lg px-2.5 py-1.5 text-xs font-bold border border-slate-300 hover:border-indigo-400 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+              title="Reload / Reset Game"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Reset</span>
+            </button>
+
+            {['jar', 'sis'].includes(format) && (
+              <button
+                onClick={() => {
+                  HapticEngine.lightTick();
+                  setShowTouchKeypad(!showTouchKeypad);
+                }}
+                className={`backdrop-blur-md rounded-lg px-2.5 py-1.5 text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${
+                  showTouchKeypad
+                    ? 'bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/30'
+                    : 'bg-white/95 hover:bg-slate-100 text-slate-700 border-slate-300 shadow-sm'
+                }`}
+                title="Toggle Virtual Phone Keypad"
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                <span>{showTouchKeypad ? 'Hide Keypad' : 'Virtual Keypad'}</span>
+              </button>
+            )}
+
+            <select
+              value={selectedRatio}
+              onChange={(e) => {
+                HapticEngine.lightTick();
+                setSelectedRatio(e.target.value);
+              }}
+              className="bg-white/95 backdrop-blur-md text-slate-800 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-indigo-500 cursor-pointer font-bold shadow-sm"
+            >
+              <option value="16:9">🖥️ Widescreen HD (16:9)</option>
+              <option value="4:3">🕹️ Classic Arcade (4:3)</option>
+              <option value="3:2">🎮 Handheld GBA (3:2)</option>
+              <option value="fill">🔲 Stretch Fill (100%)</option>
+              <option value="3:4">📱 Retro Nokia (3:4)</option>
+              <option value="auto">⚡ Auto Fit</option>
+            </select>
+            <button
+              onClick={() => {
+                HapticEngine.selectionClick();
+                toggleFullscreen();
+              }}
+              className="bg-white/95 backdrop-blur-md hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 rounded-lg p-2 border border-slate-300 hover:border-indigo-400 transition-all cursor-pointer shadow-sm"
+              title="Toggle Fullscreen"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-      </div>
+      </UniversalMouseOverlay>
 
       {/* Adaptive Device-Aware Game Console & Controls */}
       <AdaptiveGameControls

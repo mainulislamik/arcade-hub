@@ -117,7 +117,7 @@ export const StickmanSniperGame: React.FC<StickmanSniperGameProps> = ({
     sounds.playVictory();
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
@@ -130,8 +130,9 @@ export const StickmanSniperGame: React.FC<StickmanSniperGameProps> = ({
     setScopePos({ x, y });
   };
 
-  const handleMouseDown = () => {
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!isPlaying || isGameOver) return;
+    handlePointerMove(e);
     const state = gameState.current;
     if (state.bullets <= 0) return;
 
@@ -414,9 +415,9 @@ export const StickmanSniperGame: React.FC<StickmanSniperGameProps> = ({
         ref={canvasRef}
         width={800}
         height={450}
-        onMouseMove={handleMouseMove}
-        onMouseDown={handleMouseDown}
-        className="w-full h-full max-w-[800px] max-h-[450px] object-contain rounded-xl shadow-2xl cursor-none"
+        onPointerMove={handlePointerMove}
+        onPointerDown={handlePointerDown}
+        className="w-full h-full max-w-[800px] max-h-[450px] object-contain rounded-xl shadow-2xl cursor-none touch-none select-none"
       />
 
       {(!isPlaying || isGameOver) && (
