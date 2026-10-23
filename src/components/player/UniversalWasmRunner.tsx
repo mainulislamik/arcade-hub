@@ -1,23 +1,69 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameItem } from '../../types/game';
-import { getRomBlobUrl, getRomBinaryBlob, storeRomBinary } from '../../utils/customGamesStorage';
-import { 
-  Play, 
-  RotateCcw, 
-  Volume2, 
-  VolumeX, 
-  Sparkles, 
-  ShieldCheck, 
-  Zap, 
+import {
+  Play,
+  RotateCcw,
+  Volume2,
+  VolumeX,
+  Sparkles,
+  ShieldCheck,
+  Zap,
   Smartphone,
   Leaf,
   Maximize2,
-  Gamepad2
+  Gamepad2,
+  RefreshCw
 } from 'lucide-react';
 import { sounds } from '../../utils/soundEngine';
 import { HapticEngine } from '../../utils/hapticEngine';
 import { EcoEngine } from '../../utils/ecoEngine';
 import { AdaptiveGameControls } from './AdaptiveGameControls';
+import {
+  resolveRomWithMirrors,
+  revokeRomBlobUrl,
+  buildRomMirrorCandidates,
+  PLATFORM_DEFAULT_ROMS
+} from '../../services/romResolver';
+
+export function getDefaultAspectRatio(fmt: string): string {
+  switch (fmt) {
+    case 'jar':
+    case 'sis':
+      return '3:4';
+    case 'gba':
+      return '3:2';
+    case 'psp':
+    case 'ps2':
+    case 'ps3':
+      return '16:9';
+    case 'nes':
+    case 'snes':
+    case 'gb':
+    case 'md':
+    case 'sega':
+    case 'psx':
+    case 'dos':
+      return '4:3';
+    default:
+      return '4:3';
+  }
+}
+
+export function getAspectRatioStyle(ratio: string): React.CSSProperties {
+  switch (ratio) {
+    case '4:3':
+      return { aspectRatio: '4 / 3', maxWidth: '840px', maxHeight: '100%' };
+    case '3:2':
+      return { aspectRatio: '3 / 2', maxWidth: '780px', maxHeight: '100%' };
+    case '16:9':
+      return { aspectRatio: '16 / 9', maxWidth: '1040px', maxHeight: '100%' };
+    case '3:4':
+      return { aspectRatio: '3 / 4', maxWidth: '440px', maxHeight: '100%' };
+    case 'fill':
+    default:
+      return { width: '100%', height: '100%' };
+  }
+}
 
 interface UniversalWasmRunnerProps {
   game: GameItem;
@@ -43,7 +89,11 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
   const [gameStarted, setGameStarted] = useState(false);
   const [format, setFormat] = useState<string>('jar');
   const [isEco, setIsEco] = useState(EcoEngine.isEco());
-  
+  const [mirrorIndex, setMirrorIndex] = useState(0);
+  const [totalMirrors, setTotalMirrors] = useState(1);
+  const [isFromCache, setIsFromCache] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -89,7 +139,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
   useEffect(() => {
     let fmt = 'jar';
     const filename = (game.romFileName || game.romUrl || game.title || '').toLowerCase();
-    
+
     if (game.romFormat) fmt = game.romFormat;
     else if (filename.endsWith('.sis') || game.engineType === 'symbian_sis') fmt = 'sis';
     else if (filename.endsWith('.swf') || game.engineType === 'ruffle_flash') fmt = 'swf';
@@ -97,163 +147,89 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
     else if (filename.endsWith('.nes')) fmt = 'nes';
     else if (filename.endsWith('.zip') || game.engineType === 'html5_zip') fmt = 'zip';
     else if (filename.endsWith('.jar') || game.engineType === 'j2me_wasm') fmt = 'jar';
-    
+
     setFormat(fmt);
   }, [game]);
 
-  // Load ROM Blob from IndexedDB or static URL
-  useEffect(() => {
-    let isMounted = true;
-    let createdBlobUrl: string | null = null;
+  // Load ROM with Client-Side Multi-Mirror Failover and IndexedDB Caching (Zero VPS Load)
+  const loadRom = async (preferredIndex = 0, bypassCache = false) => {
     setIsLoading(true);
     setLoadError(null);
+    const activeFormat = game.romFormat || format || 'jar';
+    setDownloadStatus(
+      activeFormat === 'jar' || game.engineType === 'j2me_wasm' || game.engineType === 'java_j2me'
+        ? 'Initializing Java Virtual Machine (CheerpJ)...'
+        : 'Connecting to ROM mirror stream...'
+    );
 
-    const PLATFORM_DEFAULT_ROMS: Record<string, string> = {
-      nes: '/roms/contra.nes',
-      gba: '/roms/pokemon-emerald.gba',
-      snes: '/roms/astrohawk.smc',
-      sega: '/roms/sega-action-adventure.gen',
-      md: '/roms/sega-action-adventure.gen',
-      psx: '/roms/psx-action.exe',
-      psp: '/roms/psp-showcase.pbp',
-      ps2: '/roms/ps2-boot.elf',
-      jar: '/roms/nokia-rally-3d.jar',
-      sis: '/roms/symbian-game.sis',
-      dos: '/roms/dos-action.zip',
-      html: '/games/web-runner.html',
-    };
-
-    const loadRom = async () => {
-      try {
-        if (game.customRomKey) {
-          const url = await getRomBlobUrl(game.customRomKey);
-          if (url && isMounted) {
-            setRomBlobUrl(url);
-            setIsLoading(false);
-            return;
-          }
+    try {
+      const res = await resolveRomWithMirrors(game, activeFormat, {
+        preferredMirrorIndex: preferredIndex,
+        bypassCache,
+        timeoutMs: 8000,
+        onStatusUpdate: (msg) => {
+          setDownloadStatus(msg);
         }
+      });
 
-        // Check local IndexedDB cache first for zero-bandwidth instant boot
-        const cacheKey = `cached_rom_${game.id}`;
-        try {
-          const cachedBlob = await getRomBinaryBlob(cacheKey);
-          if (cachedBlob && isMounted) {
-            setDownloadStatus('Loaded from local device cache');
-            createdBlobUrl = URL.createObjectURL(cachedBlob);
-            setRomBlobUrl(createdBlobUrl);
-            setIsLoading(false);
-            return;
-          }
-        } catch (e) {
-          console.warn('[Arcadex] Cache check failed:', e);
-        }
+      setRomBlobUrl(res.blobUrl);
+      setMirrorIndex(res.mirrorIndex);
+      setTotalMirrors(res.totalMirrors);
+      setIsFromCache(res.isFromCache);
+      setDownloadStatus(res.statusMessage);
+      setIsLoading(false);
+    } catch (err: any) {
+      console.warn('[Arcadex] ROM resolution failed, using platform fallback:', err);
+      const defaultRom = PLATFORM_DEFAULT_ROMS[activeFormat] || PLATFORM_DEFAULT_ROMS[format] || '/roms/contra.nes';
+      const fallbackFull = typeof window !== 'undefined' ? `${window.location.origin}${defaultRom}` : defaultRom;
+      setRomBlobUrl(fallbackFull);
+      setDownloadStatus('Loaded bundled safety fallback ROM');
+      setIsLoading(false);
+    }
+  };
 
-        const activeFormat = game.romFormat || format || 'jar';
-        const defaultRom = PLATFORM_DEFAULT_ROMS[activeFormat] || PLATFORM_DEFAULT_ROMS[format] || '/roms/contra.nes';
-
-        // Build Multi-Mirror Failover Source List
-        const sourceCandidates: string[] = [];
-        if (Array.isArray(game.romSources) && game.romSources.length > 0) {
-          sourceCandidates.push(...game.romSources);
-        }
-        if (game.romUrl && !sourceCandidates.includes(game.romUrl)) {
-          sourceCandidates.push(game.romUrl);
-        }
-        if (!sourceCandidates.includes(defaultRom)) {
-          sourceCandidates.push(defaultRom);
-        }
-
-        let fetchedBlob: Blob | null = null;
-        let mirrorIndex = 0;
-
-        for (const candidate of sourceCandidates) {
-          if (!candidate) continue;
-          mirrorIndex++;
-          const resolved = candidate.startsWith('http') || candidate.startsWith('blob:')
-            ? candidate
-            : (typeof window !== 'undefined' ? window.location.origin + candidate : candidate);
-
-          try {
-            if (isMounted) {
-              setDownloadStatus(`Loading from Mirror ${mirrorIndex} of ${sourceCandidates.length}...`);
-            }
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 8000);
-            const resp = await fetch(resolved, { signal: controller.signal });
-            clearTimeout(timeoutId);
-
-            if (resp.ok) {
-              fetchedBlob = await resp.blob();
-              // Cache into IndexedDB for instant offline re-play without re-downloading
-              try {
-                await storeRomBinary(cacheKey, fetchedBlob);
-              } catch (cacheErr) {
-                console.warn('[Arcadex] Could not save to IDB cache:', cacheErr);
-              }
-              break;
-            }
-          } catch (fetchErr) {
-            console.warn(`[Arcadex] Mirror ${mirrorIndex} (${candidate}) failed, trying next mirror:`, fetchErr);
-          }
-        }
-
-        if (fetchedBlob && isMounted) {
-          createdBlobUrl = URL.createObjectURL(fetchedBlob);
-          setRomBlobUrl(createdBlobUrl);
-          setIsLoading(false);
-          setDownloadStatus(null);
-          return;
-        }
-
-        // Final safety fallback
-        const fallbackFull = typeof window !== 'undefined' ? window.location.origin + defaultRom : defaultRom;
-        try {
-          const fbResp = await fetch(fallbackFull);
-          if (fbResp.ok) {
-            const fbBlob = await fbResp.blob();
-            createdBlobUrl = URL.createObjectURL(fbBlob);
-            if (isMounted) {
-              setRomBlobUrl(createdBlobUrl);
-              setIsLoading(false);
-              setDownloadStatus(null);
-              return;
-            }
-          }
-        } catch (fbErr) {
-          console.warn('[Arcadex] Fallback ROM fetch error:', fbErr);
-        }
-
-        if (isMounted) {
-          setRomBlobUrl(fallbackFull);
-          setIsLoading(false);
-          setDownloadStatus(null);
-        }
-      } catch (err: any) {
-        if (isMounted) {
-          const defaultRom = PLATFORM_DEFAULT_ROMS[format] || '/roms/contra.nes';
-          const fallbackFull = typeof window !== 'undefined' ? window.location.origin + defaultRom : defaultRom;
-          setRomBlobUrl(fallbackFull);
-          setIsLoading(false);
-        }
-      }
-    };
-
-    loadRom();
+  useEffect(() => {
+    loadRom(0, false);
 
     return () => {
-      isMounted = false;
-      if (createdBlobUrl) {
-        URL.revokeObjectURL(createdBlobUrl);
+      if (romBlobUrl) {
+        revokeRomBlobUrl(romBlobUrl);
       }
     };
   }, [game.id, game.customRomKey, game.romUrl, format]);
+
+  // Quick Control: Switch to next available mirror
+  const handleSwitchMirror = () => {
+    HapticEngine.selectionClick();
+    if (totalMirrors <= 1) return;
+    const nextIndex = (mirrorIndex + 1) % totalMirrors;
+    loadRom(nextIndex, true);
+  };
+
+  // Quick Control: Reload / Reset current game runtime
+  const handleResetGame = () => {
+    HapticEngine.lightTick();
+    setReloadKey((prev) => prev + 1);
+    loadRom(mirrorIndex, false);
+  };
+
+  // Ensure AudioContext is unlocked and canvas element receives focus
+  const ensureAudioAndFocus = () => {
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      try {
+        iframeRef.current.contentWindow.postMessage({ type: 'RESUME_AUDIO' }, '*');
+        iframeRef.current.contentWindow.postMessage({ type: 'REFOCUS' }, '*');
+      } catch (_) {}
+    }
+    iframeRef.current?.focus();
+  };
 
   // Send virtual key or keyboard event to iframe
   const sendKey = (key: string, type: 'keydown' | 'keyup') => {
     if (!iframeRef.current || !iframeRef.current.contentWindow) return;
     iframeRef.current.contentWindow.postMessage({ type: 'EMULATOR_KEY', key, eventType: type }, '*');
     iframeRef.current.contentWindow.postMessage({ type: 'NOKIA_KEY', key, eventType: type }, '*');
+    iframeRef.current.contentWindow.postMessage({ type: 'CONTROLLER_KEY', key, eventType: type }, '*');
   };
 
   // GLOBAL KEYBOARD EVENT BRIDGE: Intercept all PC keyboard presses and forward them to the game
@@ -830,7 +806,8 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
     }
 
     // 5. AUTHENTIC JAVA ME / NOKIA MOBILE RUNTIME (.JAR) -> FreeJ2ME Web / CheerpJ
-    if (format === 'jar' || game.engineType === 'java_j2me') {
+    if (format === 'jar' || game.engineType === 'java_j2me' || game.engineType === 'j2me_wasm') {
+      const jarTarget = romBlobUrl || game.romUrl || '/roms/nokia-rally-3d.jar';
       return `
         <!DOCTYPE html>
         <html>
@@ -845,7 +822,22 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
           </style>
         </head>
         <body>
-          <iframe id="j2me-frame" src="/j2me/run.html?jar=${encodeURIComponent(game.romUrl || '/roms/nokia-rally-3d.jar')}&title=${encodeURIComponent(game.title)}" allow="autoplay; gamepad; fullscreen"></iframe>
+          <iframe id="j2me-frame" src="/j2me/run.html?jar=${encodeURIComponent(jarTarget)}&title=${encodeURIComponent(game.title)}" allow="autoplay; gamepad; fullscreen"></iframe>
+          <script>
+            window.addEventListener('message', function(e) {
+              var frame = document.getElementById('j2me-frame');
+              if (frame && frame.contentWindow && e.data) {
+                frame.contentWindow.postMessage(e.data, '*');
+              }
+            });
+            window.addEventListener('pointerdown', function() {
+              var frame = document.getElementById('j2me-frame');
+              if (frame && frame.contentWindow) {
+                frame.contentWindow.postMessage({ type: 'RESUME_AUDIO' }, '*');
+                frame.contentWindow.postMessage({ type: 'REFOCUS' }, '*');
+              }
+            });
+          </script>
         </body>
         </html>
       `;
@@ -1208,34 +1200,92 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
   ];
 
   return (
-    <div ref={containerRef} className="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-white rounded-2xl overflow-hidden shadow-2xl relative select-none">
+    <div
+      ref={containerRef}
+      className="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-white rounded-2xl overflow-hidden shadow-2xl relative select-none"
+      onPointerDown={ensureAudioAndFocus}
+      onClick={ensureAudioAndFocus}
+    >
       {/* Emulator Canvas Display Area */}
-      <div 
+      <div
         className="w-full flex-1 h-full min-h-[580px] flex items-center justify-center relative overflow-hidden bg-black"
+        onPointerDown={ensureAudioAndFocus}
+        onClick={ensureAudioAndFocus}
       >
-        <iframe
-          key={`${game.id}-${selectedRatio}`}
-          ref={iframeRef}
-          srcDoc={buildEmulatorDoc()}
-          title={game.title}
-          className="w-full h-full border-0 bg-slate-950"
-          allow="autoplay; fullscreen; gamepad; accelerometer; gyroscope"
-          sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-forms allow-modals"
-          onLoad={() => setIsLoading(false)}
-        />
+        <div
+          style={getAspectRatioStyle(selectedRatio)}
+          className="w-full h-full flex items-center justify-center relative [image-rendering:pixelated] [image-rendering:crisp-edges]"
+        >
+          <iframe
+            key={`${game.id}-${selectedRatio}-${reloadKey}`}
+            ref={iframeRef}
+            srcDoc={buildEmulatorDoc()}
+            title={game.title}
+            className="w-full h-full border-0 bg-slate-950 [image-rendering:pixelated] [image-rendering:crisp-edges]"
+            allow="autoplay; fullscreen; gamepad; accelerometer; gyroscope"
+            sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-forms allow-modals"
+            onLoad={() => {
+              setIsLoading(false);
+              ensureAudioAndFocus();
+            }}
+          />
+        </div>
 
         {isLoading && (
-          <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center z-20">
-            <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4" />
-            <span className="text-sm font-bold text-cyan-400">Booting Multi-Core WASM Runtime...</span>
-            {downloadStatus && (
-              <span className="text-xs text-slate-400 mt-2 font-mono animate-pulse">{downloadStatus}</span>
+          <div className="absolute inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center z-20 p-6">
+            {(format === 'jar' || game.engineType === 'j2me_wasm' || game.engineType === 'java_j2me') ? (
+              <div className="flex flex-col items-center max-w-sm w-full bg-slate-900/90 border border-amber-500/40 rounded-2xl p-6 shadow-2xl text-center">
+                <div className="w-12 h-12 rounded-full border-4 border-amber-500/20 border-t-amber-500 animate-spin mb-4" />
+                <h4 className="text-base font-bold text-amber-400 mb-1">Initializing Java Virtual Machine (CheerpJ)...</h4>
+                <p className="text-xs text-slate-300 font-mono mb-4">
+                  {downloadStatus || 'Booting FreeJ2ME Java runtime and compiling bytecode...'}
+                </p>
+                <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
+                  <div className="h-full bg-gradient-to-r from-amber-500 to-rose-500 rounded-full animate-pulse w-full" />
+                </div>
+                <span className="text-[11px] text-slate-400 mt-3">Authentic Nokia / Symbian Java Engine</span>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center max-w-sm w-full bg-slate-900/90 border border-cyan-500/40 rounded-2xl p-6 shadow-2xl text-center">
+                <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4" />
+                <span className="text-sm font-bold text-cyan-400">Booting Multi-Core WASM Runtime...</span>
+                {downloadStatus && (
+                  <span className="text-xs text-slate-300 mt-2 font-mono animate-pulse">{downloadStatus}</span>
+                )}
+              </div>
             )}
           </div>
         )}
 
         {/* Floating Quick Controls inside Player */}
-        <div className="absolute top-4 right-4 flex items-center gap-2 z-10 opacity-80 hover:opacity-100 transition-opacity">
+        <div className="absolute top-4 right-4 flex items-center gap-2 z-10 opacity-80 hover:opacity-100 transition-opacity flex-wrap justify-end">
+          {/* Quick Control: Switch Mirror */}
+          <button
+            onClick={handleSwitchMirror}
+            disabled={totalMirrors <= 1 && !isFromCache}
+            className="bg-white/95 backdrop-blur-md hover:bg-slate-100 disabled:opacity-50 text-slate-700 hover:text-indigo-600 rounded-lg px-2.5 py-1.5 text-xs font-bold border border-slate-300 hover:border-indigo-400 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm disabled:cursor-not-allowed"
+            title={
+              isFromCache
+                ? 'Stored in IndexedDB (Click to switch to fresh mirror)'
+                : totalMirrors > 1
+                  ? `Switch to next mirror (${mirrorIndex + 1}/${totalMirrors})`
+                  : 'Single mirror source'
+            }
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>{isFromCache ? 'Cached ROM' : `Mirror ${mirrorIndex + 1}/${totalMirrors}`}</span>
+          </button>
+
+          {/* Quick Control: Reload / Reset Game */}
+          <button
+            onClick={handleResetGame}
+            className="bg-white/95 backdrop-blur-md hover:bg-slate-100 text-slate-700 hover:text-indigo-600 rounded-lg px-2.5 py-1.5 text-xs font-bold border border-slate-300 hover:border-indigo-400 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+            title="Reload / Reset Game"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Reset</span>
+          </button>
+
           {['jar', 'sis'].includes(format) && (
             <button
               onClick={() => {
@@ -1243,8 +1293,8 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
                 setShowTouchKeypad(!showTouchKeypad);
               }}
               className={`backdrop-blur-md rounded-lg px-2.5 py-1.5 text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${
-                showTouchKeypad 
-                  ? 'bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/30' 
+                showTouchKeypad
+                  ? 'bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/30'
                   : 'bg-white/95 hover:bg-slate-100 text-slate-700 border-slate-300 shadow-sm'
               }`}
               title="Toggle Virtual Phone Keypad"
@@ -1254,7 +1304,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
             </button>
           )}
 
-          <select 
+          <select
             value={selectedRatio}
             onChange={(e) => {
               HapticEngine.lightTick();
@@ -1262,13 +1312,14 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
             }}
             className="bg-white/95 backdrop-blur-md text-slate-800 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-indigo-500 cursor-pointer font-bold shadow-sm"
           >
-            <option value="16:9">🖥️ Widescreen HD (16:9) - Full Stage</option>
+            <option value="16:9">🖥️ Widescreen HD (16:9)</option>
             <option value="4:3">🕹️ Classic Arcade (4:3)</option>
+            <option value="3:2">🎮 Handheld GBA (3:2)</option>
             <option value="fill">🔲 Stretch Fill (100%)</option>
             <option value="3:4">📱 Retro Nokia (3:4)</option>
             <option value="auto">⚡ Auto Fit</option>
           </select>
-          <button 
+          <button
             onClick={() => {
               HapticEngine.selectionClick();
               toggleFullscreen();

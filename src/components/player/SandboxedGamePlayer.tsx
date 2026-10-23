@@ -60,6 +60,99 @@ import { VoxelShooter3DGame } from '../games/VoxelShooter3DGame';
 import { UniversalProceduralCore } from './UniversalProceduralCore';
 import { UniversalWasmRunner } from './UniversalWasmRunner';
 
+// Complete registry of all 37 rich native React/Canvas games
+export const NATIVE_GAME_IDS = new Set([
+  'mecha-blaster-2',
+  'snake',
+  'game-2048',
+  'galaxy-defender',
+  'flappy-bird',
+  'breakout',
+  'tetris',
+  'pac-maze',
+  'memory-flip',
+  'minesweeper',
+  'cyber-pong',
+  'wordle',
+  'asteroid-blaster',
+  'sudoku',
+  'connect-four',
+  'simon-echo',
+  'bubble-shooter',
+  'ultimate-tictactoe',
+  'hextris',
+  'cyber-stack',
+  'cyber-dino',
+  'solitaire-pro',
+  'cyber-chess',
+  'stickman-fighter',
+  'stickman-archer',
+  'stickman-runner',
+  'stickman-sniper',
+  'stickman-warriors',
+  'subway-surfer',
+  'temple-dash',
+  'hill-climb',
+  'fruit-slash',
+  'slope-3d',
+  'drift-3d',
+  'subway-3d',
+  'knife-3d',
+  'voxel-3d'
+]);
+
+// Aliases mapping common search/catalog names to native implementations
+export const NATIVE_ID_ALIASES: Record<string, string> = {
+  'space-invaders': 'galaxy-defender',
+  'pacman': 'pac-maze',
+  'pong': 'cyber-pong',
+  'asteroids': 'asteroid-blaster',
+  'dino': 'cyber-dino',
+  '2048': 'game-2048',
+  'solitaire': 'solitaire-pro',
+  'chess': 'cyber-chess',
+  'stack': 'cyber-stack',
+  'knife': 'knife-3d',
+};
+
+/**
+ * Checks whether a game should render directly using our high-performance
+ * native React canvas engines instead of running through UniversalWasmRunner.
+ */
+export const isNativeGame = (game: GameItem): boolean => {
+  if (!game) return false;
+  // User custom uploaded ROMs with binary keys always route to WASM runner
+  if (game.isCustomUpload && game.customRomKey) return false;
+
+  const id = game.id?.toLowerCase() || '';
+  const normalizedId = id.replace(/_/g, '-');
+
+  // Direct match or alias match
+  if (NATIVE_GAME_IDS.has(id) || NATIVE_GAME_IDS.has(normalizedId)) return true;
+  if (NATIVE_ID_ALIASES[id] || NATIVE_ID_ALIASES[normalizedId]) return true;
+
+  // Engine type explicitly specifying native canvas
+  if (['native_canvas', 'canvas', 'native', 'react_canvas'].includes(game.engineType || '')) {
+    return true;
+  }
+
+  // Fallback web-runner games with no heavy emulator engine
+  if (game.romUrl === '/games/web-runner.html' && (!game.engineType || game.engineType === 'iframe_web' || game.engineType === 'native_canvas')) {
+    return true;
+  }
+
+  return false;
+};
+
+/**
+ * Resolves the primary native ID (handling aliases)
+ */
+export const getResolvedNativeId = (game: GameItem): string => {
+  const id = game.id?.toLowerCase() || '';
+  const normalizedId = id.replace(/_/g, '-');
+  return NATIVE_ID_ALIASES[id] || NATIVE_ID_ALIASES[normalizedId] || id;
+};
+
 interface SandboxedGamePlayerProps {
   game: GameItem;
   soundEnabled: boolean;
@@ -84,11 +177,14 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const isNative = isNativeGame(game);
+
   // If native canvas game, instant ready; if binary/emulator, simulate client streaming download
   useEffect(() => {
-    if (!game.engineType || game.engineType === 'native_canvas') {
+    if (isNative || !game.engineType || game.engineType === 'native_canvas') {
       setIsStreamingReady(true);
       setDownloadProgress(100);
+      setIsStreamingActive(false);
       return;
     }
 
@@ -112,7 +208,7 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
     }, 150);
 
     return () => clearInterval(interval);
-  }, [game.id, game.engineType]);
+  }, [game.id, game.engineType, isNative]);
 
   // Handle Mobile Keypad Key dispatch to window, document and iframe
   const handleKeypadPress = (key: string) => {
@@ -177,15 +273,47 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
     else if (key === 'ArrowDown') { code = 'ArrowDown'; eventKey = 'ArrowDown'; }
     else if (key === 'ArrowLeft') { code = 'ArrowLeft'; eventKey = 'ArrowLeft'; }
     else if (key === 'ArrowRight') { code = 'ArrowRight'; eventKey = 'ArrowRight'; }
-    else if (key === 'KeyX') { code = 'KeyX'; eventKey = 'x'; }
-    else if (key === 'KeyZ') { code = 'KeyZ'; eventKey = 'z'; }
-    else if (key === 'KeyS') { code = 'KeyS'; eventKey = 's'; }
-    else if (key === 'KeyA') { code = 'KeyA'; eventKey = 'a'; }
+    else if (key === 'KeyX' || key === 'x' || key === 'X') { code = 'KeyX'; eventKey = 'x'; }
+    else if (key === 'KeyZ' || key === 'z' || key === 'Z') { code = 'KeyZ'; eventKey = 'z'; }
+    else if (key === 'KeyS' || key === 's' || key === 'S') { code = 'KeyS'; eventKey = 's'; }
+    else if (key === 'KeyA' || key === 'a' || key === 'A') { code = 'KeyA'; eventKey = 'a'; }
+    else if (key === 'KeyW' || key === 'w' || key === 'W') { code = 'KeyW'; eventKey = 'w'; }
+    else if (key === 'KeyD' || key === 'd' || key === 'D') { code = 'KeyD'; eventKey = 'd'; }
+    else if (key === 'Space' || key === ' ' || key === 'ACTION' || key === 'FIRE') { code = 'Space'; eventKey = ' '; }
     else if (key === 'Enter') { code = 'Enter'; eventKey = 'Enter'; }
-    else if (key === 'KeyV') { code = 'KeyV'; eventKey = 'v'; }
+    else if (key === 'KeyV' || key === 'v') { code = 'KeyV'; eventKey = 'v'; }
+    else if (key === 'Shift' || key === 'ShiftLeft' || key === 'ShiftRight') { code = 'ShiftLeft'; eventKey = 'Shift'; }
+    else if (key === 'Escape') { code = 'Escape'; eventKey = 'Escape'; }
+
+    const keyCodes: Record<string, number> = {
+      ArrowUp: 38,
+      ArrowDown: 40,
+      ArrowLeft: 37,
+      ArrowRight: 39,
+      ' ': 32,
+      Space: 32,
+      Enter: 13,
+      Escape: 27,
+      Shift: 16,
+      x: 88,
+      z: 90,
+      s: 83,
+      a: 65,
+      w: 87,
+      d: 68,
+      v: 86
+    };
+    const numericCode = keyCodes[eventKey] || keyCodes[code] || 0;
 
     try {
-      const evt = new KeyboardEvent(type, { key: eventKey, code, bubbles: true, cancelable: true });
+      const evt = new KeyboardEvent(type, {
+        key: eventKey,
+        code,
+        keyCode: numericCode,
+        which: numericCode,
+        bubbles: true,
+        cancelable: true
+      });
       window.dispatchEvent(evt);
       document.dispatchEvent(evt);
     } catch (_) {}
@@ -201,53 +329,54 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
 
   // Render Native React Canvas Game component
   const renderNativeGame = () => {
-    switch (game.id) {
+    const targetId = getResolvedNativeId(game);
+    switch (targetId) {
       case 'mecha-blaster-2':
-        return <MechaBlaster2Game />;
+        return <MechaBlaster2Game onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'snake':
-        return <SnakeGame />;
+        return <SnakeGame onScoreUpdate={onScoreUpdate} />;
       case 'game-2048':
-        return <Game2048 />;
+        return <Game2048 onScoreUpdate={onScoreUpdate} />;
       case 'galaxy-defender':
-        return <GalaxyDefender />;
+        return <GalaxyDefender onScoreUpdate={onScoreUpdate} />;
       case 'flappy-bird':
-        return <FlappyBirdGame />;
+        return <FlappyBirdGame onScoreUpdate={onScoreUpdate} />;
       case 'breakout':
-        return <BreakoutGame />;
+        return <BreakoutGame onScoreUpdate={onScoreUpdate} />;
       case 'tetris':
-        return <TetrisGame />;
+        return <TetrisGame onScoreUpdate={onScoreUpdate} />;
       case 'pac-maze':
-        return <PacMazeGame />;
+        return <PacMazeGame onScoreUpdate={onScoreUpdate} />;
       case 'memory-flip':
-        return <MemoryFlipGame />;
+        return <MemoryFlipGame onScoreUpdate={onScoreUpdate} />;
       case 'minesweeper':
-        return <MinesweeperGame />;
+        return <MinesweeperGame onScoreUpdate={onScoreUpdate} />;
       case 'cyber-pong':
-        return <CyberPongGame />;
+        return <CyberPongGame onScoreUpdate={onScoreUpdate} />;
       case 'wordle':
-        return <WordleGame />;
+        return <WordleGame onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'asteroid-blaster':
-        return <AsteroidBlasterGame />;
+        return <AsteroidBlasterGame onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'sudoku':
-        return <SudokuGame />;
+        return <SudokuGame onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'connect-four':
-        return <ConnectFourGame />;
+        return <ConnectFourGame onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'simon-echo':
-        return <SimonEchoGame />;
+        return <SimonEchoGame onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'bubble-shooter':
-        return <BubbleShooterGame />;
+        return <BubbleShooterGame onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'ultimate-tictactoe':
-        return <UltimateTicTacToeGame />;
+        return <UltimateTicTacToeGame onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'hextris':
-        return <HextrisGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} />;
+        return <HextrisGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'cyber-stack':
-        return <CyberStackGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} />;
+        return <CyberStackGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'cyber-dino':
-        return <CyberDinoGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} />;
+        return <CyberDinoGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'solitaire-pro':
-        return <SolitaireGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} />;
+        return <SolitaireGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'cyber-chess':
-        return <CyberChessGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} />;
+        return <CyberChessGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'stickman-fighter':
         return <StickmanFighterGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'stickman-archer':
@@ -358,7 +487,9 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
         {/* Active Game Runtime */}
         {isStreamingReady && (
           <div className="w-full h-full flex flex-col items-center justify-center">
-            {game.isCustomUpload || Boolean(game.romUrl) || ['j2me_wasm', 'emulatorjs', 'ruffle_flash', 'symbian_sis', 'html5_zip'].includes(game.engineType || '') ? (
+            {isNative ? (
+              renderNativeGame()
+            ) : game.isCustomUpload || Boolean(game.romUrl) || ['j2me_wasm', 'emulatorjs', 'ruffle_flash', 'symbian_sis', 'html5_zip', 'dosbox_wasm', 'scummvm_wasm', 'wasm_emscripten', 'ps2_wasm'].includes(game.engineType || '') ? (
               <UniversalWasmRunner
                 game={game}
                 soundEnabled={soundEnabled}
@@ -386,11 +517,11 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
         )}
       </div>
 
-      {/* For Non-WASM Runner Games (Canvas / HTML5 / React Games), Render AdaptiveGameControls */}
-      {!(game.isCustomUpload || Boolean(game.romUrl) || ['j2me_wasm', 'emulatorjs', 'ruffle_flash', 'symbian_sis', 'html5_zip'].includes(game.engineType || '')) && (
+      {/* For Non-WASM Runner Games (Canvas / Native React / HTML5 Games), Render AdaptiveGameControls */}
+      {(isNative || !(game.isCustomUpload || Boolean(game.romUrl) || ['j2me_wasm', 'emulatorjs', 'ruffle_flash', 'symbian_sis', 'html5_zip', 'dosbox_wasm', 'scummvm_wasm', 'wasm_emscripten', 'ps2_wasm'].includes(game.engineType || ''))) && (
         <AdaptiveGameControls
           game={game}
-          format={game.romFormat || 'html'}
+          format={isNative ? 'canvas' : (game.romFormat || 'html')}
           onSendKey={sendKey}
           onRefocus={() => {
             iframeRef.current?.focus();

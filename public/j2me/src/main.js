@@ -202,6 +202,16 @@ function setListeners() {
 
     window.addEventListener('message', e => {
         if (!e.data) return;
+        if (e.data.type === 'REFOCUS') {
+            if (display) display.focus();
+            return;
+        }
+        if (e.data.type === 'RESUME_AUDIO') {
+            if (window.libmidi && window.libmidi.audioCtx && window.libmidi.audioCtx.state === 'suspended') {
+                window.libmidi.audioCtx.resume().catch(() => {});
+            }
+            return;
+        }
         if (e.data.type === 'NOKIA_KEY' || e.data.type === 'EMULATOR_KEY') {
             const isDown = e.data.eventType !== 'keyup';
             let code = e.data.key;
@@ -256,7 +266,9 @@ async function ensureAppInstalled(lib, appId) {
 }
 
 async function init() {
-    document.getElementById("loading").textContent = "Loading CheerpJ...";
+    const loadingText = document.getElementById("loading-text");
+    if (loadingText) loadingText.textContent = "Initializing Java Virtual Machine (CheerpJ)...";
+    else if (document.getElementById("loading")) document.getElementById("loading").textContent = "Initializing Java Virtual Machine (CheerpJ)...";
 
     display = document.getElementById('display');
     screenCtx = display.getContext('2d');
@@ -341,7 +353,9 @@ async function init() {
         }
     });
 
-    document.getElementById("loading").textContent = "Loading...";
+    const lt = document.getElementById("loading-text");
+    if (lt) lt.textContent = "Booting FreeJ2ME Java Runtime...";
+    else if (document.getElementById("loading")) document.getElementById("loading").textContent = "Booting FreeJ2ME Java Runtime...";
 
     const lib = await cheerpjRunLibrary(cheerpjWebRoot+"/freej2me-web.jar");
 
@@ -356,7 +370,7 @@ async function init() {
         args = ['app', sp.get('app')];
     } else {
         const jarParam = sp.get('jar') || "game.jar";
-        const jarPath = (jarParam.startsWith('http') || jarParam.startsWith('/')) ? jarParam : (cheerpjWebRoot + "/jar/" + jarParam);
+        const jarPath = (jarParam.startsWith('http') || jarParam.startsWith('/') || jarParam.startsWith('blob:')) ? jarParam : (cheerpjWebRoot + "/jar/" + jarParam);
         args = ['jar', jarPath];
     }
 

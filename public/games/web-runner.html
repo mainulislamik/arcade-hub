@@ -138,17 +138,35 @@
       keys[e.key.toLowerCase()] = false;
     });
 
-    // Cross-frame PostMessage Support for Mobile Keypad and Gamepad
+    // Cross-frame PostMessage Support for Mobile Keypad, Gamepad, Audio Resume, and Focus
     window.addEventListener('message', (event) => {
       if (!event.data) return;
-      const { type, key, code } = event.data;
+      if (event.data.type === 'RESUME_AUDIO') {
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        return;
+      }
+      if (event.data.type === 'REFOCUS') {
+        canvas.focus();
+        return;
+      }
+      const { type, key, code, eventType } = event.data;
       const keyName = (key || code || '').toLowerCase();
-      if (type === 'keydown') {
+      const isDown = type === 'keydown' || eventType === 'keydown' || type === 'EMULATOR_KEY' && eventType === 'keydown';
+      const isUp = type === 'keyup' || eventType === 'keyup' || type === 'EMULATOR_KEY' && eventType === 'keyup';
+
+      if (isDown) {
         keys[keyName] = true;
-        if (keyName === ' ' || keyName === 'action' || keyName === 'fire') shoot();
-      } else if (type === 'keyup') {
+        if (keyName === ' ' || keyName === 'space' || keyName === 'action' || keyName === 'fire' || keyName === 'z' || keyName === 'x') {
+          shoot();
+        }
+      } else if (isUp) {
         keys[keyName] = false;
       }
+    });
+
+    window.addEventListener('pointerdown', () => {
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      canvas.focus();
     });
 
     function shoot() {
