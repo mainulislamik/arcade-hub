@@ -84,7 +84,7 @@ export const App: React.FC = () => {
     return window.location.pathname === '/imon' || window.location.pathname.startsWith('/imon/');
   });
 
-  // URL Routing Sync (Deep Linking for /imon, ?game=slug or ?category=action or ?admin=true or ?legal=privacy)
+  // URL Routing Sync (Deep Linking for /imon, /game/:slug, /category/:cat, /platform/:plat, legal pages & fallback query params)
   useEffect(() => {
     const handleUrlChange = () => {
       const path = window.location.pathname;
@@ -96,14 +96,68 @@ export const App: React.FC = () => {
       }
 
       const params = new URLSearchParams(window.location.search);
-      const gameSlug = params.get('game');
-      const catParam = params.get('category') as GameCategory | null;
-      const legalParam = params.get('legal') as 'privacy' | 'terms' | 'dmca' | 'about' | 'contact' | null;
       const adminParam = params.get('admin');
-
       if (adminParam === 'true' || window.location.hash === '#admin') {
         setIsAdminOpen(true);
       }
+
+      // Check clean path routes
+      const gameMatch = path.match(/^\/game\/([^/]+)/);
+      const categoryMatch = path.match(/^\/category\/([^/]+)/);
+      const platformMatch = path.match(/^\/platform\/([^/]+)/);
+      const legalMatch = path.match(/^\/(privacy|terms|dmca|about|contact)/);
+
+      // Clean path: /game/:slug
+      if (gameMatch) {
+        const slug = decodeURIComponent(gameMatch[1]);
+        const found = allGames.find((g) => g.slug === slug || g.id === slug);
+        if (found) {
+          setSelectedGame(found);
+          updateGameSEO(found);
+          return;
+        }
+      }
+
+      // Clean path: /category/:category
+      if (categoryMatch) {
+        const cat = decodeURIComponent(categoryMatch[1]);
+        if (['all', 'action', 'puzzle', 'retro', 'arcade', 'strategy', 'word', 'driving', 'shooting', 'playstation', 'favorites'].includes(cat)) {
+          setSelectedGame(null);
+          setSelectedTag(null);
+          setActiveCategory(cat as GameCategory);
+          if (cat === 'all') {
+            resetToHomeSEO();
+          } else {
+            updateCategorySEO(cat);
+          }
+          return;
+        }
+      }
+
+      // Clean path: /platform/:platform
+      if (platformMatch) {
+        const plat = decodeURIComponent(platformMatch[1]);
+        setSelectedGame(null);
+        setSelectedTag(plat);
+        setActiveCategory('all');
+        updateCategorySEO(plat, true);
+        return;
+      }
+
+      // Clean path: /privacy, /terms, /dmca, /about, /contact
+      if (legalMatch) {
+        const modalName = legalMatch[1] as 'privacy' | 'terms' | 'dmca' | 'about' | 'contact';
+        setActiveLegalModal(modalName);
+        setSelectedGame(null);
+        resetToHomeSEO();
+        return;
+      }
+
+      // Fallback to query parameters for backward compatibility
+      const gameSlug = params.get('game');
+      const catParam = params.get('category') as GameCategory | null;
+      const platParam = params.get('platform');
+      const legalParam = params.get('legal') as 'privacy' | 'terms' | 'dmca' | 'about' | 'contact' | null;
 
       if (gameSlug) {
         const found = allGames.find((g) => g.slug === gameSlug || g.id === gameSlug);
@@ -118,11 +172,16 @@ export const App: React.FC = () => {
 
       if (catParam && ['all', 'action', 'puzzle', 'retro', 'arcade', 'strategy', 'word', 'driving', 'shooting', 'playstation', 'favorites'].includes(catParam)) {
         setActiveCategory(catParam);
+        setSelectedTag(null);
         if (catParam === 'all') {
           resetToHomeSEO();
         } else {
           updateCategorySEO(catParam);
         }
+      } else if (platParam) {
+        setSelectedTag(platParam);
+        setActiveCategory('all');
+        updateCategorySEO(platParam, true);
       } else if (!gameSlug) {
         resetToHomeSEO();
       }
@@ -141,25 +200,16 @@ export const App: React.FC = () => {
   const handleSelectGame = useCallback((game: GameItem) => {
     setSelectedGame(game);
     setIsAdminOpen(false);
-    const url = new URL(window.location.href);
-    url.searchParams.set('game', game.slug);
-    url.searchParams.delete('category');
-    url.searchParams.delete('admin');
-    window.history.pushState({}, '', url.toString());
+    window.history.pushState({}, '', `/game/${encodeURIComponent(game.slug)}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
     updateGameSEO(game);
   }, []);
 
   // Back to Lobby / Home
   const handleBackToLobby = useCallback(() => {
     setSelectedGame(null);
-    const url = new URL(window.location.href);
-    url.searchParams.delete('game');
-    url.searchParams.delete('admin');
-    window.history.pushState({}, '', url.toString());
+    window.history.pushState({}, '', '/');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
     resetToHomeSEO();
   }, []);
 
@@ -168,17 +218,13 @@ export const App: React.FC = () => {
     setSelectedGame(null);
     setActiveCategory(cat);
     setSelectedTag(null);
-    const url = new URL(window.location.href);
-    url.searchParams.delete('game');
-    url.searchParams.delete('admin');
     if (cat === 'all') {
-      url.searchParams.delete('category');
+      window.history.pushState({}, '', '/');
       resetToHomeSEO();
     } else {
-      url.searchParams.set('category', cat);
+      window.history.pushState({}, '', `/category/${encodeURIComponent(cat)}`);
       updateCategorySEO(cat);
     }
-    window.history.pushState({}, '', url.toString());
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
@@ -187,11 +233,9 @@ export const App: React.FC = () => {
     setSelectedGame(null);
     setSelectedTag(tag);
     setActiveCategory('all');
-    const url = new URL(window.location.href);
-    url.searchParams.delete('game');
-    url.searchParams.delete('admin');
-    window.history.pushState({}, '', url.toString());
+    window.history.pushState({}, '', `/platform/${encodeURIComponent(tag)}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    updateCategorySEO(tag, true);
   }, []);
 
   // Favorite toggle

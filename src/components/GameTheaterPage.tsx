@@ -215,7 +215,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
 
   const handleShare = () => {
     sounds.playClick();
-    const url = window.location.origin + '/?game=' + game.slug;
+    const url = window.location.origin + '/game/' + encodeURIComponent(game.slug);
     navigator.clipboard.writeText(url).then(() => {
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2500);

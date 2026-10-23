@@ -209,7 +209,7 @@ export const updateSEO = (config: SEOConfig): void => {
               '@type': 'ListItem',
               position: 2,
               name: (g.category || 'Arcade').toUpperCase(),
-              item: `${CANONICAL_ORIGIN}/?category=${encodeURIComponent(g.category || 'all')}`,
+              item: `${CANONICAL_ORIGIN}/category/${encodeURIComponent(g.category || 'all')}`,
             },
             {
               '@type': 'ListItem',
@@ -330,7 +330,7 @@ export const updatePageSEO = (opts: UpdatePageSEOOptions): void => {
  * Dedicated SEO updater for individual game pages
  */
 export const updateGameSEO = (game: GameItem): void => {
-  const directUrl = `${CANONICAL_ORIGIN}/?game=${encodeURIComponent(game.slug || game.id)}`;
+  const directUrl = `${CANONICAL_ORIGIN}/game/${encodeURIComponent(game.slug || game.id)}`;
   const genreLabel = (game.category || 'Arcade').toUpperCase();
   const platformLabel = game.platform || 'Browser';
 
@@ -361,8 +361,9 @@ export const updateGameSEO = (game: GameItem): void => {
  * Dedicated SEO updater for Category and Platform views
  */
 export const updateCategorySEO = (category: string, isPlatform: boolean = false): void => {
-  const param = isPlatform ? 'platform' : 'category';
-  const directUrl = `${CANONICAL_ORIGIN}/?${param}=${encodeURIComponent(category)}`;
+  const directUrl = isPlatform
+    ? `${CANONICAL_ORIGIN}/platform/${encodeURIComponent(category)}`
+    : `${CANONICAL_ORIGIN}/category/${encodeURIComponent(category)}`;
   const displayTitle = category.charAt(0).toUpperCase() + category.slice(1);
 
   updateSEO({

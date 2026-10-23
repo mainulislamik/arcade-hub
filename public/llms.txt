@@ -73,56 +73,56 @@ Arcadex automatically maps player inputs according to the detected device:
 
 The following 50 featured games can be launched instantly in any modern web browser without downloads, installation, or sign-up:
 
-1. [Flappy Bird: Classic](https://game.amarpdf.net/?game=android-flappy-bird-classic) — Tap-to-fly endless obstacle arcade with original pixel physics.
-2. [Subway Surfers: World Tour](https://game.amarpdf.net/?game=android-subway-surfers-world-tour) — High-speed 3D rail runner with hoverboards, coin magnets, and mouse-swipe turns.
-3. [Angry Birds: Slingshot Classic](https://game.amarpdf.net/?game=android-angry-birds-classic) — Trajectory physics demolition with slingshot projectile destruction.
-4. [Geometry Dash: Neon Rush](https://game.amarpdf.net/?game=android-geometry-dash-neon) — Rhythm-based neon cube obstacle jumper with electronic soundtracks.
-5. [Temple Run: Jungle Escape](https://game.amarpdf.net/?game=android-temple-run-classic) — Fast-paced 3D temple escape with tilting, jumping, sliding, and corner turns.
-6. [Plants vs. Zombies: Defense](https://game.amarpdf.net/?game=android-plants-vs-zombies-web) — Tactical lawn defense deploying peashooters, wall-nuts, and sunflower economy.
-7. [Slope 3D: Infinity Speed](https://game.amarpdf.net/?game=android-slope-3d) — Adrenaline 3D rolling ball simulator on neon infinite downhill ramps.
-8. [Cut the Rope: Candy Slash](https://game.amarpdf.net/?game=android-cut-the-rope-classic) — Gravity puzzle cutting ropes to feed candy to the hungry creature Om Nom.
-9. [Fruit Ninja: Blade Master](https://game.amarpdf.net/?game=android-fruit-ninja-hd) — Mouse-blade slicing frenzy with combos, critical cuts, and bomb dodging.
-10. [Crossy Road: Cyber Crossing](https://game.amarpdf.net/?game=android-crossy-road) — Endless isometric road hopper dodging highways, trains, and rivers.
-11. [Shadow Fight: Stickman Brawler](https://game.amarpdf.net/?game=android-shadow-fight-2-web) — Martial arts shadow combat with weapon strikes, kicks, and combos.
-12. [Jetpack Joyride: Bullet Lab](https://game.amarpdf.net/?game=android-jetpack-joyride) — Bullet-powered jetpack flight navigating laser traps and missile barrages.
-13. [Hill Climb Racing: Offroad 4x4](https://game.amarpdf.net/?game=android-hill-climb-racing) — Physics vehicle climb balancing throttle, brake, and gravity over hills.
-14. [Sniper 3D: Tactical Strike](https://game.amarpdf.net/?game=android-sniper-3d) — Precision scope targeting, windage adjustment, and silent urban sniper missions.
-15. [2048: Retro Mobile Edition](https://game.amarpdf.net/?game=android-2048-original-edition) — Smooth sliding tile arithmetic puzzle aiming for the coveted 2048 tile.
-16. [Drift Max: Tokyo Highway](https://game.amarpdf.net/?game=android-drift-max) — Precision tire-smoking corner drifting on neon asphalt raceways.
-17. [Doodle Jump: Classic Bounce](https://game.amarpdf.net/?game=android-doodle-jump-classic) — Endless vertical spring platformer dodging black holes and flying monsters.
-18. [Bowmasters: Stickman Archery](https://game.amarpdf.net/?game=android-bowmasters) — Turn-based angle and power bow duel with ragdoll physics.
-19. [Knife Hit: Blade Challenge](https://game.amarpdf.net/?game=android-knife-hit) — Target-spinning blade thrower testing timing and knife spacing.
-20. [Bad Piggies: Workshop Racer](https://game.amarpdf.net/?game=android-bad-piggies-hd) — Mechanical contraption builder engineering flight and land rovers.
-21. [Stickman Hook: Swing Pro](https://game.amarpdf.net/?game=android-stickman-hook) — High-momentum grappling rope swings through obstacle-filled bouncy courses.
-22. [Bubble Shooter: Galaxy Pop](https://game.amarpdf.net/?game=android-bubble-shooter) — Match-3 cosmic bubble cannon with angle bank shots and cluster drops.
-23. [Vector: Neon Rooftop Runner](https://game.amarpdf.net/?game=android-vector-runner) — Dystopian parkour rooftop sprint with realistic vaulting, slides, and climbs.
-24. [Vector: Mobile Rooftop Runner](https://game.amarpdf.net/?game=android-vector) — Fluid stickman athletic acrobatics fleeing totalitarian security forces.
-25. [Pixel Gun 3D: Voxel Strike](https://game.amarpdf.net/?game=android-pixel-gun) — Blocky voxel FPS arena combat with fast movement and weapon arsenals.
-26. [Pokémon Emerald Version](https://game.amarpdf.net/?game=pokemon-emerald) — Legendary 32-bit Game Boy Advance monster-catching RPG in the Hoenn region.
-27. [Super Mario Bros (NES 1985)](https://game.amarpdf.net/?game=super-mario-bros) — The foundational 8-bit platforming classic across 8 worlds of the Mushroom Kingdom.
-28. [Tetris (Official NES 1989)](https://game.amarpdf.net/?game=tetris-nes) — Nintendo's classic 1989 competitive line-clearing puzzle cartridge.
-29. [Angry Birds Mobile (Nokia J2ME)](https://game.amarpdf.net/?game=angry-birds-j2me) — Vintage keypad mobile phone adaptation of the classic physics slinger.
-30. [Tetris Classic 1989](https://game.amarpdf.net/?game=tetris) — Clean HTML5 canvas falling tetromino matrix with ghost piece drop and line scoring.
-31. [Pac-Man (Namco NES Original)](https://game.amarpdf.net/?game=pacman-nes) — The iconic dot-chomping ghost maze runner with power pellets and fruit bonuses.
-32. [Contra (Konami NES)](https://game.amarpdf.net/?game=contra-nes) — Legendary run-and-gun cooperative arcade shooter battling alien insurgencies.
-33. [Subway 3D Surf Runner](https://game.amarpdf.net/?game=subway-3d) — WebGL 3D infinite track sprint with dynamic shadows and barrier evasion.
-34. [Nokia Snake Classic 1997](https://game.amarpdf.net/?game=snake) — Authentic retro monochrome pixel serpent with 9-speed levels and vintage audio.
-35. [Pac-Maze Retro 1980](https://game.amarpdf.net/?game=pac-maze) — Vector arcade maze with smart ghost AI personalities (Blinky, Pinky, Inky, Clyde).
-36. [Mega Man (Capcom NES)](https://game.amarpdf.net/?game=mega-man-nes) — High-difficulty 8-bit action platformer battling Robot Masters.
-37. [Slope 3D WebGL](https://game.amarpdf.net/?game=slope-3d) — High-FPS WebGL rolling sphere downhill dash with reactive obstacles.
-38. [Drift 3D Hyper Racer](https://game.amarpdf.net/?game=drift-3d) — 3D sports vehicle drift racer with customizable handling and tire smoke physics.
-39. [Cyber Chess Grandmaster](https://game.amarpdf.net/?game=cyber-chess) — Full FIDE chess engine with visual board, move history, and smart bot heuristics.
-40. [Mecha Blaster II: Mecha Clash](https://game.amarpdf.net/?game=mecha-blaster-2) — Retro Symbian mobile mecha shooter with upgradeable laser cannons.
-41. [2020 Super Baseball](https://game.amarpdf.net/?game=snes-2020-super-baseball) — Cybernetic futuristic baseball on Super Nintendo with robots and armor.
-42. [Harvest Moon](https://game.amarpdf.net/?game=snes-harvest-moon-intuitive-ranch-master) — Wholesome 16-bit farming and village life simulation on Super Nintendo.
-43. [Super Bomberman 3](https://game.amarpdf.net/?game=snes-super-bomberman-3) — Multiplayer bomb grid strategy with blast radius upgrades and Louey mounts.
-44. [Teenage Mutant Ninja Turtles IV: Turtles in Time](https://game.amarpdf.net/?game=snes-teenage-mutant-hero-turtles-iv-turtles-in-time) — Premier 16-bit beat 'em up across prehistoric and futuristic eras.
-45. [Tony Hawk's Pro Skater 2](https://game.amarpdf.net/?game=psx-tony-hawk-s-pro-skater-2) — 32-bit PlayStation skateboarding legend with manual reverts and trick combos.
-46. [Star Fox 2](https://game.amarpdf.net/?game=snes-star-fox-2) — Super FX chip 3D space dogfighting defending the Lylat planetary system.
-47. [Tomb Raider: The Last Revelation](https://game.amarpdf.net/?game=psx-tomb-raider-the-last-revelation) — Lara Croft's Egyptian tomb expedition with 3D platforming and ancient puzzles.
-48. [Mega Man X2](https://game.amarpdf.net/?game=snes-rockman-x2) — 16-bit dash, wall-jump, and Maverick-hunting action with CX4 chip enhancements.
-49. [Tomb Raider II: Golden Mask](https://game.amarpdf.net/?game=psx-tomb-raider-ii-golden-mask) — PlayStation 3D action exploration in search of the Golden Mask of Tornarsuk.
-50. [Mega Man X](https://game.amarpdf.net/?game=snes-rockman-x) — The definitive 16-bit action upgrade featuring armor capsules, Buster upgrades, and Zero.
+1. [Flappy Bird: Classic](https://game.amarpdf.net/game/android-flappy-bird-classic) — Tap-to-fly endless obstacle arcade with original pixel physics.
+2. [Subway Surfers: World Tour](https://game.amarpdf.net/game/android-subway-surfers-world-tour) — High-speed 3D rail runner with hoverboards, coin magnets, and mouse-swipe turns.
+3. [Angry Birds: Slingshot Classic](https://game.amarpdf.net/game/android-angry-birds-classic) — Trajectory physics demolition with slingshot projectile destruction.
+4. [Geometry Dash: Neon Rush](https://game.amarpdf.net/game/android-geometry-dash-neon) — Rhythm-based neon cube obstacle jumper with electronic soundtracks.
+5. [Temple Run: Jungle Escape](https://game.amarpdf.net/game/android-temple-run-classic) — Fast-paced 3D temple escape with tilting, jumping, sliding, and corner turns.
+6. [Plants vs. Zombies: Defense](https://game.amarpdf.net/game/android-plants-vs-zombies-web) — Tactical lawn defense deploying peashooters, wall-nuts, and sunflower economy.
+7. [Slope 3D: Infinity Speed](https://game.amarpdf.net/game/android-slope-3d) — Adrenaline 3D rolling ball simulator on neon infinite downhill ramps.
+8. [Cut the Rope: Candy Slash](https://game.amarpdf.net/game/android-cut-the-rope-classic) — Gravity puzzle cutting ropes to feed candy to the hungry creature Om Nom.
+9. [Fruit Ninja: Blade Master](https://game.amarpdf.net/game/android-fruit-ninja-hd) — Mouse-blade slicing frenzy with combos, critical cuts, and bomb dodging.
+10. [Crossy Road: Cyber Crossing](https://game.amarpdf.net/game/android-crossy-road) — Endless isometric road hopper dodging highways, trains, and rivers.
+11. [Shadow Fight: Stickman Brawler](https://game.amarpdf.net/game/android-shadow-fight-2-web) — Martial arts shadow combat with weapon strikes, kicks, and combos.
+12. [Jetpack Joyride: Bullet Lab](https://game.amarpdf.net/game/android-jetpack-joyride) — Bullet-powered jetpack flight navigating laser traps and missile barrages.
+13. [Hill Climb Racing: Offroad 4x4](https://game.amarpdf.net/game/android-hill-climb-racing) — Physics vehicle climb balancing throttle, brake, and gravity over hills.
+14. [Sniper 3D: Tactical Strike](https://game.amarpdf.net/game/android-sniper-3d) — Precision scope targeting, windage adjustment, and silent urban sniper missions.
+15. [2048: Retro Mobile Edition](https://game.amarpdf.net/game/android-2048-original-edition) — Smooth sliding tile arithmetic puzzle aiming for the coveted 2048 tile.
+16. [Drift Max: Tokyo Highway](https://game.amarpdf.net/game/android-drift-max) — Precision tire-smoking corner drifting on neon asphalt raceways.
+17. [Doodle Jump: Classic Bounce](https://game.amarpdf.net/game/android-doodle-jump-classic) — Endless vertical spring platformer dodging black holes and flying monsters.
+18. [Bowmasters: Stickman Archery](https://game.amarpdf.net/game/android-bowmasters) — Turn-based angle and power bow duel with ragdoll physics.
+19. [Knife Hit: Blade Challenge](https://game.amarpdf.net/game/android-knife-hit) — Target-spinning blade thrower testing timing and knife spacing.
+20. [Bad Piggies: Workshop Racer](https://game.amarpdf.net/game/android-bad-piggies-hd) — Mechanical contraption builder engineering flight and land rovers.
+21. [Stickman Hook: Swing Pro](https://game.amarpdf.net/game/android-stickman-hook) — High-momentum grappling rope swings through obstacle-filled bouncy courses.
+22. [Bubble Shooter: Galaxy Pop](https://game.amarpdf.net/game/android-bubble-shooter) — Match-3 cosmic bubble cannon with angle bank shots and cluster drops.
+23. [Vector: Neon Rooftop Runner](https://game.amarpdf.net/game/android-vector-runner) — Dystopian parkour rooftop sprint with realistic vaulting, slides, and climbs.
+24. [Vector: Mobile Rooftop Runner](https://game.amarpdf.net/game/android-vector) — Fluid stickman athletic acrobatics fleeing totalitarian security forces.
+25. [Pixel Gun 3D: Voxel Strike](https://game.amarpdf.net/game/android-pixel-gun) — Blocky voxel FPS arena combat with fast movement and weapon arsenals.
+26. [Pokémon Emerald Version](https://game.amarpdf.net/game/pokemon-emerald) — Legendary 32-bit Game Boy Advance monster-catching RPG in the Hoenn region.
+27. [Super Mario Bros (NES 1985)](https://game.amarpdf.net/game/super-mario-bros) — The foundational 8-bit platforming classic across 8 worlds of the Mushroom Kingdom.
+28. [Tetris (Official NES 1989)](https://game.amarpdf.net/game/tetris-nes) — Nintendo's classic 1989 competitive line-clearing puzzle cartridge.
+29. [Angry Birds Mobile (Nokia J2ME)](https://game.amarpdf.net/game/angry-birds-j2me) — Vintage keypad mobile phone adaptation of the classic physics slinger.
+30. [Tetris Classic 1989](https://game.amarpdf.net/game/tetris) — Clean HTML5 canvas falling tetromino matrix with ghost piece drop and line scoring.
+31. [Pac-Man (Namco NES Original)](https://game.amarpdf.net/game/pacman-nes) — The iconic dot-chomping ghost maze runner with power pellets and fruit bonuses.
+32. [Contra (Konami NES)](https://game.amarpdf.net/game/contra-nes) — Legendary run-and-gun cooperative arcade shooter battling alien insurgencies.
+33. [Subway 3D Surf Runner](https://game.amarpdf.net/game/subway-3d) — WebGL 3D infinite track sprint with dynamic shadows and barrier evasion.
+34. [Nokia Snake Classic 1997](https://game.amarpdf.net/game/snake) — Authentic retro monochrome pixel serpent with 9-speed levels and vintage audio.
+35. [Pac-Maze Retro 1980](https://game.amarpdf.net/game/pac-maze) — Vector arcade maze with smart ghost AI personalities (Blinky, Pinky, Inky, Clyde).
+36. [Mega Man (Capcom NES)](https://game.amarpdf.net/game/mega-man-nes) — High-difficulty 8-bit action platformer battling Robot Masters.
+37. [Slope 3D WebGL](https://game.amarpdf.net/game/slope-3d) — High-FPS WebGL rolling sphere downhill dash with reactive obstacles.
+38. [Drift 3D Hyper Racer](https://game.amarpdf.net/game/drift-3d) — 3D sports vehicle drift racer with customizable handling and tire smoke physics.
+39. [Cyber Chess Grandmaster](https://game.amarpdf.net/game/cyber-chess) — Full FIDE chess engine with visual board, move history, and smart bot heuristics.
+40. [Mecha Blaster II: Mecha Clash](https://game.amarpdf.net/game/mecha-blaster-2) — Retro Symbian mobile mecha shooter with upgradeable laser cannons.
+41. [2020 Super Baseball](https://game.amarpdf.net/game/snes-2020-super-baseball) — Cybernetic futuristic baseball on Super Nintendo with robots and armor.
+42. [Harvest Moon](https://game.amarpdf.net/game/snes-harvest-moon-intuitive-ranch-master) — Wholesome 16-bit farming and village life simulation on Super Nintendo.
+43. [Super Bomberman 3](https://game.amarpdf.net/game/snes-super-bomberman-3) — Multiplayer bomb grid strategy with blast radius upgrades and Louey mounts.
+44. [Teenage Mutant Ninja Turtles IV: Turtles in Time](https://game.amarpdf.net/game/snes-teenage-mutant-hero-turtles-iv-turtles-in-time) — Premier 16-bit beat 'em up across prehistoric and futuristic eras.
+45. [Tony Hawk's Pro Skater 2](https://game.amarpdf.net/game/psx-tony-hawk-s-pro-skater-2) — 32-bit PlayStation skateboarding legend with manual reverts and trick combos.
+46. [Star Fox 2](https://game.amarpdf.net/game/snes-star-fox-2) — Super FX chip 3D space dogfighting defending the Lylat planetary system.
+47. [Tomb Raider: The Last Revelation](https://game.amarpdf.net/game/psx-tomb-raider-the-last-revelation) — Lara Croft's Egyptian tomb expedition with 3D platforming and ancient puzzles.
+48. [Mega Man X2](https://game.amarpdf.net/game/snes-rockman-x2) — 16-bit dash, wall-jump, and Maverick-hunting action with CX4 chip enhancements.
+49. [Tomb Raider II: Golden Mask](https://game.amarpdf.net/game/psx-tomb-raider-ii-golden-mask) — PlayStation 3D action exploration in search of the Golden Mask of Tornarsuk.
+50. [Mega Man X](https://game.amarpdf.net/game/snes-rockman-x) — The definitive 16-bit action upgrade featuring armor capsules, Buster upgrades, and Zero.
 
 ---
 
@@ -130,6 +130,6 @@ The following 50 featured games can be launched instantly in any modern web brow
 - **Canonical Website:** https://game.amarpdf.net
 - **Developer Submission Portal:** https://game.amarpdf.net/#developer
 - **Publisher & Studio:** Arcadex Studio
-- **License / DMCA Inquiries:** https://game.amarpdf.net/?legal=dmca
-- **Privacy Policy:** https://game.amarpdf.net/?legal=privacy
-- **Terms of Service:** https://game.amarpdf.net/?legal=terms
+- **License / DMCA Inquiries:** https://game.amarpdf.net/dmca
+- **Privacy Policy:** https://game.amarpdf.net/privacy
+- **Terms of Service:** https://game.amarpdf.net/terms

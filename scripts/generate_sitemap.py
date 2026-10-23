@@ -63,7 +63,7 @@ def main():
     all_categories = sorted(list(set(categories + standard_categories)))
 
     for cat in all_categories:
-        cat_loc = f"{CANONICAL_DOMAIN}/?category={escape_xml(cat)}"
+        cat_loc = f"{CANONICAL_DOMAIN}/category/{escape_xml(cat)}"
         cat_title = cat.capitalize()
         lines.append('  <url>')
         lines.append(f'    <loc>{cat_loc}</loc>')
@@ -93,7 +93,7 @@ def main():
         "webgl"
     ]
     for plat in standard_platforms:
-        plat_loc = f"{CANONICAL_DOMAIN}/?platform={escape_xml(plat)}"
+        plat_loc = f"{CANONICAL_DOMAIN}/platform/{escape_xml(plat)}"
         plat_title = plat.replace("-", " ").title()
         lines.append('  <url>')
         lines.append(f'    <loc>{plat_loc}</loc>')
@@ -114,7 +114,7 @@ def main():
             continue
         seen_slugs.add(slug)
 
-        game_loc = f"{CANONICAL_DOMAIN}/?game={escape_xml(slug)}"
+        game_loc = f"{CANONICAL_DOMAIN}/game/{escape_xml(slug)}"
         is_featured = bool(g.get("featured") or (g.get("plays", 0) > 100000))
         priority = "0.8" if is_featured else "0.7"
         changefreq = "weekly"

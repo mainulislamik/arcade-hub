@@ -71,7 +71,7 @@ export const GamePlayerModal: React.FC<GamePlayerModalProps> = ({
 
   const handleShareGame = () => {
     sounds.playClick();
-    const shareUrl = `${window.location.origin}/?game=${game.slug}`;
+    const shareUrl = `${window.location.origin}/game/${encodeURIComponent(game.slug || game.id)}`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(shareUrl);
       setCopiedLink(true);

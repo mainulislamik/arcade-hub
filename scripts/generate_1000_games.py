@@ -588,7 +588,7 @@ def main():
 
     for g in all_games:
         sitemap_lines.append("  <url>")
-        sitemap_lines.append(f"    <loc>https://game.amarpdf.net/?game={g['slug']}</loc>")
+        sitemap_lines.append(f"    <loc>https://game.amarpdf.net/game/{g['slug']}</loc>")
         sitemap_lines.append("    <lastmod>2026-10-23</lastmod>")
         sitemap_lines.append("    <changefreq>weekly</changefreq>")
         sitemap_lines.append("    <priority>0.9</priority>")

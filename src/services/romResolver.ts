@@ -35,7 +35,7 @@ export const PLATFORM_DEFAULT_ROMS: Record<string, string> = {
   jar: '/roms/nokia-rally-3d.jar',
   sis: '/roms/symbian-game.sis',
   dos: '/roms/dos-action.zip',
-  swf: '/roms/pacman.swf',
+  swf: '/games/web-runner.html',
   html: '/games/web-runner.html',
   zip: '/games/web-runner.html'
 };

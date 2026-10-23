@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <defs>
+    <linearGradient id="arcadexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+  </defs>
+  <rect width="24" height="24" rx="6" fill="#0f172a" />
+  <!-- Gamepad body -->
+  <path d="M20 7.5H4C2.9 7.5 2 8.4 2 9.5v5c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-5c0-1.1-.9-2-2-2z" fill="url(#arcadexGrad)"/>
+  <!-- D-pad (Cyan) -->
+  <path d="M8.5 10H7v1.5H5.5v1H7V14h1.5v-1.5H10v-1H8.5V10z" fill="#ffffff" />
+  <!-- Action Buttons (Indigo/Cyan Accent) -->
+  <circle cx="15.5" cy="12" r="1.1" fill="#ffffff" />
+  <circle cx="18" cy="10.5" r="1.1" fill="#ffffff" />
+  <circle cx="18" cy="13.5" r="0.9" fill="#e0e7ff" />
+</svg>
