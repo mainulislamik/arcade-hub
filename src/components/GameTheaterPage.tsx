@@ -320,7 +320,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-black text-slate-900 tracking-tight">{game.title}</h1>
+                <h1 className="text-xl font-black text-slate-900 tracking-tight">{game.title} - Free Online Game</h1>
                 {game.badge && (
                   <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-full border border-amber-300">
                     {game.badge}
@@ -441,6 +441,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             {/* Canvas Screenshot & Clip Tool */}
             <button
               onClick={handleTakeSnapshot}
+              aria-label="Take Game Screenshot"
               className={`p-2 rounded-xl transition-all border ${
                 snapshotTaken
                   ? 'bg-emerald-50 text-emerald-600 border-emerald-300'
@@ -454,6 +455,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             {/* P2P Multiplayer Lobby Button */}
             <button
               onClick={() => { sounds.playClick(); setShowMultiplayerModal(true); }}
+              aria-label="Open 2-Player WebRTC P2P Multiplayer Lobby"
               className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
               title="2-Player WebRTC P2P Multiplayer (0% Server Load)"
             >
@@ -464,6 +466,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             {/* Like Button */}
             <button
               onClick={() => handleVote('like')}
+              aria-label={`Like ${game.title}`}
               className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                 userVote === 'like'
                   ? 'bg-emerald-50 text-emerald-700 border-emerald-300 shadow-sm'
@@ -480,6 +483,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
                 sounds.playClick();
                 onToggleFavorite(game.id);
               }}
+              aria-label={isFavorite ? `Remove ${game.title} from favorites` : `Add ${game.title} to favorites`}
               className={`p-2 rounded-xl transition-all border ${
                 isFavorite
                   ? 'bg-rose-50 text-rose-600 border-rose-200'
@@ -493,6 +497,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             {/* Save State & Rewind Vault */}
             <button
               onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setShowSaveStateHUD(true); }}
+              aria-label="Save or load game state"
               className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
               title="Quick Save (F1) / Load (F3) / Rewind (\)"
             >
@@ -503,6 +508,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             {/* Instant 30s Replay Clip */}
             <button
               onClick={handleExportReplay}
+              aria-label="Record and export 30-second replay clip"
               className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
               title="Record & Export 30-Second Replay Video"
             >
@@ -513,6 +519,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             {/* AI Gaming Coach */}
             <button
               onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setShowAiCoachModal(true); }}
+              aria-label="Open AI Gaming Coach"
               className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
               title="Open Arcadex AI Gaming Coach & Strategies"
             >
@@ -523,6 +530,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             {/* Speedrun Hall of Fame */}
             <button
               onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setShowSpeedrunModal(true); }}
+              aria-label="Open Speedrun Leaderboard"
               className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
               title="Speedrun Leaderboard & Ghost Times"
             >
@@ -533,6 +541,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             {/* Gamepad Calibrator */}
             <button
               onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setShowGamepadModal(true); }}
+              aria-label="Gamepad settings and remapper"
               className="p-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-colors"
               title="Gamepad Studio, Deadzones & Button Remapper"
             >

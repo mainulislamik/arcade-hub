@@ -579,8 +579,8 @@ def main():
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
         '  <url>',
-        '    <loc>http://localhost:3080/</loc>',
-        '    <lastmod>2026-10-08</lastmod>',
+        '    <loc>https://game.amarpdf.net/</loc>',
+        '    <lastmod>2026-10-23</lastmod>',
         '    <changefreq>daily</changefreq>',
         '    <priority>1.0</priority>',
         '  </url>'
@@ -588,8 +588,8 @@ def main():
 
     for g in all_games:
         sitemap_lines.append("  <url>")
-        sitemap_lines.append(f"    <loc>http://localhost:3080/?game={g['slug']}</loc>")
-        sitemap_lines.append("    <lastmod>2026-10-08</lastmod>")
+        sitemap_lines.append(f"    <loc>https://game.amarpdf.net/?game={g['slug']}</loc>")
+        sitemap_lines.append("    <lastmod>2026-10-23</lastmod>")
         sitemap_lines.append("    <changefreq>weekly</changefreq>")
         sitemap_lines.append("    <priority>0.9</priority>")
         sitemap_lines.append("  </url>")

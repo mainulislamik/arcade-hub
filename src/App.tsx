@@ -4,7 +4,7 @@ import { GAMES_CATALOG } from './data/games';
 import { getPlayerProfile, getFavorites, toggleFavorite as toggleFavStorage } from './utils/storage';
 import { getCustomGames } from './utils/customGamesStorage';
 import { sounds } from './utils/soundEngine';
-import { updatePageSEO } from './utils/seo';
+import { updateGameSEO, updateCategorySEO, resetToHomeSEO, updatePageSEO } from './utils/seo';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { CrazyGamesGrid } from './components/CrazyGamesGrid';
@@ -109,30 +109,22 @@ export const App: React.FC = () => {
         const found = allGames.find((g) => g.slug === gameSlug || g.id === gameSlug);
         if (found) {
           setSelectedGame(found);
-          updatePageSEO({
-            title: `${found.title} - Play Free Online on Arcadex`,
-            description: found.description,
-            canonical: `http://localhost:3080/?game=${found.slug}`
-          });
+          updateGameSEO(found);
           return;
         }
       } else {
         setSelectedGame(null);
       }
 
-      if (catParam && ['all', 'action', 'puzzle', 'retro', 'arcade', 'strategy', 'word', 'driving', 'shooting', 'favorites'].includes(catParam)) {
+      if (catParam && ['all', 'action', 'puzzle', 'retro', 'arcade', 'strategy', 'word', 'driving', 'shooting', 'playstation', 'favorites'].includes(catParam)) {
         setActiveCategory(catParam);
-        updatePageSEO({
-          title: `Free ${catParam.toUpperCase()} Games Online - Arcadex`,
-          description: `Play top rated ${catParam} browser games without download or login on Arcadex.`,
-          canonical: `http://localhost:3080/?category=${catParam}`
-        });
+        if (catParam === 'all') {
+          resetToHomeSEO();
+        } else {
+          updateCategorySEO(catParam);
+        }
       } else if (!gameSlug) {
-        updatePageSEO({
-          title: 'Arcadex - Universal Original Game Vault & Player',
-          description: 'Play original Nokia Java, Symbian SIS, Retro GBA and Web games online for free with 0% server load.',
-          canonical: 'http://localhost:3080/'
-        });
+        resetToHomeSEO();
       }
 
       if (legalParam) {
@@ -156,11 +148,7 @@ export const App: React.FC = () => {
     window.history.pushState({}, '', url.toString());
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    updatePageSEO({
-      title: `${game.title} - Play Free Online on Arcadex`,
-      description: game.description,
-      canonical: `http://localhost:3080/?game=${game.slug}`
-    });
+    updateGameSEO(game);
   }, []);
 
   // Back to Lobby / Home
@@ -172,11 +160,7 @@ export const App: React.FC = () => {
     window.history.pushState({}, '', url.toString());
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    updatePageSEO({
-      title: 'Arcadex - Universal Original Game Vault & Player',
-      description: 'Play original Nokia Java, Symbian SIS, Retro GBA and Web games online for free with 0% server load.',
-      canonical: 'http://localhost:3080/'
-    });
+    resetToHomeSEO();
   }, []);
 
   // Category Switch
@@ -189,8 +173,10 @@ export const App: React.FC = () => {
     url.searchParams.delete('admin');
     if (cat === 'all') {
       url.searchParams.delete('category');
+      resetToHomeSEO();
     } else {
       url.searchParams.set('category', cat);
+      updateCategorySEO(cat);
     }
     window.history.pushState({}, '', url.toString());
     window.scrollTo({ top: 0, behavior: 'smooth' });

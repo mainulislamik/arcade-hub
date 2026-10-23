@@ -104,7 +104,7 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
           {game.coverImage ? (
             <img
               src={game.coverImage}
-              alt={game.title}
+              alt={`Play ${game.title} - Free Online ${game.category || 'Arcade'} Game`}
               onError={(e) => handleGameImageError(e, game.title, game.platform, game.category)}
               className={`w-full h-full object-cover transition-all duration-500 ${
                 isHovered ? 'scale-110 opacity-0' : 'scale-100 opacity-100'
@@ -151,9 +151,10 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
                 sounds.playPowerup();
                 onToggleFavorite(game.id);
               }}
-              className={`pointer-events-auto p-1.5 rounded-xl backdrop-blur-md transition-all shadow-sm ${
-                isFav 
-                  ? 'bg-rose-500 text-white shadow-rose-500/20 scale-110' 
+              aria-label={isFav ? `Remove ${game.title} from favorites` : `Add ${game.title} to favorites`}
+              className={`pointer-events-auto p-1.5 rounded-xl backdrop-blur-md transition-all shadow-sm cursor-pointer ${
+                isFav
+                  ? 'bg-rose-500 text-white shadow-rose-500/20 scale-110'
                   : 'bg-white/90 text-slate-500 hover:text-rose-600 hover:bg-white border border-slate-200'
               }`}
               title={isFav ? 'Remove from favorites' : 'Add to favorites'}
@@ -209,6 +210,24 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
 
   return (
     <div className="space-y-8 pb-12">
+      {/* Semantic H1 for Lobby Home & Category views */}
+      {activeCategory === 'all' && !selectedTag ? (
+        <h1 className="sr-only">Arcadex - Free Online Web Games &amp; Retro Arcade</h1>
+      ) : (
+        <div className="mb-2">
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            {activeCategory === 'favorites'
+              ? 'Your Favorite Games - Arcadex'
+              : `Free ${activeCategory.toUpperCase()} Games Online - Arcadex`}
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-600 mt-1">
+            {activeCategory === 'favorites'
+              ? 'Instant play your bookmarked games with zero download.'
+              : `Play hundreds of free ${activeCategory} games directly in your browser with zero download and 60 FPS performance.`}
+          </p>
+        </div>
+      )}
+
       {/* Featured Big Bento Spotlight Banner (When browsing All / Home) */}
       {activeCategory === 'all' && !selectedTag && featuredGame && (
         <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-indigo-50/80 via-blue-50/40 to-white border border-indigo-100 shadow-sm group">
@@ -225,9 +244,9 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
                 </span>
               </div>
 
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-none">
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-none">
                 {featuredGame.title}
-              </h1>
+              </h2>
 
               <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 sm:line-clamp-3 max-w-xl leading-relaxed">
                 {featuredGame.description}
@@ -239,6 +258,7 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
                     sounds.playClick();
                     onSelectGame(featuredGame);
                   }}
+                  aria-label={`Play ${featuredGame.title} Free Online`}
                   className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-black text-sm shadow-lg shadow-indigo-500/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Play className="w-4 h-4 fill-current" />
@@ -261,7 +281,7 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
               {featuredGame.coverImage ? (
                 <img
                   src={featuredGame.coverImage}
-                  alt={featuredGame.title}
+                  alt={`Play ${featuredGame.title} - Free Online ${featuredGame.category || 'Arcade'} Game`}
                   onError={(e) => handleGameImageError(e, featuredGame.title, featuredGame.platform, featuredGame.category)}
                   className="w-full h-full object-cover rounded-2xl border border-slate-200 shadow-md group-hover:scale-105 transition-transform duration-700"
                 />
@@ -296,6 +316,7 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
               sounds.playPowerup();
               onOpenLocalRomModal();
             }}
+            aria-label="Open Client-Side ROM Drop & Play Emulator"
             className="shrink-0 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
           >
             <UploadCloud className="w-4 h-4" />
@@ -334,6 +355,7 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
               sounds.playClick();
               setVisibleCount(prev => prev + 24);
             }}
+            aria-label={`Load ${Math.min(24, filteredGames.length - displayedGames.length)} more games`}
             className="px-8 py-3.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-black text-sm shadow-sm hover:border-indigo-400 transition-all flex items-center gap-2 cursor-pointer"
           >
             <span>LOAD MORE GAMES ({filteredGames.length - displayedGames.length} LEFT)</span>

@@ -36,7 +36,7 @@ export const GameCard: React.FC<GameCardProps> = ({
         {game.coverImage ? (
           <img
             src={game.coverImage}
-            alt={`${game.title} Official Game Cover`}
+            alt={`Play ${game.title} - Free Online ${game.category || 'Arcade'} Game`}
             loading="lazy"
             onError={(e) => handleGameImageError(e, game.title, game.platform, game.category)}
             className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out"
@@ -124,7 +124,8 @@ export const GameCard: React.FC<GameCardProps> = ({
                 sounds.playVictory();
                 onPlay(game);
               }}
-              className="col-span-4 py-2.5 px-4 rounded-xl bg-slate-900 text-white font-extrabold text-xs flex items-center justify-center gap-2 group-hover:bg-indigo-600 group-hover:shadow-lg group-hover:shadow-indigo-500/30 transition-all duration-200 active:scale-95 border border-slate-800 group-hover:border-indigo-400"
+              aria-label={`Play ${game.title} Now Free`}
+              className="col-span-4 py-2.5 px-4 rounded-xl bg-slate-900 text-white font-extrabold text-xs flex items-center justify-center gap-2 group-hover:bg-indigo-600 group-hover:shadow-lg group-hover:shadow-indigo-500/30 transition-all duration-200 active:scale-95 border border-slate-800 group-hover:border-indigo-400 cursor-pointer"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>PLAY NOW</span>

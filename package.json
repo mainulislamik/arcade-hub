@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "tsc && vite build",
+    "sitemap": "python3 scripts/generate_sitemap.py",
+    "build": "python3 scripts/generate_sitemap.py && tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

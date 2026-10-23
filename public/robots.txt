@@ -1,23 +1,50 @@
+# robots.txt for Arcadex Web Gaming Platform
+# Canonical Host: https://game.amarpdf.net
+
 User-agent: *
 Allow: /
+Disallow: /imon/
 Disallow: /dist/
+Disallow: /*.bin$
+Disallow: /*.pak$
 
+# Search Engine Crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# AI Answer Engines & LLM Search Bots
 User-agent: GPTBot
 Allow: /
 
-User-agent: OAI-SearchBot
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-User-agent: Google-Extended
+User-agent: ClaudeBot
 Allow: /
 
 User-agent: Claude-Web
 Allow: /
 
-User-agent: CCBot
-Disallow: /
+User-agent: PerplexityBot
+Allow: /
 
-Sitemap: http://localhost:3080/sitemap.xml
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Canonical XML Sitemap
+Sitemap: https://game.amarpdf.net/sitemap.xml
