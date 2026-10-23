@@ -17,6 +17,7 @@ import {
 import { sounds } from '../../utils/soundEngine';
 import { HapticEngine } from '../../utils/hapticEngine';
 import { EcoEngine } from '../../utils/ecoEngine';
+import { AdaptiveGameControls } from './AdaptiveGameControls';
 
 interface UniversalWasmRunnerProps {
   game: GameItem;
@@ -1280,219 +1281,17 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
         </div>
       </div>
 
-      {/* Docked Virtual Keypad for Mobile / Touch Devices (Shown only when toggled on) */}
-      {showTouchKeypad && ['jar', 'sis'].includes(format) && (
-        <div className="w-full bg-slate-100 border-t border-slate-300 px-4 py-3 flex flex-col items-center gap-2 animate-in slide-in-from-bottom duration-200 shrink-0">
-          <div className="flex items-center justify-between w-full max-w-md text-xs text-slate-600 font-mono px-2">
-            <span className="flex items-center gap-1.5 text-indigo-600 font-bold">
-              <Smartphone className="w-3.5 h-3.5" />
-              <span>Nokia Series Keypad</span>
-            </span>
-            <span className="text-[11px] text-slate-500">PC Keyboard: Arrow Keys / WASD / Space</span>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 w-full max-w-[280px]">
-            {keypadButtons.map((row, rIdx) => (
-              <React.Fragment key={rIdx}>
-                {row.map((k) => (
-                  <button
-                    key={k}
-                    onMouseDown={() => { HapticEngine.lightTick(); sendKey(k, 'keydown'); }}
-                    onMouseUp={() => sendKey(k, 'keyup')}
-                    onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey(k, 'keydown'); }}
-                    onTouchEnd={(e) => { e.preventDefault(); sendKey(k, 'keyup'); }}
-                    className="h-10 bg-white hover:bg-slate-50 active:bg-indigo-600 text-slate-800 active:text-white rounded-lg font-bold font-mono text-sm border border-slate-300 shadow-sm transition-all flex items-center justify-center cursor-pointer"
-                  >
-                    {k}
-                  </button>
-                ))}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Universal Interactive Game Key Suggestions & Controller Bar (Desktop + Mobile) */}
-      {['gba', 'nes', 'snes', 'md', 'sega', 'psx', 'gb', 'gbc', 'psp', 'ps2', 'emulatorjs'].includes(format) || game.engineType === 'emulatorjs' || game.engineType === 'ps2_wasm' ? (
-        <div className="w-full bg-white border-t border-slate-200 p-3 sm:p-4 flex flex-col items-center gap-3 shadow-sm">
-          {/* Header & Status Indicator */}
-          <div className="flex flex-wrap items-center justify-between w-full max-w-4xl text-xs px-2 gap-2">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5 font-mono text-[11px] sm:text-xs">
-                <Gamepad2 className="w-4 h-4 text-indigo-600 inline" />
-                <span>GAME CONTROLS GUIDE (KEYBOARD & TOUCH)</span>
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] text-slate-500 hidden md:inline">
-                Press physical keyboard or click/touch buttons below:
-              </span>
-              <button
-                onClick={() => {
-                  HapticEngine.selectionClick();
-                  iframeRef.current?.focus();
-                  iframeRef.current?.contentWindow?.focus();
-                }}
-                className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded text-indigo-700 font-mono text-[11px] font-bold transition-colors cursor-pointer"
-                title="Focus game canvas for keyboard"
-              >
-                🎯 Refocus Game
-              </button>
-            </div>
-          </div>
-
-          {/* Key Suggestions Cards & Interactive Virtual Controller Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 w-full max-w-4xl">
-            {/* 1. D-Pad / Movement */}
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-between gap-1.5 shadow-sm col-span-2 sm:col-span-2">
-              <div className="text-[10px] uppercase font-bold text-slate-600 tracking-wider">
-                Direction / Aim & Run
-              </div>
-              <div className="flex items-center gap-1 font-mono text-[11px] text-indigo-600">
-                <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-slate-800 font-bold shadow-sm">↑</kbd>
-                <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-slate-800 font-bold shadow-sm">↓</kbd>
-                <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-slate-800 font-bold shadow-sm">←</kbd>
-                <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-slate-800 font-bold shadow-sm">→</kbd>
-                <span className="text-slate-400 mx-1">or</span>
-                <span className="text-slate-700 font-bold">WASD</span>
-              </div>
-              <div className="grid grid-cols-3 gap-1 w-28 h-20 items-center justify-center mt-1">
-                <div />
-                <button
-                  onMouseDown={() => { HapticEngine.lightTick(); sendKey('ArrowUp', 'keydown'); }}
-                  onMouseUp={() => sendKey('ArrowUp', 'keyup')}
-                  onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('ArrowUp', 'keydown'); }}
-                  onTouchEnd={(e) => { e.preventDefault(); sendKey('ArrowUp', 'keyup'); }}
-                  className="h-8 bg-white hover:bg-slate-100 active:bg-indigo-600 rounded border border-slate-300 text-slate-700 active:text-white font-bold flex items-center justify-center text-xs shadow-sm cursor-pointer"
-                >▲</button>
-                <div />
-                <button
-                  onMouseDown={() => { HapticEngine.lightTick(); sendKey('ArrowLeft', 'keydown'); }}
-                  onMouseUp={() => sendKey('ArrowLeft', 'keyup')}
-                  onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('ArrowLeft', 'keydown'); }}
-                  onTouchEnd={(e) => { e.preventDefault(); sendKey('ArrowLeft', 'keyup'); }}
-                  className="h-8 bg-white hover:bg-slate-100 active:bg-indigo-600 rounded border border-slate-300 text-slate-700 active:text-white font-bold flex items-center justify-center text-xs shadow-sm cursor-pointer"
-                >◀</button>
-                <button
-                  onMouseDown={() => { HapticEngine.lightTick(); sendKey('ArrowDown', 'keydown'); }}
-                  onMouseUp={() => sendKey('ArrowDown', 'keyup')}
-                  onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('ArrowDown', 'keydown'); }}
-                  onTouchEnd={(e) => { e.preventDefault(); sendKey('ArrowDown', 'keyup'); }}
-                  className="h-8 bg-white hover:bg-slate-100 active:bg-indigo-600 rounded border border-slate-300 text-slate-700 active:text-white font-bold flex items-center justify-center text-xs shadow-sm cursor-pointer"
-                >▼</button>
-                <button
-                  onMouseDown={() => { HapticEngine.lightTick(); sendKey('ArrowRight', 'keydown'); }}
-                  onMouseUp={() => sendKey('ArrowRight', 'keyup')}
-                  onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('ArrowRight', 'keydown'); }}
-                  onTouchEnd={(e) => { e.preventDefault(); sendKey('ArrowRight', 'keyup'); }}
-                  className="h-8 bg-white hover:bg-slate-100 active:bg-indigo-600 rounded border border-slate-300 text-slate-700 active:text-white font-bold flex items-center justify-center text-xs shadow-sm cursor-pointer"
-                >▶</button>
-              </div>
-            </div>
-
-            {/* 2. Fire / Shoot (Button B) */}
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-between gap-1.5 shadow-sm">
-              <div className="text-[10px] uppercase font-bold text-rose-600 tracking-wider">
-                🔫 Fire / Shoot (B)
-              </div>
-              <div className="flex items-center gap-1 font-mono text-[11px]">
-                <kbd className="px-2 py-0.5 bg-rose-50 border border-rose-200 rounded text-rose-700 font-bold shadow-sm">Z</kbd>
-                <span className="text-slate-400">or</span>
-                <kbd className="px-2 py-0.5 bg-white border border-slate-300 rounded text-slate-700 font-bold shadow-sm">J</kbd>
-              </div>
-              <button
-                onMouseDown={() => { HapticEngine.selectionClick(); sendKey('KeyZ', 'keydown'); }}
-                onMouseUp={() => sendKey('KeyZ', 'keyup')}
-                onTouchStart={(e) => { e.preventDefault(); HapticEngine.selectionClick(); sendKey('KeyZ', 'keydown'); }}
-                onTouchEnd={(e) => { e.preventDefault(); sendKey('KeyZ', 'keyup'); }}
-                className="w-14 h-14 rounded-full bg-gradient-to-br from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 active:scale-95 text-white font-black text-sm shadow-md shadow-rose-500/20 border-2 border-white flex items-center justify-center cursor-pointer transition-transform"
-              >
-                FIRE
-              </button>
-            </div>
-
-            {/* 3. Jump (Button A) */}
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-between gap-1.5 shadow-sm">
-              <div className="text-[10px] uppercase font-bold text-indigo-600 tracking-wider">
-                🦘 Jump (A)
-              </div>
-              <div className="flex items-center gap-1 font-mono text-[11px]">
-                <kbd className="px-2 py-0.5 bg-indigo-50 border border-indigo-200 rounded text-indigo-700 font-bold shadow-sm">X</kbd>
-                <span className="text-slate-400">or</span>
-                <kbd className="px-2 py-0.5 bg-white border border-slate-300 rounded text-slate-700 font-bold shadow-sm">K</kbd>
-              </div>
-              <button
-                onMouseDown={() => { HapticEngine.selectionClick(); sendKey('KeyX', 'keydown'); }}
-                onMouseUp={() => sendKey('KeyX', 'keyup')}
-                onTouchStart={(e) => { e.preventDefault(); HapticEngine.selectionClick(); sendKey('KeyX', 'keydown'); }}
-                onTouchEnd={(e) => { e.preventDefault(); sendKey('KeyX', 'keyup'); }}
-                className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 active:scale-95 text-white font-black text-sm shadow-md shadow-indigo-500/20 border-2 border-white flex items-center justify-center cursor-pointer transition-transform"
-              >
-                JUMP
-              </button>
-            </div>
-
-            {/* 4. Turbo / Rapid Fire */}
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-between gap-1.5 shadow-sm">
-              <div className="text-[10px] uppercase font-bold text-purple-700 tracking-wider">
-                ⚡ Turbo Rapid
-              </div>
-              <div className="flex items-center gap-1 font-mono text-[11px]">
-                <kbd className="px-1.5 py-0.5 bg-purple-50 border border-purple-200 rounded text-purple-700 font-bold shadow-sm">A</kbd>
-                <span className="text-slate-400">/</span>
-                <kbd className="px-1.5 py-0.5 bg-purple-50 border border-purple-200 rounded text-purple-700 font-bold shadow-sm">S</kbd>
-              </div>
-              <div className="flex gap-1.5 mt-1">
-                <button
-                  onMouseDown={() => { HapticEngine.lightTick(); sendKey('KeyA', 'keydown'); }}
-                  onMouseUp={() => sendKey('KeyA', 'keyup')}
-                  onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('KeyA', 'keydown'); }}
-                  onTouchEnd={(e) => { e.preventDefault(); sendKey('KeyA', 'keyup'); }}
-                  className="w-10 h-10 rounded-full bg-white hover:bg-purple-50 active:bg-purple-600 border border-purple-300 text-purple-700 active:text-white font-bold text-xs flex items-center justify-center cursor-pointer shadow-sm"
-                >TA</button>
-                <button
-                  onMouseDown={() => { HapticEngine.lightTick(); sendKey('KeyS', 'keydown'); }}
-                  onMouseUp={() => sendKey('KeyS', 'keyup')}
-                  onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('KeyS', 'keydown'); }}
-                  onTouchEnd={(e) => { e.preventDefault(); sendKey('KeyS', 'keyup'); }}
-                  className="w-10 h-10 rounded-full bg-white hover:bg-purple-50 active:bg-purple-600 border border-purple-300 text-purple-700 active:text-white font-bold text-xs flex items-center justify-center cursor-pointer shadow-sm"
-                >TB</button>
-              </div>
-            </div>
-
-            {/* 5. Start & Select Controls */}
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-between gap-1.5 shadow-sm">
-              <div className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider">
-                ▶ Start / Select
-              </div>
-              <div className="flex items-center gap-1 font-mono text-[10px] text-slate-600">
-                <span>Enter / V</span>
-              </div>
-              <div className="flex flex-col gap-1.5 w-full mt-1">
-                <button
-                  onMouseDown={() => { HapticEngine.lightTick(); sendKey('Enter', 'keydown'); }}
-                  onMouseUp={() => sendKey('Enter', 'keyup')}
-                  onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('Enter', 'keydown'); }}
-                  onTouchEnd={(e) => { e.preventDefault(); sendKey('Enter', 'keyup'); }}
-                  className="w-full py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold font-mono text-[11px] shadow-sm flex items-center justify-center cursor-pointer"
-                >
-                  START (Enter)
-                </button>
-                <button
-                  onMouseDown={() => { HapticEngine.lightTick(); sendKey('KeyV', 'keydown'); }}
-                  onMouseUp={() => sendKey('KeyV', 'keyup')}
-                  onTouchStart={(e) => { e.preventDefault(); HapticEngine.lightTick(); sendKey('KeyV', 'keydown'); }}
-                  onTouchEnd={(e) => { e.preventDefault(); sendKey('KeyV', 'keyup'); }}
-                  className="w-full py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 font-bold font-mono text-[10px] shadow-sm flex items-center justify-center cursor-pointer"
-                >
-                  SELECT (V)
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {/* Adaptive Device-Aware Game Console & Controls */}
+      <AdaptiveGameControls
+        game={game}
+        format={format}
+        onSendKey={sendKey}
+        onRefocus={() => {
+          iframeRef.current?.focus();
+          iframeRef.current?.contentWindow?.focus();
+        }}
+        soundEnabled={soundEnabled}
+      />
     </div>
   );
 };

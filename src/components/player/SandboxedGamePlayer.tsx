@@ -16,8 +16,7 @@ import {
   Gamepad,
   Monitor
 } from 'lucide-react';
-import { RetroMobileKeypad } from './RetroMobileKeypad';
-import { VirtualGamepad } from './VirtualGamepad';
+import { AdaptiveGameControls } from './AdaptiveGameControls';
 import { sounds } from '../../utils/soundEngine';
 
 // Import All Native Canvas Game Components
@@ -82,9 +81,6 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
   const [isStreamingReady, setIsStreamingReady] = useState<boolean>(false);
   const [isStreamingActive, setIsStreamingActive] = useState<boolean>(false);
   const [fps, setFps] = useState<number>(60);
-  const [showKeypad, setShowKeypad] = useState<boolean>(false);
-  const [showVirtualGamepad, setShowVirtualGamepad] = useState<boolean>(false);
-  
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -169,6 +165,36 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
     if (iframeRef.current && iframeRef.current.contentWindow) {
       try {
         iframeRef.current.contentWindow.postMessage({ type: 'KEY_UP', key: eventKey, code }, '*');
+      } catch (_) {}
+    }
+  };
+
+  // Universal Send Key dispatcher for AdaptiveGameControls
+  const sendKey = (key: string, type: 'keydown' | 'keyup') => {
+    let code = key;
+    let eventKey = key;
+    if (key === 'ArrowUp') { code = 'ArrowUp'; eventKey = 'ArrowUp'; }
+    else if (key === 'ArrowDown') { code = 'ArrowDown'; eventKey = 'ArrowDown'; }
+    else if (key === 'ArrowLeft') { code = 'ArrowLeft'; eventKey = 'ArrowLeft'; }
+    else if (key === 'ArrowRight') { code = 'ArrowRight'; eventKey = 'ArrowRight'; }
+    else if (key === 'KeyX') { code = 'KeyX'; eventKey = 'x'; }
+    else if (key === 'KeyZ') { code = 'KeyZ'; eventKey = 'z'; }
+    else if (key === 'KeyS') { code = 'KeyS'; eventKey = 's'; }
+    else if (key === 'KeyA') { code = 'KeyA'; eventKey = 'a'; }
+    else if (key === 'Enter') { code = 'Enter'; eventKey = 'Enter'; }
+    else if (key === 'KeyV') { code = 'KeyV'; eventKey = 'v'; }
+
+    try {
+      const evt = new KeyboardEvent(type, { key: eventKey, code, bubbles: true, cancelable: true });
+      window.dispatchEvent(evt);
+      document.dispatchEvent(evt);
+    } catch (_) {}
+
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      try {
+        iframeRef.current.contentWindow.postMessage({ type: type === 'keydown' ? 'KEY_DOWN' : 'KEY_UP', key: eventKey, code }, '*');
+        iframeRef.current.contentWindow.postMessage({ type: 'EMULATOR_KEY', key, eventType: type }, '*');
+        iframeRef.current.contentWindow.postMessage({ type: 'NOKIA_KEY', key, eventType: type }, '*');
       } catch (_) {}
     }
   };
@@ -360,63 +386,19 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
         )}
       </div>
 
-      {/* Universal Touch Controller & Retro Keypad Drawer (Accessible across all games & devices) */}
-      <div className="w-full p-3 bg-slate-50 border-t border-slate-200 flex flex-col items-center gap-3">
-        {/* Keypad & Gamepad Toggle Selectors */}
-        <div className="flex items-center gap-2 flex-wrap justify-center">
-          <button
-            onClick={() => {
-              setShowVirtualGamepad(!showVirtualGamepad);
-              setShowKeypad(false);
-            }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
-              showVirtualGamepad 
-                ? 'bg-indigo-600 text-white shadow-indigo-600/20' 
-                : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-100'
-            }`}
-          >
-            <Gamepad className="w-3.5 h-3.5" />
-            <span>{showVirtualGamepad ? 'Hide Gamepad' : 'Touch Gamepad'}</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setShowKeypad(!showKeypad);
-              setShowVirtualGamepad(false);
-            }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
-              showKeypad 
-                ? 'bg-amber-600 text-white shadow-amber-600/20' 
-                : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-100'
-            }`}
-          >
-            <Smartphone className="w-3.5 h-3.5" />
-            <span>{showKeypad ? 'Hide Retro Keypad' : 'Nokia / Retro Keypad'}</span>
-          </button>
-        </div>
-
-        {/* Dynamic Mobile Keypad Overlay */}
-        {showKeypad && (
-          <div className="w-full animate-in fade-in zoom-in duration-200">
-            <RetroMobileKeypad
-              onKeyPress={handleKeypadPress}
-              onKeyRelease={handleKeypadRelease}
-              soundEnabled={soundEnabled}
-            />
-          </div>
-        )}
-
-        {/* Dynamic Virtual Arcade Gamepad Overlay */}
-        {showVirtualGamepad && (
-          <div className="w-full animate-in fade-in zoom-in duration-200">
-            <VirtualGamepad
-              onButtonPress={handleKeypadPress}
-              onButtonRelease={handleKeypadRelease}
-              soundEnabled={soundEnabled}
-            />
-          </div>
-        )}
-      </div>
+      {/* For Non-WASM Runner Games (Canvas / HTML5 / React Games), Render AdaptiveGameControls */}
+      {!(game.isCustomUpload || Boolean(game.romUrl) || ['j2me_wasm', 'emulatorjs', 'ruffle_flash', 'symbian_sis', 'html5_zip'].includes(game.engineType || '')) && (
+        <AdaptiveGameControls
+          game={game}
+          format={game.romFormat || 'html'}
+          onSendKey={sendKey}
+          onRefocus={() => {
+            iframeRef.current?.focus();
+            iframeRef.current?.contentWindow?.focus();
+          }}
+          soundEnabled={soundEnabled}
+        />
+      )}
     </div>
   );
 };
