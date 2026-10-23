@@ -29,7 +29,7 @@ export const PLATFORM_DEFAULT_ROMS: Record<string, string> = {
   snes: '/roms/astrohawk.smc',
   sega: '/roms/sega-action-adventure.gen',
   md: '/roms/sega-action-adventure.gen',
-  psx: '/roms/psx-action.exe',
+  psx: '/roms/psx-action-adventure.zip',
   psp: '/roms/psp-showcase.pbp',
   ps2: '/roms/ps2-boot.elf',
   jar: '/roms/nokia-rally-3d.jar',
@@ -177,32 +177,50 @@ export async function getRomCacheStats(): Promise<{ count: number; totalMb: numb
 
 // Build resilient multi-mirror list for a game
 export function buildRomMirrorCandidates(game: GameItem, format: string): string[] {
-  const candidates: string[] = [];
+  const rawList: string[] = [];
+
+  const addCandidate = (url?: string) => {
+    if (!url) return;
+    let normalized = url.trim();
+    if (normalized === '/roms/psx-action.exe') {
+      normalized = '/roms/psx-action-adventure.zip';
+    }
+    if (normalized && !rawList.includes(normalized)) {
+      rawList.push(normalized);
+    }
+  };
 
   // 1. Primary custom sources if provided
   if (Array.isArray(game.romSources) && game.romSources.length > 0) {
     for (const src of game.romSources) {
-      if (src && !candidates.includes(src)) candidates.push(src);
+      addCandidate(src);
     }
   }
 
   // 2. Primary catalog romUrl
-  if (game.romUrl && !candidates.includes(game.romUrl)) {
-    candidates.push(game.romUrl);
-  }
+  addCandidate(game.romUrl);
 
   // 3. Binary URL if provided
-  if (game.binaryUrl && !candidates.includes(game.binaryUrl)) {
-    candidates.push(game.binaryUrl);
-  }
+  addCandidate(game.binaryUrl);
 
   // 4. Fallback platform default ROM
   const defaultRom = PLATFORM_DEFAULT_ROMS[format] || PLATFORM_DEFAULT_ROMS.nes;
-  if (defaultRom && !candidates.includes(defaultRom)) {
-    candidates.push(defaultRom);
+  addCandidate(defaultRom);
+
+  // Separate local fallbacks (urls starting with '/roms/') from remote URLs
+  const remoteUrls: string[] = [];
+  const localUrls: string[] = [];
+
+  for (const url of rawList) {
+    if (url.startsWith('/roms/')) {
+      if (!localUrls.includes(url)) localUrls.push(url);
+    } else {
+      if (!remoteUrls.includes(url)) remoteUrls.push(url);
+    }
   }
 
-  return candidates;
+  // Remote URLs first, local fallbacks at the very end
+  return [...remoteUrls, ...localUrls];
 }
 
 // Main multi-mirror resolver with client IndexedDB caching
@@ -211,10 +229,15 @@ export async function resolveRomWithMirrors(
   format: string,
   options: RomResolveOptions = {}
 ): Promise<RomResolutionResult> {
+  const isLargeFormat = format === 'psx' || format === 'psp' || format === 'ps2';
+  const timeoutMs =
+    isLargeFormat && (options.timeoutMs === undefined || options.timeoutMs === 8000)
+      ? 60000
+      : (options.timeoutMs ?? 8000);
+
   const {
     preferredMirrorIndex = 0,
     onStatusUpdate,
-    timeoutMs = 8000,
     bypassCache = false
   } = options;
 

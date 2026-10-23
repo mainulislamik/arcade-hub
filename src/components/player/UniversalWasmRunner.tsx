@@ -84,6 +84,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
   onGameOver
 }) => {
   const [romBlobUrl, setRomBlobUrl] = useState<string | null>(null);
+  const [romSourceUrl, setRomSourceUrl] = useState<string>('');
   const [downloadStatus, setDownloadStatus] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -167,13 +168,14 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
       const res = await resolveRomWithMirrors(game, activeFormat, {
         preferredMirrorIndex: preferredIndex,
         bypassCache,
-        timeoutMs: 8000,
+        timeoutMs: (activeFormat === 'psx' || activeFormat === 'psp' || activeFormat === 'ps2') ? 60000 : 8000,
         onStatusUpdate: (msg) => {
           setDownloadStatus(msg);
         }
       });
 
       setRomBlobUrl(res.blobUrl);
+      setRomSourceUrl(res.sourceUrl || '');
       setMirrorIndex(res.mirrorIndex);
       setTotalMirrors(res.totalMirrors);
       setIsFromCache(res.isFromCache);
@@ -182,6 +184,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
     } catch (err: any) {
       console.warn('[Arcadex] ROM resolution failed, using platform fallback:', err);
       const defaultRom = PLATFORM_DEFAULT_ROMS[activeFormat] || PLATFORM_DEFAULT_ROMS[format] || '/roms/contra.nes';
+      setRomSourceUrl(defaultRom);
       const fallbackFull = typeof window !== 'undefined' ? `${window.location.origin}${defaultRom}` : defaultRom;
       setRomBlobUrl(fallbackFull);
       setDownloadStatus('Loaded bundled safety fallback ROM');
@@ -326,6 +329,34 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
                 ? 'Sega Genesis (16-Bit)'
                 : 'Nintendo Entertainment System (8-Bit)';
       const coverImg = game.thumbnailUrl || game.coverImage || game.cover || '/assets/covers/super-mario-boxart.jpg';
+
+      const baseName = game.slug || game.id || 'game';
+      let fileExt = '.bin';
+      const lowerSource = (romSourceUrl || '').toLowerCase();
+      if (format === 'psx') {
+        if (lowerSource.includes('.chd')) fileExt = '.chd';
+        else if (lowerSource.includes('.iso')) fileExt = '.iso';
+        else if (lowerSource.includes('.cue')) fileExt = '.cue';
+        else if (lowerSource.includes('.bin')) fileExt = '.bin';
+        else if (lowerSource.includes('.pbp')) fileExt = '.pbp';
+        else if (lowerSource.includes('.zip')) fileExt = '.zip';
+        else if (lowerSource.startsWith('http://') || lowerSource.startsWith('https://')) fileExt = '.chd';
+        else fileExt = '.zip';
+      } else if (format === 'gba') {
+        fileExt = '.gba';
+      } else if (format === 'nes') {
+        fileExt = '.nes';
+      } else if (format === 'snes') {
+        fileExt = '.sfc';
+      } else if (format === 'psp') {
+        fileExt = '.iso';
+      } else if (format === 'sega' || format === 'md' || format === 'gb') {
+        fileExt = '.bin';
+      } else {
+        fileExt = `.${format}`;
+      }
+      const gameFileName = `${baseName}${fileExt}`;
+
       return `
         <!DOCTYPE html>
         <html>
@@ -525,9 +556,11 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
               window.EJS_player = '#game';
               window.EJS_core = '${(format === "sega" || format === "md") ? "segaMD" : format}';
               window.EJS_gameUrl = '${romBlobUrl}';
+              window.EJS_gameName = '${gameFileName}';
               window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
               window.EJS_startOnLoaded = true;
               window.EJS_language = 'en-US';
+              ${format === 'psx' ? `window.EJS_biosUrl = '/bios/scph5501.bin';\n              window.EJS_disableCue = false;` : ''}
 
               // Prevent console translation noise
               var origLog = console.log;
