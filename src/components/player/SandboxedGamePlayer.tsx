@@ -100,8 +100,7 @@ export const NATIVE_GAME_IDS = new Set([
   'drift-3d',
   'subway-3d',
   'knife-3d',
-  'voxel-3d',
-  'angry-birds'
+  'voxel-3d'
 ]);
 
 // Aliases mapping common search/catalog names to native implementations
@@ -136,10 +135,6 @@ export const NATIVE_ID_ALIASES: Record<string, string> = {
   'cut-the-rope': 'fruit-slash',
   'doodle-jump': 'cyber-stack',
   'jetpack-joyride': 'stickman-runner',
-  'angry-birds': 'angry-birds',
-  'angry-bird': 'angry-birds',
-  'angrybard': 'angry-birds',
-  'android-angry-birds': 'angry-birds',
   'plants-vs-zombies': 'galaxy-defender'
 };
 
@@ -189,7 +184,6 @@ export const resolveNativeGameId = (game: GameItem): string => {
   if (normalizedId.startsWith('android-cut-the-rope')) return 'fruit-slash';
   if (normalizedId.startsWith('android-doodle-jump')) return 'cyber-stack';
   if (normalizedId.startsWith('android-jetpack-joyride')) return 'stickman-runner';
-  if (normalizedId.startsWith('android-angry-birds') || normalizedId.includes('angry-bird') || normalizedId.includes('angrybard')) return 'angry-birds';
   if (normalizedId.startsWith('android-crossy-road')) return 'subway-3d';
   if (normalizedId.startsWith('android-plants-vs-zombies')) return 'galaxy-defender';
   if (normalizedId.startsWith('android-bad-piggies')) return 'hill-climb';
@@ -212,6 +206,11 @@ export const isNativeGame = (game: GameItem): boolean => {
   if (!game) return false;
   // User custom uploaded ROMs with binary keys always route to WASM runner
   if (game.isCustomUpload && game.customRomKey) return false;
+
+  // Real Web/HTML5 games and ROM files are handled by emulator or direct iframe runner
+  if (game.romUrl && !game.romUrl.startsWith('native:') && game.romUrl !== '/games/web-runner.html') {
+    return false;
+  }
 
   if (game.id && NATIVE_GAME_IDS.has(game.id)) return true;
   if (game.nativeGameId && NATIVE_GAME_IDS.has(game.nativeGameId)) return true;

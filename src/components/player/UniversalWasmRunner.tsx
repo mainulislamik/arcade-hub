@@ -309,6 +309,13 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
     setLoadError(null);
     const activeFormat = detectActiveFormat(game);
     setFormat(activeFormat);
+
+    if (activeFormat === 'html' || activeFormat === 'zip' || game.engineType === 'iframe_web' || game.engineType === 'html5_zip') {
+      setDownloadStatus('Game engine ready');
+      setIsLoading(false);
+      return;
+    }
+
     setDownloadStatus(
       activeFormat === 'jar' || game.engineType === 'j2me_wasm' || game.engineType === 'java_j2me'
         ? 'Initializing Java Virtual Machine (CheerpJ)...'
@@ -1167,9 +1174,9 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
 
     // 5. AUTHENTIC WEB / HTML5 RUNNER (iframe_web / html / zip)
     if (format === 'html' || format === 'zip' || game.engineType === 'iframe_web' || game.engineType === 'html5_zip') {
-      const targetUrl = (game.binaryUrl && game.binaryUrl.startsWith('http')) 
+      const targetUrl = (game.binaryUrl && (game.binaryUrl.startsWith('http') || game.binaryUrl.startsWith('/'))) 
         ? game.binaryUrl 
-        : (game.romUrl && game.romUrl.startsWith('http'))
+        : (game.romUrl && (game.romUrl.startsWith('http') || game.romUrl.startsWith('/')))
           ? game.romUrl
           : `/games/web-runner.html?game=${encodeURIComponent(game.title)}&format=${format}`;
       return `
@@ -1402,7 +1409,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
             style={getAspectRatioStyle(selectedRatio)}
             className="w-full h-full flex items-center justify-center relative [image-rendering:pixelated] [image-rendering:crisp-edges]"
           >
-            {(!isLoading && (romBlobUrl || romSourceUrl || format === 'html' || format === 'zip' || game.engineType === 'iframe_web')) ? (
+            {(!isLoading && (romBlobUrl || romSourceUrl || format === 'html' || format === 'zip' || game.engineType === 'iframe_web' || game.engineType === 'html5_zip')) ? (
               <iframe
                 key={`${game.id}-${selectedRatio}-${reloadKey}-${romBlobUrl || romSourceUrl || ''}`}
                 ref={iframeRef}
