@@ -390,8 +390,8 @@ export const updateCategorySEO = (category: string, isPlatform: boolean = false)
  */
 export const resetToHomeSEO = (): void => {
   updateSEO({
-    title: 'Arcadex - Play 5,500+ Free Online Games (No Download, No Install, 60 FPS Browser Arcade)',
-    description: 'Play 5,500+ free online games on Arcadex. Instant play Android, Retro GBA, Nokia Java, Action, Puzzle & Driving games with zero download, zero lag & mouse/touch controls.',
+    title: 'Arcadex - Play Free Online Games (No Download, No Install, 60 FPS Browser Arcade)',
+    description: 'Play free online games on Arcadex. Instant play Android, Physics Puzzle, Action & Arcade games with zero download, zero lag & mouse/touch controls.',
     canonicalUrl: `${CANONICAL_ORIGIN}/`,
     ogType: 'website',
     keywords: [
@@ -399,11 +399,11 @@ export const resetToHomeSEO = (): void => {
       'play games without download',
       'unblocked games',
       'android games on pc',
+      'angry birds online',
+      'angry birds unblocked',
       'retro arcade games',
       'crazygames alternative',
-      'html5 canvas games',
-      'play nokia java games online',
-      'gba web emulator'
+      'html5 canvas games'
     ],
   });
 };

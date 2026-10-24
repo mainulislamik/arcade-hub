@@ -22,7 +22,8 @@ import {
   X,
   Car,
   Zap,
-  ShieldCheck
+  ShieldCheck,
+  Smartphone
 } from 'lucide-react';
 import { GameCategory, GameItem } from '../types/game';
 import { GAMES_CATALOG } from '../data/games';
@@ -80,18 +81,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
         g.category?.toLowerCase() === 'playstation'
       ).length;
     }
+    if (catId === 'android') {
+      return games.filter(g => 
+        g.category === 'android' || 
+        g.platform?.toLowerCase().includes('android') ||
+        g.tags?.includes('android')
+      ).length;
+    }
     return games.filter(g => g.category === catId).length;
   };
 
   const categories: { id: GameCategory; label: string; icon: React.ReactNode; count: number }[] = [
     { id: 'all', label: 'All Games', icon: <Gamepad2 className="w-5 h-5 text-indigo-600" />, count: getCategoryCount('all') },
-    { id: 'playstation', label: 'PlayStation (PS1/PS2/PSP)', icon: <Gamepad2 className="w-5 h-5 text-indigo-500" />, count: getCategoryCount('playstation') },
+    { id: 'android', label: 'Android & Mobile', icon: <Smartphone className="w-5 h-5 text-emerald-600" />, count: getCategoryCount('android') },
+    { id: 'arcade', label: 'Arcade & Skill', icon: <Zap className="w-5 h-5 text-purple-600" />, count: getCategoryCount('arcade') },
+    { id: 'puzzle', label: 'Puzzle & Logic', icon: <Puzzle className="w-5 h-5 text-emerald-600" />, count: getCategoryCount('puzzle') },
     { id: 'action', label: 'Action & 3D', icon: <Swords className="w-5 h-5 text-rose-500" />, count: getCategoryCount('action') },
     { id: 'driving', label: 'Driving & Cars', icon: <Car className="w-5 h-5 text-amber-500" />, count: getCategoryCount('driving') },
     { id: 'shooting', label: 'Shooting & FPS', icon: <Crosshair className="w-5 h-5 text-cyan-600" />, count: getCategoryCount('shooting') },
-    { id: 'arcade', label: 'Arcade & Skill', icon: <Zap className="w-5 h-5 text-purple-600" />, count: getCategoryCount('arcade') },
-    { id: 'puzzle', label: 'Puzzle & Logic', icon: <Puzzle className="w-5 h-5 text-emerald-600" />, count: getCategoryCount('puzzle') },
     { id: 'strategy', label: 'Strategy & Brain', icon: <Brain className="w-5 h-5 text-blue-600" />, count: getCategoryCount('strategy') },
+    { id: 'playstation', label: 'PlayStation (PS1/PS2/PSP)', icon: <Gamepad2 className="w-5 h-5 text-indigo-500" />, count: getCategoryCount('playstation') },
   ];
 
   const content = (

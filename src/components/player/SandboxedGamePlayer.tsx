@@ -57,6 +57,7 @@ import { Drift3DGame } from '../games/Drift3DGame';
 import { Subway3DGame } from '../games/Subway3DGame';
 import { CyberKnife3DGame } from '../games/CyberKnife3DGame';
 import { VoxelShooter3DGame } from '../games/VoxelShooter3DGame';
+import { AngryBirdsGame } from '../games/AngryBirdsGame';
 import { UniversalProceduralCore } from './UniversalProceduralCore';
 import { UniversalWasmRunner } from './UniversalWasmRunner';
 import { UniversalMouseOverlay } from './UniversalMouseOverlay';
@@ -99,7 +100,8 @@ export const NATIVE_GAME_IDS = new Set([
   'drift-3d',
   'subway-3d',
   'knife-3d',
-  'voxel-3d'
+  'voxel-3d',
+  'angry-birds'
 ]);
 
 // Aliases mapping common search/catalog names to native implementations
@@ -134,7 +136,10 @@ export const NATIVE_ID_ALIASES: Record<string, string> = {
   'cut-the-rope': 'fruit-slash',
   'doodle-jump': 'cyber-stack',
   'jetpack-joyride': 'stickman-runner',
-  'angry-birds': 'stickman-archer',
+  'angry-birds': 'angry-birds',
+  'angry-bird': 'angry-birds',
+  'angrybard': 'angry-birds',
+  'android-angry-birds': 'angry-birds',
   'plants-vs-zombies': 'galaxy-defender'
 };
 
@@ -184,7 +189,7 @@ export const resolveNativeGameId = (game: GameItem): string => {
   if (normalizedId.startsWith('android-cut-the-rope')) return 'fruit-slash';
   if (normalizedId.startsWith('android-doodle-jump')) return 'cyber-stack';
   if (normalizedId.startsWith('android-jetpack-joyride')) return 'stickman-runner';
-  if (normalizedId.startsWith('android-angry-birds')) return 'stickman-archer';
+  if (normalizedId.startsWith('android-angry-birds') || normalizedId.includes('angry-bird') || normalizedId.includes('angrybard')) return 'angry-birds';
   if (normalizedId.startsWith('android-crossy-road')) return 'subway-3d';
   if (normalizedId.startsWith('android-plants-vs-zombies')) return 'galaxy-defender';
   if (normalizedId.startsWith('android-bad-piggies')) return 'hill-climb';
@@ -487,6 +492,8 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
         return <CyberKnife3DGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       case 'voxel-3d':
         return <VoxelShooter3DGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
+      case 'angry-birds':
+        return <AngryBirdsGame soundEnabled={soundEnabled} onScoreUpdate={onScoreUpdate} onGameOver={onGameOver} />;
       default:
         return (
           <UniversalProceduralCore

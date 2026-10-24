@@ -12,7 +12,8 @@ import {
   Heart,
   ChevronLeft,
   ChevronRight,
-  Flame
+  Flame,
+  Smartphone
 } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 
@@ -31,14 +32,15 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
 
   const categories: { id: GameCategory; label: string; icon: React.ReactNode }[] = [
     { id: 'all', label: 'All Games', icon: <Zap className="w-4 h-4 text-amber-500 fill-amber-400" /> },
-    { id: 'playstation', label: 'PlayStation (PS1/PS2/PSP)', icon: <Gamepad2 className="w-4 h-4 text-indigo-500" /> },
-    { id: 'driving', label: 'Driving & Racing', icon: <Car className="w-4 h-4 text-amber-500" /> },
-    { id: 'action', label: 'Action & 3D', icon: <Swords className="w-4 h-4 text-rose-500" /> },
+    { id: 'android', label: 'Android & Mobile', icon: <Smartphone className="w-4 h-4 text-emerald-500" /> },
     { id: 'arcade', label: 'Arcade & Skill', icon: <Zap className="w-4 h-4 text-purple-500" /> },
     { id: 'puzzle', label: 'Puzzle & Brain', icon: <Puzzle className="w-4 h-4 text-emerald-500" /> },
-    { id: 'retro', label: 'Retro Classics', icon: <Crown className="w-4 h-4 text-yellow-500" /> },
-    { id: 'strategy', label: 'Strategy & 2-Player', icon: <Brain className="w-4 h-4 text-blue-500" /> },
+    { id: 'action', label: 'Action & 3D', icon: <Swords className="w-4 h-4 text-rose-500" /> },
+    { id: 'driving', label: 'Driving & Racing', icon: <Car className="w-4 h-4 text-amber-500" /> },
     { id: 'shooting', label: 'Shooting & FPS', icon: <Crosshair className="w-4 h-4 text-cyan-500" /> },
+    { id: 'strategy', label: 'Strategy & 2-Player', icon: <Brain className="w-4 h-4 text-blue-500" /> },
+    { id: 'playstation', label: 'PlayStation (PS1/PS2/PSP)', icon: <Gamepad2 className="w-4 h-4 text-indigo-500" /> },
+    { id: 'retro', label: 'Retro Classics', icon: <Crown className="w-4 h-4 text-yellow-500" /> },
     { id: 'favorites', label: 'Favorites', icon: <Heart className="w-4 h-4 text-rose-500" /> },
   ];
 

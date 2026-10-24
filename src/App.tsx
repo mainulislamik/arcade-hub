@@ -120,7 +120,7 @@ export const App: React.FC = () => {
       // Clean path: /category/:category
       if (categoryMatch) {
         const cat = decodeURIComponent(categoryMatch[1]);
-        if (['all', 'action', 'puzzle', 'retro', 'arcade', 'strategy', 'word', 'driving', 'shooting', 'playstation', 'favorites'].includes(cat)) {
+        if (['all', 'action', 'puzzle', 'retro', 'arcade', 'strategy', 'word', 'driving', 'shooting', 'playstation', 'android', 'favorites'].includes(cat)) {
           setSelectedGame(null);
           setSelectedTag(null);
           setActiveCategory(cat as GameCategory);

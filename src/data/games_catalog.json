@@ -1,1 +1,97 @@
-[]
+[
+  {
+    "id": "android-angry-birds",
+    "slug": "angry-birds",
+    "title": "Angry Birds Classic",
+    "category": "android",
+    "platform": "Android",
+    "engineType": "native_canvas",
+    "nativeGameId": "angry-birds",
+    "romUrl": "native:angry-birds",
+    "description": "Play Angry Birds Classic Android game online unblocked! Launch red birds from the slingshot, destroy bad piggies fortresses, trigger TNT explosions, and conquer fun physics puzzle levels with 3 stars.",
+    "longDescription": "Angry Birds Classic is the legendary physics-based slingshot arcade game that became a global gaming phenomenon on Android and mobile devices. In this authentic unblocked web edition, take control of the angry birds flock seeking vengeance on the mischievous green bad piggies who stole their beloved eggs. Pull back the elastic slingshot rubber bands, calibrate your trajectory angle, factor in gravity, and launch Red birds directly at fortified wooden planks, heavy stone pillars, fragile ice blocks, and explosive TNT crates. Watch in delight as real-time 2D physics cause structures to crumble, domino effects to flatten enemy fortresses, and pigs to pop into puffs of smoke with massive bonus points! Fully optimized for desktop mouse drag and mobile touch gestures with smooth 60 FPS performance, zero installation, and no ads interruption.",
+    "instructions": "Click and drag (or touch and pull) the Red bird backwards in the slingshot to aim and build launch tension. Follow the white dotted trajectory arc to align your shot against weak structural joints. Release your finger or mouse to fire the bird through the air. Clear all green pigs to advance to the next level and achieve a 3-star victory rating!",
+    "aspectRatio": "16:9",
+    "howToPlay": [
+      "Select and drag the Red bird loaded in the slingshot pouch.",
+      "Pull back and adjust the vertical angle to alter velocity and trajectory.",
+      "Use the projected dotted trajectory arc to estimate distance and gravity drop.",
+      "Release mouse button or touch screen to launch the bird towards the piggy fortress.",
+      "Target key support beams and foundation blocks to trigger structural collapses.",
+      "Detonate red TNT crates to blast through armored stone fortifications.",
+      "Eliminate every green pig on the battlefield to clear the level and unlock the next challenge!"
+    ],
+    "tips": [
+      "Foundation First: Always aim for the lowest wooden or stone support pillars. Knocking out the base causes the entire upper castle to come crashing down on the pigs below.",
+      "Trigger Chain Reactions: Target red TNT crates directly with your bird or drop heavy stone boulders onto them for massive explosive shockwaves.",
+      "Utilize Ground Bounces: Even after hitting the ground, the bird and falling debris maintain momentum and can slide into hidden underground pig bunkers.",
+      "Save Your Birds: Every bird remaining in your slingshot reserve when the last pig is popped awards a huge +10,000 bonus score, essential for achieving 3 stars."
+    ],
+    "faqs": [
+      {
+        "question": "Can I play Angry Birds Classic on Android and iPhone browsers?",
+        "answer": "Yes! The game features full responsive HTML5 canvas touch support. You can aim, pull back the slingshot, and launch birds smoothly on any smartphone or tablet browser without installing an APK."
+      },
+      {
+        "question": "Is this Angry Birds game free and unblocked?",
+        "answer": "Yes, this is an unblocked, 100% free web edition hosted on Arcadex with instant loading, zero pop-ups, and full offline-ready client-side execution."
+      },
+      {
+        "question": "How do I earn 3 stars in every level?",
+        "answer": "You earn 3 stars by maximizing your score: demolish high-value stone and wood structures, detonate TNT crates, and finish the level using the fewest birds possible to gain +10,000 bonus points per leftover bird."
+      },
+      {
+        "question": "What happens when a green pig is hit?",
+        "answer": "When a green pig takes fatal impact damage from a flying bird or falling heavy block, it pops into a green puff of feathers and stars, awarding +5,000 points to your score."
+      }
+    ],
+    "controls": {
+      "mouse": [
+        "Left-Click & Drag Slingshot Pouch to Aim",
+        "Release to Launch Red Bird",
+        "R key to Restart Level",
+        "M key to Toggle Sound",
+        "Esc to Pause / Resume"
+      ],
+      "touch": [
+        "Touch & Drag Slingshot Pouch to Aim",
+        "Release Finger to Launch",
+        "Tap Restart Button on top right to Retry",
+        "Tap Sound Icon to Mute/Unmute"
+      ]
+    },
+    "thumbnailGradient": "from-red-600 via-amber-500 to-yellow-400",
+    "gradient": "from-red-600 to-amber-500",
+    "accentColor": "#ef4444",
+    "cover": "/assets/covers/angry-birds-boxart.jpg",
+    "coverImage": "/assets/covers/angry-birds.jpg",
+    "thumbnailUrl": "/assets/covers/angry-birds.jpg",
+    "likes": 24500,
+    "featured": true,
+    "isFeatured": true,
+    "icon": "🐦",
+    "difficulty": "Medium",
+    "playCount": 185400,
+    "plays": 185400,
+    "rating": 4.95,
+    "reviewCount": 1420,
+    "releaseDate": "2009-12-11",
+    "tags": [
+      "android",
+      "mobile",
+      "slingshot",
+      "physics",
+      "puzzle",
+      "arcade",
+      "angry-birds",
+      "action",
+      "casual",
+      "unblocked",
+      "free-games"
+    ],
+    "badge": "ANDROID CLASSIC",
+    "proBadge": "ORIGINAL HIT",
+    "developer": "Rovio Entertainment / Arcadex Classic Port",
+    "license": "Freeware / HTML5 Web Port"
+  }
+]

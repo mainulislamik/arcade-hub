@@ -9,7 +9,8 @@ import {
   Compass,
   ArrowRight,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Smartphone
 } from 'lucide-react';
 import { sounds } from '../utils/soundEngine';
 import { GameCard } from './GameCard';
@@ -56,6 +57,7 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
       ps2: 0,
       ps3: 0,
       psp: 0,
+      android: 0,
       favorites: favorites.length,
     };
 
@@ -68,6 +70,15 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
 
       if (isPS) {
         counts.playstation++;
+      }
+
+      const isAndroid =
+        g.category?.toLowerCase() === 'android' ||
+        g.platform?.toLowerCase().includes('android') ||
+        g.tags?.includes('android');
+
+      if (isAndroid) {
+        counts.android++;
       }
 
       const cat = g.category as GameCategory;
@@ -99,6 +110,13 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
           g.platform?.toLowerCase().includes('ps3') ||
           g.platform?.toLowerCase().includes('psp') ||
           g.category?.toLowerCase() === 'playstation'
+        );
+      }
+      if (catLower === 'android') {
+        return games.filter((g) =>
+          g.category?.toLowerCase() === 'android' ||
+          g.platform?.toLowerCase().includes('android') ||
+          g.tags?.includes('android')
         );
       }
       return games.filter(
@@ -163,6 +181,18 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
           g.category === 'puzzle' ||
           g.category === 'strategy' ||
           g.tags.some((t) => ['puzzle', 'brain', 'logic', 'match', 'strategy'].includes(t.toLowerCase()))
+      )
+      .slice(0, 7);
+  }, [games]);
+
+  // Curated Row 6: Android & Mobile (7 games)
+  const androidGames = useMemo(() => {
+    return games
+      .filter(
+        (g) =>
+          g.category === 'android' ||
+          g.platform?.toLowerCase().includes('android') ||
+          g.tags.some((t) => ['android', 'mobile', 'touch', 'slingshot'].includes(t.toLowerCase()))
       )
       .slice(0, 7);
   }, [games]);
@@ -383,7 +413,31 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
             </section>
           )}
 
-          {/* Section 6: Complete Game Catalog with High-Density Grid */}
+          {/* Section 6: Android & Mobile Hits */}
+          {androidGames.length > 0 && (
+            <section>
+              {renderSectionHeader(
+                'Android & Mobile Hits',
+                <Smartphone className="w-4 h-4 text-emerald-600" />,
+                categoryCounts.android,
+                'android'
+              )}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4">
+                {androidGames.map((game) => (
+                  <GameCard
+                    key={game.id}
+                    game={game}
+                    isFavorite={favorites.includes(game.id)}
+                    onPlay={onSelectGame}
+                    onToggleFavorite={onToggleFavorite}
+                    onOpenInfo={onOpenInfo}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Section 7: Complete Game Catalog with High-Density Grid */}
           <section className="pt-2 border-t border-slate-200">
             {renderSectionHeader(
               'All Games',
