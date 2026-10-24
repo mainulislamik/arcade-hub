@@ -38,6 +38,7 @@ interface HeaderProps {
   soundEnabled: boolean;
   onToggleSound: () => void;
   favoritesCount: number;
+  onToggleSidebar?: () => void;
   onOpenMobileSidebar: () => void;
   currentLanguage?: LanguageCode;
   onSelectLanguage?: (lang: LanguageCode) => void;
@@ -69,6 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
   soundEnabled,
   onToggleSound,
   favoritesCount,
+  onToggleSidebar,
   onOpenMobileSidebar,
   currentLanguage = 'en',
   onSelectLanguage
@@ -141,15 +143,19 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs">
       <div className="w-full px-3 sm:px-6 h-16 flex items-center justify-between gap-3 sm:gap-6">
-        {/* Left: Mobile Toggle & Brand Logo */}
-        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+        {/* Left: Sidebar Toggle & Brand Logo */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <button
             onClick={() => {
               sounds.playClick();
-              onOpenMobileSidebar();
+              if (onToggleSidebar) {
+                onToggleSidebar();
+              } else {
+                onOpenMobileSidebar();
+              }
             }}
-            className="md:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
-            title="Toggle Navigation Menu"
+            className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            title="Toggle Sidebar"
             aria-label="Toggle navigation menu"
           >
             <Menu className="w-5 h-5" />

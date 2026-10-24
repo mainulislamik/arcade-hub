@@ -124,7 +124,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Navigation Scrollable Body */}
-      <div className="flex-1 overflow-y-auto px-2 py-3 space-y-6 scrollbar-thin">
+      <div className="flex-1 overflow-y-auto px-2 py-3 space-y-4 scrollbar-thin">
         {/* Main Quick Links */}
         <div className="space-y-1">
           <button
@@ -133,13 +133,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onCloseMobile();
             }}
             aria-label="Browse all games"
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+            title="All Games"
+            className={`w-full flex items-center ${
+              isCollapsed ? 'justify-center p-2.5' : 'justify-between px-3 py-2.5'
+            } rounded-xl text-sm font-semibold transition-all cursor-pointer ${
               currentCategory === 'all'
                 ? 'bg-slate-900 text-white shadow-xs font-black'
                 : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
             }`}
           >
-            <div className="flex items-center gap-3">
+            <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
               <Gamepad2 className={`w-5 h-5 shrink-0 ${currentCategory === 'all' ? 'text-white' : 'text-indigo-600'}`} />
               {!isCollapsed && <span className="truncate">Featured / All Games</span>}
             </div>
@@ -158,13 +161,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onCloseMobile();
             }}
             aria-label="View favorite games"
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+            title={`Favorites (${favoritesCount})`}
+            className={`w-full flex items-center ${
+              isCollapsed ? 'justify-center p-2.5' : 'justify-between px-3 py-2.5'
+            } rounded-xl text-sm font-semibold transition-all cursor-pointer ${
               currentCategory === 'favorites'
                 ? 'bg-rose-500 text-white shadow-xs font-black'
                 : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
             }`}
           >
-            <div className="flex items-center gap-3">
+            <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
               <Heart className={`w-5 h-5 shrink-0 ${currentCategory === 'favorites' ? 'fill-white text-white' : 'text-rose-500'}`} />
               {!isCollapsed && <span className="truncate">My Favorites</span>}
             </div>
@@ -179,7 +185,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Categories Section */}
-        <div>
+        <div className="space-y-1">
           {!isCollapsed && (
             <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3 block mb-1">
               Top Categories
@@ -195,12 +201,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onCloseMobile();
                 }}
                 aria-label={`Browse ${cat.label}`}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                title={cat.label}
+                className={`w-full flex items-center ${
+                  isCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2'
+                } rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                   isActive
                     ? 'bg-slate-900 text-white shadow-xs font-black'
                     : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
                 }`}
-                title={isCollapsed ? cat.label : undefined}
               >
                 <div className={`shrink-0 ${isActive ? 'text-white' : ''}`}>{cat.icon}</div>
                 {!isCollapsed && (

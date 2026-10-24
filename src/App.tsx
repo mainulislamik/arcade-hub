@@ -17,7 +17,6 @@ import { AdminDashboardModal } from './components/admin/AdminDashboardModal';
 import { DailyQuestsModal } from './components/gamification/DailyQuestsModal';
 import { ArcadexLevelStudioModal } from './components/studio/ArcadexLevelStudioModal';
 import { ClientLocalRomModal } from './components/player/ClientLocalRomModal';
-import { ChiptuneJukebox } from './components/player/ChiptuneJukebox';
 import { SuperAdminDashboard } from './components/admin/SuperAdminDashboard';
 import { LanguageCode } from './utils/i18n';
 
@@ -26,7 +25,7 @@ export const App: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<GameCategory>('all');
   const [selectedGame, setSelectedGame] = useState<GameItem | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
   const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>(() => {
     return (localStorage.getItem('arcadex_lang') as LanguageCode) || 'en';
@@ -303,6 +302,13 @@ export const App: React.FC = () => {
         soundEnabled={soundEnabled}
         onToggleSound={handleToggleSound}
         favoritesCount={favorites.length}
+        onToggleSidebar={() => {
+          if (window.innerWidth < 768) {
+            setIsMobileSidebarOpen((prev) => !prev);
+          } else {
+            setIsSidebarCollapsed((prev) => !prev);
+          }
+        }}
         onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
         currentLanguage={currentLanguage}
         onSelectLanguage={handleSelectLanguage}
@@ -454,9 +460,6 @@ export const App: React.FC = () => {
           onClose={() => setIsStudioOpen(false)}
         />
       )}
-
-      {/* Floating Retro Synth Chiptune Radio */}
-      <ChiptuneJukebox />
     </div>
   );
 };
