@@ -25,3 +25,4 @@ dist-ssr
 
 # Extracted SIS binaries & artifacts
 extracted_sis/
+*.backup.json

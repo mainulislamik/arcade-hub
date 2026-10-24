@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """
 Automated XML Sitemap Generator for Arcadex Web Gaming Platform.
-Reads src/data/games_catalog.json and outputs enterprise-grade public/sitemap.xml
-with Google Image Search extensions (<image:image>) for all 5,500+ games.
+Reads src/data/games_catalog.json and outputs clean public/sitemap.xml.
+When the games catalog is empty, it outputs only the canonical homepage.
 """
 
 import json
 import os
-import re
 import html
 
 CANONICAL_DOMAIN = "https://game.amarpdf.net"
@@ -51,62 +50,23 @@ def main():
     lines.append('    <priority>1.0</priority>')
     lines.append('    <image:image>')
     lines.append(f'      <image:loc>{CANONICAL_DOMAIN}/assets/hero-banner.png</image:loc>')
-    lines.append('      <image:title>Arcadex - Play 5,500+ Free Online Games</image:title>')
-    lines.append('      <image:caption>Play 5,500+ free online games with zero download, zero lag and instant 60 FPS browser arcade.</image:caption>')
+    lines.append('      <image:title>Arcadex - Online Gaming Hub</image:title>')
+    lines.append('      <image:caption>Arcadex Web Gaming Platform</image:caption>')
     lines.append('    </image:image>')
     lines.append('  </url>')
 
-    # 2. Categories
-    categories = sorted(list(set(g.get("category", "").lower().strip() for g in games if g.get("category"))))
-    # Ensure standard categories exist
-    standard_categories = ["action", "arcade", "driving", "playstation", "puzzle", "retro", "shooting", "strategy", "word"]
-    all_categories = sorted(list(set(categories + standard_categories)))
-
-    for cat in all_categories:
+    # 2. Categories (Only if games exist)
+    categories = sorted(list(set(g.get("category", "").lower().strip() for g in games if g.get("category")))) if games else []
+    for cat in categories:
         cat_loc = f"{CANONICAL_DOMAIN}/category/{escape_xml(cat)}"
         cat_title = cat.capitalize()
         lines.append('  <url>')
         lines.append(f'    <loc>{cat_loc}</loc>')
         lines.append('    <changefreq>daily</changefreq>')
         lines.append('    <priority>0.9</priority>')
-        lines.append('    <image:image>')
-        lines.append(f'      <image:loc>{CANONICAL_DOMAIN}/assets/hero-banner.png</image:loc>')
-        lines.append(f'      <image:title>{cat_title} Games - Free Online on Arcadex</image:title>')
-        lines.append(f'      <image:caption>Play hundreds of free {cat} games online without download.</image:caption>')
-        lines.append('    </image:image>')
         lines.append('  </url>')
 
-    # 3. Platforms
-    standard_platforms = [
-        "android",
-        "nokia-java",
-        "symbian",
-        "retro-gba",
-        "nes",
-        "snes",
-        "sega-genesis",
-        "playstation",
-        "ps2",
-        "psp",
-        "ms-dos",
-        "web-canvas",
-        "webgl"
-    ]
-    for plat in standard_platforms:
-        plat_loc = f"{CANONICAL_DOMAIN}/platform/{escape_xml(plat)}"
-        plat_title = plat.replace("-", " ").title()
-        lines.append('  <url>')
-        lines.append(f'    <loc>{plat_loc}</loc>')
-        lines.append('    <changefreq>daily</changefreq>')
-        lines.append('    <priority>0.9</priority>')
-        lines.append('    <image:image>')
-        lines.append(f'      <image:loc>{CANONICAL_DOMAIN}/assets/hero-banner.png</image:loc>')
-        lines.append(f'      <image:title>{plat_title} Games Emulation Online</image:title>')
-        lines.append(f'      <image:caption>Play {plat_title} games online with zero VPS server lag.</image:caption>')
-        lines.append('    </image:image>')
-        lines.append('  </url>')
-
-    # 4. Games (All 5,500+)
+    # 3. Games (Only if games exist)
     seen_slugs = set()
     for g in games:
         slug = g.get("slug") or g.get("id")
@@ -129,7 +89,7 @@ def main():
         lines.append(f'    <priority>{priority}</priority>')
         lines.append('    <image:image>')
         lines.append(f'      <image:loc>{img_url}</image:loc>')
-        lines.append(f'      <image:title>{title} - Free Online Game</image:title>')
+        lines.append(f'      <image:title>{title}</image:title>')
         lines.append(f'      <image:caption>{desc}</image:caption>')
         lines.append('    </image:image>')
         lines.append('  </url>')
@@ -142,7 +102,8 @@ def main():
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         f.write(content)
 
-    print(f"Successfully generated sitemap with {1 + len(all_categories) + len(standard_platforms) + len(seen_slugs)} URLs at {OUTPUT_PATH}")
+    total_urls = 1 + len(categories) + len(seen_slugs)
+    print(f"Successfully generated clean sitemap with {total_urls} URL(s) at {OUTPUT_PATH}")
 
 if __name__ == "__main__":
     main()

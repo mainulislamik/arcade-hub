@@ -208,6 +208,25 @@ export const CrazyGamesGrid: React.FC<CrazyGamesGridProps> = ({
     </div>
   );
 
+  if (games.length === 0) {
+    return (
+      <div className="space-y-6 pb-12 w-full">
+        <h1 className="sr-only">Arcadex - Free Online Web Games &amp; Retro Arcade</h1>
+        <div className="p-16 text-center bg-white rounded-2xl border border-slate-200/80 flex flex-col items-center justify-center gap-4 max-w-xl mx-auto shadow-xs my-10">
+          <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500">
+            <Gamepad2 className="w-8 h-8" />
+          </div>
+          <div className="space-y-1.5">
+            <h2 className="text-lg font-bold text-slate-900 tracking-tight">No Games Available</h2>
+            <p className="text-sm text-slate-500 max-w-md">
+              All games and categories have been cleared from the catalog.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 pb-12 w-full">
       {/* Horizontal Category Pill Filter Bar */}

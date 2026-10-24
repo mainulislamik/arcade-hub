@@ -185,49 +185,51 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Categories Section */}
-        <div className="space-y-1">
-          {!isCollapsed && (
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3 block mb-1">
-              Top Categories
-            </span>
-          )}
-          {categories.map((cat) => {
-            const isActive = currentCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => {
-                  onSelectCategory(cat.id);
-                  onCloseMobile();
-                }}
-                aria-label={`Browse ${cat.label}`}
-                title={cat.label}
-                className={`w-full flex items-center ${
-                  isCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2'
-                } rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                  isActive
-                    ? 'bg-slate-900 text-white shadow-xs font-black'
-                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
-                }`}
-              >
-                <div className={`shrink-0 ${isActive ? 'text-white' : ''}`}>{cat.icon}</div>
-                {!isCollapsed && (
-                  <div className="flex items-center justify-between w-full">
-                    <span className="truncate">{cat.label}</span>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono ${
-                      isActive ? 'bg-white/20 text-white' : 'text-slate-500 bg-slate-100'
-                    }`}>
-                      {cat.count}
-                    </span>
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </div>
+        {GAMES_CATALOG.length > 0 && (
+          <div className="space-y-1">
+            {!isCollapsed && (
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3 block mb-1">
+                Top Categories
+              </span>
+            )}
+            {categories.map((cat) => {
+              const isActive = currentCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    onSelectCategory(cat.id);
+                    onCloseMobile();
+                  }}
+                  aria-label={`Browse ${cat.label}`}
+                  title={cat.label}
+                  className={`w-full flex items-center ${
+                    isCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2'
+                  } rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-slate-900 text-white shadow-xs font-black'
+                      : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                  }`}
+                >
+                  <div className={`shrink-0 ${isActive ? 'text-white' : ''}`}>{cat.icon}</div>
+                  {!isCollapsed && (
+                    <div className="flex items-center justify-between w-full">
+                      <span className="truncate">{cat.label}</span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono ${
+                        isActive ? 'bg-white/20 text-white' : 'text-slate-500 bg-slate-100'
+                      }`}>
+                        {cat.count}
+                      </span>
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
-        {/* Trending Tags (Only visible when expanded) */}
-        {!isCollapsed && (
+        {/* Trending Tags (Only visible when expanded and games exist) */}
+        {GAMES_CATALOG.length > 0 && !isCollapsed && (
           <div className="space-y-2 pt-2 border-t border-slate-200">
             <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3 block">
               Trending Tags

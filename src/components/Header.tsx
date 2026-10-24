@@ -204,7 +204,7 @@ export const Header: React.FC<HeaderProps> = ({
               }}
               onFocus={() => setIsSearchOpen(true)}
               onKeyDown={handleKeyDown}
-              placeholder="Search 5,500+ free games (Slope, Subway Runner, Hyper Drift, PS1...)"
+              placeholder="Search games..."
               className="w-full pl-11 pr-20 py-2.5 rounded-full bg-slate-100 hover:bg-slate-100/90 focus:bg-white text-slate-900 text-xs sm:text-sm font-medium border border-slate-200/90 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100/80 outline-none transition-all placeholder:text-slate-400 shadow-inner"
             />
             <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
@@ -418,7 +418,7 @@ export const Header: React.FC<HeaderProps> = ({
                 setQuery(e.target.value);
                 setIsSearchOpen(true);
               }}
-              placeholder="Search 5,500+ free games..."
+              placeholder="Search games..."
               className="w-full pl-10 pr-9 py-2 rounded-full bg-slate-100 text-slate-900 text-xs font-medium border border-slate-200 focus:bg-white focus:border-indigo-500 outline-none"
               autoFocus
             />
