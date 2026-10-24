@@ -74,6 +74,7 @@ export interface GameItem {
   
   // Universal Multi-Core Engine Extensions
   engineType?: GameEngineType;
+  nativeGameId?: string;
   binaryUrl?: string;
   romUrl?: string;
   romSources?: string[];

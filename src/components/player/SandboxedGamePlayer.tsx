@@ -141,8 +141,16 @@ export const NATIVE_ID_ALIASES: Record<string, string> = {
 /**
  * Resolves the primary native ID (handling aliases and Android prefixes)
  */
-export const getResolvedNativeId = (game: GameItem): string => {
+export const resolveNativeGameId = (game: GameItem): string => {
   if (!game) return '';
+  if (game.id && NATIVE_GAME_IDS.has(game.id)) return game.id;
+  if (game.nativeGameId && NATIVE_GAME_IDS.has(game.nativeGameId)) return game.nativeGameId;
+
+  const id = game.id?.toLowerCase() || '';
+  const normalizedId = id.replace(/_/g, '-');
+
+  if (NATIVE_GAME_IDS.has(id)) return id;
+  if (NATIVE_GAME_IDS.has(normalizedId)) return normalizedId;
 
   if (game.romUrl && game.romUrl.startsWith('native:')) {
     const rawNative = game.romUrl.replace('native:', '').trim().toLowerCase();
@@ -150,14 +158,21 @@ export const getResolvedNativeId = (game: GameItem): string => {
     if (NATIVE_ID_ALIASES[rawNative]) return NATIVE_ID_ALIASES[rawNative];
   }
 
-  const id = game.id?.toLowerCase() || '';
-  const normalizedId = id.replace(/_/g, '-');
-
   // Direct alias match
+  if (NATIVE_ID_ALIASES[game.id]) return NATIVE_ID_ALIASES[game.id];
   if (NATIVE_ID_ALIASES[id]) return NATIVE_ID_ALIASES[id];
   if (NATIVE_ID_ALIASES[normalizedId]) return NATIVE_ID_ALIASES[normalizedId];
 
   // Prefix matching for Android mobile games
+  if (normalizedId.startsWith('android-pixel-gun')) return 'voxel-3d';
+  if (normalizedId.startsWith('android-drift-max')) return 'drift-3d';
+  if (normalizedId.startsWith('android-slope-3d') || normalizedId.startsWith('android-slope')) return 'slope-3d';
+  if (normalizedId.startsWith('android-bubble-shooter')) return 'bubble-shooter';
+  if (normalizedId.startsWith('android-tetris')) return 'tetris';
+  if (normalizedId.startsWith('android-pacman')) return 'pac-maze';
+  if (normalizedId.startsWith('android-chess')) return 'cyber-chess';
+  if (normalizedId.startsWith('android-solitaire')) return 'solitaire-pro';
+
   if (normalizedId.startsWith('android-subway-surfers')) return 'subway-surfer';
   if (normalizedId.startsWith('android-temple-run')) return 'temple-dash';
   if (normalizedId.startsWith('android-fruit-ninja')) return 'fruit-slash';
@@ -178,13 +193,11 @@ export const getResolvedNativeId = (game: GameItem): string => {
   if (normalizedId.startsWith('android-vector')) return 'stickman-runner';
   if (normalizedId.startsWith('android-bowmasters')) return 'stickman-archer';
   if (normalizedId.startsWith('android-sniper-3d')) return 'stickman-sniper';
-  if (normalizedId.startsWith('android-pixel-gun')) return 'voxel-3d';
-  if (normalizedId.startsWith('android-drift-max')) return 'drift-3d';
-  if (normalizedId.startsWith('android-slope')) return 'slope-3d';
-  if (normalizedId.startsWith('android-bubble-shooter')) return 'bubble-shooter';
 
   return NATIVE_ID_ALIASES[id] || NATIVE_ID_ALIASES[normalizedId] || normalizedId;
 };
+
+export const getResolvedNativeId = resolveNativeGameId;
 
 /**
  * Checks whether a game should render directly using our high-performance
@@ -195,17 +208,19 @@ export const isNativeGame = (game: GameItem): boolean => {
   // User custom uploaded ROMs with binary keys always route to WASM runner
   if (game.isCustomUpload && game.customRomKey) return false;
 
+  if (game.id && NATIVE_GAME_IDS.has(game.id)) return true;
+  if (game.nativeGameId && NATIVE_GAME_IDS.has(game.nativeGameId)) return true;
+
   const id = game.id?.toLowerCase() || '';
   const normalizedId = id.replace(/_/g, '-');
 
+  if (NATIVE_GAME_IDS.has(id) || NATIVE_GAME_IDS.has(normalizedId)) return true;
+  if (NATIVE_ID_ALIASES[game.id] || NATIVE_ID_ALIASES[id] || NATIVE_ID_ALIASES[normalizedId]) return true;
+
   if (game.romUrl?.startsWith('native:')) return true;
 
-  const resolved = getResolvedNativeId(game);
+  const resolved = resolveNativeGameId(game);
   if (NATIVE_GAME_IDS.has(resolved)) return true;
-
-  // Direct match or alias match
-  if (NATIVE_GAME_IDS.has(id) || NATIVE_GAME_IDS.has(normalizedId)) return true;
-  if (NATIVE_ID_ALIASES[id] || NATIVE_ID_ALIASES[normalizedId]) return true;
 
   // Engine type explicitly specifying native canvas
   if (['native_canvas', 'canvas_native', 'canvas', 'native', 'react_canvas'].includes(game.engineType || '')) {
@@ -578,7 +593,7 @@ export const SandboxedGamePlayer: React.FC<SandboxedGamePlayerProps> = ({
                   <iframe
                     ref={iframeRef}
                     title={game.title}
-                    src={game.binaryUrl || (game.romUrl && game.romUrl.startsWith('http') ? game.romUrl : `/games/web-runner.html?game=${encodeURIComponent(game.title)}`)}
+                    src={game.binaryUrl || (game.romUrl && game.romUrl.startsWith('http') ? game.romUrl : `/games/web-runner.html?game=${encodeURIComponent(game.title)}&title=${encodeURIComponent(game.title)}`)}
                     className="w-full h-full min-h-[560px] border-0 rounded-xl"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                     sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups"

@@ -45,9 +45,169 @@ export function getDefaultAspectRatio(fmt: string): string {
     case 'psx':
     case 'dos':
       return '4:3';
+    case 'html':
+    case 'web':
+    case 'zip':
+    case 'swf':
     default:
       return '4:3';
   }
+}
+
+// Robust format detection based on game.platform, game.engineType, game.romFormat, and file extensions
+export function detectActiveFormat(game: GameItem): string {
+  const platform = (game.platform || '').toLowerCase();
+  const rawFormat = (game.romFormat || '').toLowerCase();
+  const engine = (game.engineType || '').toLowerCase();
+  const fileString = (game.romFileName || game.romUrl || game.binaryUrl || '').toLowerCase();
+
+  const hasExt = (...exts: string[]) =>
+    exts.some(
+      (ext) =>
+        rawFormat === ext ||
+        fileString.endsWith(`.${ext}`) ||
+        fileString.includes(`.${ext}?`) ||
+        fileString.includes(`.${ext}&`)
+    );
+
+  // 1. Super Nintendo / SNES
+  if (
+    platform.includes('super nintendo') ||
+    platform.includes('snes') ||
+    rawFormat === 'snes' ||
+    rawFormat === 'smc' ||
+    hasExt('snes', 'smc', 'sfc')
+  ) {
+    return 'snes';
+  }
+
+  // 2. Sega / Genesis / Mega Drive
+  if (
+    platform.includes('sega') ||
+    platform.includes('genesis') ||
+    platform.includes('mega drive') ||
+    rawFormat === 'sega' ||
+    rawFormat === 'md' ||
+    rawFormat === 'bin' ||
+    hasExt('gen', 'md', 'smd', 'bin')
+  ) {
+    return 'sega';
+  }
+
+  // 3. Game Boy Advance / GBA
+  if (
+    platform.includes('game boy advance') ||
+    platform.includes('gba') ||
+    rawFormat === 'gba' ||
+    hasExt('gba')
+  ) {
+    return 'gba';
+  }
+
+  // 4. PlayStation 2 / PS2 (check before PSX)
+  if (
+    platform.includes('playstation 2') ||
+    platform.includes('ps2') ||
+    rawFormat === 'ps2' ||
+    rawFormat === 'elf' ||
+    engine === 'ps2_wasm' ||
+    hasExt('ps2', 'elf')
+  ) {
+    return 'ps2';
+  }
+
+  // 5. PlayStation Portable / PSP (check before PSX)
+  if (
+    platform.includes('playstation portable') ||
+    platform.includes('psp') ||
+    rawFormat === 'psp' ||
+    hasExt('psp', 'cso', 'pbp')
+  ) {
+    return 'psp';
+  }
+
+  // 6. PlayStation / PSX / PS1
+  if (
+    platform.includes('playstation') ||
+    platform.includes('psx') ||
+    platform.includes('ps1') ||
+    rawFormat === 'psx' ||
+    rawFormat === 'chd' ||
+    rawFormat === 'iso' ||
+    rawFormat === 'cue' ||
+    hasExt('psx', 'chd', 'iso', 'cue')
+  ) {
+    return 'psx';
+  }
+
+  // 7. MS-DOS
+  if (
+    platform.includes('ms-dos') ||
+    platform.includes('dos') ||
+    rawFormat === 'dos' ||
+    engine === 'retro_dos'
+  ) {
+    return 'dos';
+  }
+
+  // 8. Java / J2ME
+  if (
+    platform.includes('java') ||
+    platform.includes('j2me') ||
+    rawFormat === 'jar' ||
+    engine === 'java_j2me' ||
+    engine === 'j2me_wasm' ||
+    hasExt('jar')
+  ) {
+    return 'jar';
+  }
+
+  // 9. Symbian
+  if (
+    platform.includes('symbian') ||
+    rawFormat === 'sis' ||
+    rawFormat === 'sisx' ||
+    engine === 'symbian_sis' ||
+    hasExt('sis', 'sisx')
+  ) {
+    return 'sis';
+  }
+
+  // 10. Flash / SWF
+  if (
+    platform.includes('flash') ||
+    rawFormat === 'swf' ||
+    engine === 'ruffle_flash' ||
+    hasExt('swf')
+  ) {
+    return 'swf';
+  }
+
+  // 11. HTML / Web / Zip
+  if (
+    rawFormat === 'html' ||
+    rawFormat === 'zip' ||
+    rawFormat === 'web' ||
+    engine === 'iframe_web' ||
+    engine === 'html5_zip' ||
+    platform.includes('web') ||
+    platform.includes('html5') ||
+    hasExt('html', 'htm')
+  ) {
+    return 'html';
+  }
+
+  // 12. NES
+  if (
+    platform.includes('nes') ||
+    platform.includes('nintendo entertainment system') ||
+    rawFormat === 'nes' ||
+    hasExt('nes')
+  ) {
+    return 'nes';
+  }
+
+  return rawFormat || 'jar';
 }
 
 export function getAspectRatioStyle(ratio: string): React.CSSProperties {
@@ -139,17 +299,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
 
   // Determine ROM format from metadata
   useEffect(() => {
-    let fmt = 'jar';
-    const filename = (game.romFileName || game.romUrl || game.title || '').toLowerCase();
-
-    if (game.romFormat) fmt = game.romFormat;
-    else if (filename.endsWith('.sis') || game.engineType === 'symbian_sis') fmt = 'sis';
-    else if (filename.endsWith('.swf') || game.engineType === 'ruffle_flash') fmt = 'swf';
-    else if (filename.endsWith('.gba')) fmt = 'gba';
-    else if (filename.endsWith('.nes')) fmt = 'nes';
-    else if (filename.endsWith('.zip') || game.engineType === 'html5_zip') fmt = 'zip';
-    else if (filename.endsWith('.jar') || game.engineType === 'j2me_wasm') fmt = 'jar';
-
+    const fmt = detectActiveFormat(game);
     setFormat(fmt);
   }, [game]);
 
@@ -157,7 +307,8 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
   const loadRom = async (preferredIndex = 0, bypassCache = false) => {
     setIsLoading(true);
     setLoadError(null);
-    const activeFormat = game.romFormat || format || 'jar';
+    const activeFormat = detectActiveFormat(game);
+    setFormat(activeFormat);
     setDownloadStatus(
       activeFormat === 'jar' || game.engineType === 'j2me_wasm' || game.engineType === 'java_j2me'
         ? 'Initializing Java Virtual Machine (CheerpJ)...'
@@ -168,7 +319,7 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
       const res = await resolveRomWithMirrors(game, activeFormat, {
         preferredMirrorIndex: preferredIndex,
         bypassCache,
-        timeoutMs: (activeFormat === 'psx' || activeFormat === 'psp' || activeFormat === 'ps2') ? 60000 : 8000,
+        timeoutMs: (activeFormat === 'psx' || activeFormat === 'psp' || activeFormat === 'ps2') ? 10000 : 4000,
         onStatusUpdate: (msg) => {
           setDownloadStatus(msg);
         }
@@ -1251,19 +1402,21 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
             style={getAspectRatioStyle(selectedRatio)}
             className="w-full h-full flex items-center justify-center relative [image-rendering:pixelated] [image-rendering:crisp-edges]"
           >
-            <iframe
-              key={`${game.id}-${selectedRatio}-${reloadKey}`}
-              ref={iframeRef}
-              srcDoc={buildEmulatorDoc()}
-              title={game.title}
-              className="w-full h-full border-0 bg-slate-950 [image-rendering:pixelated] [image-rendering:crisp-edges]"
-              allow="autoplay; fullscreen; gamepad; accelerometer; gyroscope"
-              sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-forms allow-modals"
-              onLoad={() => {
-                setIsLoading(false);
-                ensureAudioAndFocus();
-              }}
-            />
+            {(!isLoading && (romBlobUrl || romSourceUrl || format === 'html' || format === 'zip' || game.engineType === 'iframe_web')) ? (
+              <iframe
+                key={`${game.id}-${selectedRatio}-${reloadKey}-${romBlobUrl || romSourceUrl || ''}`}
+                ref={iframeRef}
+                srcDoc={buildEmulatorDoc()}
+                title={game.title}
+                className="w-full h-full border-0 bg-slate-950 [image-rendering:pixelated] [image-rendering:crisp-edges]"
+                allow="autoplay; fullscreen; gamepad; accelerometer; gyroscope"
+                sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-forms allow-modals"
+                onLoad={() => {
+                  setIsLoading(false);
+                  ensureAudioAndFocus();
+                }}
+              />
+            ) : null}
           </div>
 
           {isLoading && (
