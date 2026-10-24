@@ -116,11 +116,36 @@ export const AngryBirdsGame: React.FC<AngryBirdsGameProps> = ({
   const floatingTextsRef = useRef<FloatingText[]>([]);
   const settleTimerRef = useRef(0);
   const animationFrameRef = useRef<number | null>(null);
+  const audioCacheRef = useRef<Record<string, HTMLAudioElement>>({});
 
-  // Play synthetic sounds safely
+  useEffect(() => {
+    const audioMap: Record<string, string> = {
+      stretch: '/assets/games/angry-birds/audio/slingshot-stretch.ogg',
+      launch: '/assets/games/angry-birds/audio/bird-shot.ogg',
+      wood: '/assets/games/angry-birds/audio/wood-destroyed.ogg',
+      pig: '/assets/games/angry-birds/audio/pig-destroyed.ogg',
+      win: '/assets/games/angry-birds/audio/level-complete.ogg'
+    };
+    Object.entries(audioMap).forEach(([key, url]) => {
+      try {
+        const a = new Audio(url);
+        a.preload = 'auto';
+        audioCacheRef.current[key] = a;
+      } catch {
+        // audio preload catch
+      }
+    });
+  }, []);
+
+  // Play synthetic & authentic sounds safely
   const playSfx = useCallback((type: 'stretch' | 'launch' | 'wood' | 'pig' | 'tnt' | 'win' | 'lose') => {
     if (isMuted) return;
     try {
+      const a = audioCacheRef.current[type];
+      if (a) {
+        a.currentTime = 0;
+        a.play().catch(() => {});
+      }
       if (type === 'launch' || type === 'stretch') sounds.playJump();
       else if (type === 'pig') sounds.playCoin();
       else if (type === 'wood') sounds.playHit();
