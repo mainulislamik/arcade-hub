@@ -5,6 +5,29 @@
 <title>Angry Birds HTML5</title>
 <script type="text/javascript" src="cocos2d.js"></script>
 <link rel="stylesheet" type="text/css" href="style.css" />
+<script>
+function fit() {
+  var w = window.innerWidth;
+  var h = window.innerHeight;
+  if (!w || !h) return;
+  var s = Math.min(w / 1000, h / 600);
+  var left = Math.max(0, (w - 1000 * s) / 2);
+  var top = Math.max(0, (h - 600 * s) / 2);
+  var el = document.getElementById('main_div');
+  if (el) {
+    el.style.position = 'absolute';
+    el.style.left = left + 'px';
+    el.style.top = top + 'px';
+    el.style.transformOrigin = '0 0';
+    el.style.transform = 'scale(' + s + ')';
+    el.style.webkitTransform = 'scale(' + s + ')';
+  }
+}
+window.addEventListener('resize', fit);
+window.addEventListener('orientationchange', function() { setTimeout(fit, 100); });
+document.addEventListener('DOMContentLoaded', fit);
+fit();
+</script>
 
 </head>
 <body>

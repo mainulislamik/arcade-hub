@@ -5,6 +5,14 @@ padding:0;
 box-sizing:border-box;
 }
 
+html
+{
+width:100%;
+height:100%;
+margin:0;
+padding:0;
+}
+
 @font-face
 {
 font-family: "komika";
@@ -28,6 +36,10 @@ font-family:komika, system-ui, sans-serif;
 overflow:hidden;
 width:100vw;
 height:100vh;
+touch-action:none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+user-select:none;
 }
 
 #main_div
@@ -37,6 +49,10 @@ width:1000px;
 height:600px;
 overflow:hidden;
 transform-origin:0px 0px;
+touch-action:none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+user-select:none;
 }
 
 .test
@@ -129,6 +145,10 @@ width:1000px;height:600px;background-image:url(sprites/bg.png);background-positi
 #viewport
 {
 margin-left:0px;
+touch-action:none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+user-select:none;
 }
 
 #button_level_select

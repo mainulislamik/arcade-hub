@@ -7,15 +7,20 @@
         frameRate: 60,
         tag: 'viewport',
         SingleEnginFile: 'cocos2d/cocos2dx.min.js',
-        /* engineDir:'cocos2d/', */
-        appFiles: ['game.js']
+        appFiles: ['game.js', 'main.js']
     };
-    window.addEventListener('DOMContentLoaded', function () {
+    function boot() {
+        if (d.getElementById('cocos2d-html5')) return;
         var s = d.createElement('script');
         s.src = c.SingleEnginFile;
-        //s.src = c.engineDir + 'platform/jsloader.js';
-        d.body.appendChild(s);
         s.c = c;
         s.id = 'cocos2d-html5';
-    });
+        d.body.appendChild(s);
+    }
+    if (d.readyState === 'complete' || d.readyState === 'interactive') {
+        setTimeout(boot, 10);
+    } else {
+        window.addEventListener('DOMContentLoaded', boot);
+        window.addEventListener('load', boot);
+    }
 })();

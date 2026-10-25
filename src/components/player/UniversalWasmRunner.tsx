@@ -311,6 +311,8 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
     setFormat(activeFormat);
 
     if (activeFormat === 'html' || activeFormat === 'zip' || game.engineType === 'iframe_web' || game.engineType === 'html5_zip') {
+      const directUrl = (game.romUrl && !game.romUrl.startsWith('native:')) ? game.romUrl : (game.binaryUrl || '');
+      setRomSourceUrl(directUrl);
       setDownloadStatus('Game engine ready');
       setIsLoading(false);
       return;
@@ -1184,11 +1186,12 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
         <html>
         <head>
           <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
           <title>${game.title} - Web Game</title>
           <style>
             * { box-sizing: border-box; margin: 0; padding: 0; }
-            body, html, iframe { width: 100%; height: 100%; border: 0; overflow: hidden; background: #000; }
+            html, body { width: 100%; height: 100%; border: 0; overflow: hidden; background: #000; }
+            iframe { width: 100%; height: 100%; border: 0; display: block; }
           </style>
         </head>
         <body>
@@ -1391,6 +1394,8 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
     ['Down', 'Ok', 'C']
   ];
 
+  const isHtmlGame = format === 'html' || format === 'zip' || game.engineType === 'iframe_web' || game.engineType === 'html5_zip';
+
   return (
     <div
       ref={containerRef}
@@ -1399,9 +1404,9 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
       onClick={ensureAudioAndFocus}
     >
       {/* Emulator Canvas Display Area with Universal Mouse & Gesture Overlay */}
-      <UniversalMouseOverlay onSendKey={sendKey} className="w-full flex-1 h-full min-h-[580px]">
+      <UniversalMouseOverlay onSendKey={sendKey} enabled={!isHtmlGame} className="w-full flex-1 h-full min-h-[220px] sm:min-h-[580px]">
         <div
-          className="w-full h-full min-h-[580px] flex items-center justify-center relative overflow-hidden bg-black"
+          className="w-full h-full min-h-[220px] sm:min-h-[580px] flex items-center justify-center relative overflow-hidden bg-black"
           onPointerDown={ensureAudioAndFocus}
           onClick={ensureAudioAndFocus}
         >
@@ -1413,7 +1418,8 @@ export const UniversalWasmRunner: React.FC<UniversalWasmRunnerProps> = ({
               <iframe
                 key={`${game.id}-${selectedRatio}-${reloadKey}-${romBlobUrl || romSourceUrl || ''}`}
                 ref={iframeRef}
-                srcDoc={buildEmulatorDoc()}
+                src={isHtmlGame ? (game.romUrl || game.binaryUrl || '') : undefined}
+                srcDoc={isHtmlGame ? undefined : buildEmulatorDoc()}
                 title={game.title}
                 className="w-full h-full border-0 bg-slate-950 [image-rendering:pixelated] [image-rendering:crisp-edges]"
                 allow="autoplay; fullscreen; gamepad; accelerometer; gyroscope"

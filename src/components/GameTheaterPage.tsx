@@ -30,7 +30,10 @@ import {
   Save,
   Film,
   Bot,
-  Timer
+  Timer,
+  SlidersHorizontal,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { GameItem } from '../types/game';
 import { sounds } from '../utils/soundEngine';
@@ -110,6 +113,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
   const [activePeerEngine, setActivePeerEngine] = useState<WebRTCPeerEngine | null>(null);
   const [peerRole, setPeerRole] = useState<'host' | 'guest' | null>(null);
   const [snapshotTaken, setSnapshotTaken] = useState(false);
+  const [showMobileTools, setShowMobileTools] = useState(false);
 
   const theaterContainerRef = useRef<HTMLDivElement>(null);
   const replayRecorderRef = useRef<ReplayRecorder>(new ReplayRecorder());
@@ -273,7 +277,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
       case '9:16': return 'w-full max-w-2xl aspect-[9/16] max-h-[88vh] mx-auto';
       case 'fill': return 'w-full h-[85vh] max-h-[940px]';
       default: {
-        return 'w-full min-h-[580px] h-[78vh] sm:h-[84vh] max-h-[920px]';
+        return 'w-full aspect-video sm:aspect-auto sm:min-h-[580px] sm:h-[80vh] sm:max-h-[920px]';
       }
     }
   };
@@ -428,7 +432,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             {/* Ambient LED Glow Toggle */}
             <button
               onClick={() => { sounds.playClick(); setAmbientGlowEnabled(!ambientGlowEnabled); }}
-              className={`p-2 rounded-xl transition-all border ${
+              className={`hidden sm:flex p-2 rounded-xl transition-all border ${
                 ambientGlowEnabled 
                   ? 'bg-amber-50 text-amber-600 border-amber-200' 
                   : 'bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100'
@@ -442,7 +446,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             <button
               onClick={handleTakeSnapshot}
               aria-label="Take Game Screenshot"
-              className={`p-2 rounded-xl transition-all border ${
+              className={`hidden sm:flex p-2 rounded-xl transition-all border ${
                 snapshotTaken
                   ? 'bg-emerald-50 text-emerald-600 border-emerald-300'
                   : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
@@ -456,7 +460,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             <button
               onClick={() => { sounds.playClick(); setShowMultiplayerModal(true); }}
               aria-label="Open 2-Player WebRTC P2P Multiplayer Lobby"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
               title="2-Player WebRTC P2P Multiplayer (0% Server Load)"
             >
               <Users className="w-3.5 h-3.5" />
@@ -484,7 +488,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
                 onToggleFavorite(game.id);
               }}
               aria-label={isFavorite ? `Remove ${game.title} from favorites` : `Add ${game.title} to favorites`}
-              className={`p-2 rounded-xl transition-all border ${
+              className={`flex p-2 rounded-xl transition-all border ${
                 isFavorite
                   ? 'bg-rose-50 text-rose-600 border-rose-200'
                   : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
@@ -498,7 +502,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             <button
               onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setShowSaveStateHUD(true); }}
               aria-label="Save or load game state"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
               title="Quick Save (F1) / Load (F3) / Rewind (\)"
             >
               <Save className="w-3.5 h-3.5" />
@@ -509,7 +513,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             <button
               onClick={handleExportReplay}
               aria-label="Record and export 30-second replay clip"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
               title="Record & Export 30-Second Replay Video"
             >
               <Film className="w-3.5 h-3.5" />
@@ -520,7 +524,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             <button
               onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setShowAiCoachModal(true); }}
               aria-label="Open AI Gaming Coach"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
               title="Open Arcadex AI Gaming Coach & Strategies"
             >
               <Bot className="w-3.5 h-3.5" />
@@ -531,7 +535,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             <button
               onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setShowSpeedrunModal(true); }}
               aria-label="Open Speedrun Leaderboard"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
               title="Speedrun Leaderboard & Ghost Times"
             >
               <Timer className="w-3.5 h-3.5" />
@@ -542,7 +546,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             <button
               onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setShowGamepadModal(true); }}
               aria-label="Gamepad settings and remapper"
-              className="p-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-colors"
+              className="hidden sm:flex p-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-colors"
               title="Gamepad Studio, Deadzones & Button Remapper"
             >
               <Gamepad2 className="w-4 h-4" />
@@ -551,7 +555,7 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             {/* 3D Arcade Cabinet Mode Toggle */}
             <button
               onClick={() => { sounds.playClick(); setArcadeCabinetMode(!arcadeCabinetMode); }}
-              className={`p-2 rounded-xl transition-all border ${
+              className={`hidden sm:flex p-2 rounded-xl transition-all border ${
                 arcadeCabinetMode 
                   ? 'bg-purple-100 text-purple-700 border-purple-300 shadow-sm' 
                   : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
@@ -559,6 +563,21 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
               title="Toggle 3D Retro Arcade Cabinet Mode"
             >
               <Tv className="w-4 h-4" />
+            </button>
+
+            {/* Mobile Tools Toggle Button */}
+            <button
+              onClick={() => { sounds.playClick(); setShowMobileTools(!showMobileTools); }}
+              className={`sm:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                showMobileTools
+                  ? 'bg-indigo-600 text-white border-indigo-700 shadow-sm'
+                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+              }`}
+              title="Open Extra Tools"
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <span>Tools</span>
+              {showMobileTools ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
 
             {/* Sound Toggle */}
@@ -607,6 +626,61 @@ export const GameTheaterPage: React.FC<GameTheaterPageProps> = ({
             </button>
           </div>
         </div>
+
+        {/* Mobile Expanded Tools Drawer */}
+        {showMobileTools && (
+          <div className="sm:hidden -mt-2 mb-3 bg-slate-900/95 backdrop-blur-md rounded-2xl p-3 border border-slate-800 shadow-xl flex flex-wrap items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
+            <button
+              onClick={() => { sounds.playClick(); setShowMultiplayerModal(true); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl text-xs font-bold shadow-sm"
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>{t.multiplayerP2P}</span>
+            </button>
+            <button
+              onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setShowSaveStateHUD(true); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl text-xs font-bold shadow-sm"
+            >
+              <Save className="w-3.5 h-3.5" />
+              <span>Save/Load</span>
+            </button>
+            <button
+              onClick={handleExportReplay}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl text-xs font-bold shadow-sm"
+            >
+              <Film className="w-3.5 h-3.5" />
+              <span>30s Clip</span>
+            </button>
+            <button
+              onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setShowAiCoachModal(true); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl text-xs font-bold shadow-sm"
+            >
+              <Bot className="w-3.5 h-3.5" />
+              <span>AI Coach</span>
+            </button>
+            <button
+              onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setShowSpeedrunModal(true); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-xl text-xs font-bold shadow-sm"
+            >
+              <Timer className="w-3.5 h-3.5" />
+              <span>Speedrun</span>
+            </button>
+            <button
+              onClick={() => { sounds.playClick(); HapticEngine.lightTick(); setShowGamepadModal(true); }}
+              className="p-2 bg-slate-800 text-slate-300 rounded-xl border border-slate-700"
+              title="Gamepad"
+            >
+              <Gamepad2 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={handleTakeSnapshot}
+              className="p-2 bg-slate-800 text-slate-300 rounded-xl border border-slate-700"
+              title="Screenshot"
+            >
+              <Camera className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
         {/* Ambient Backlight Dynamic Glow Wrapper */}
         <AmbientBacklight enabled={ambientGlowEnabled} intensity="medium">
