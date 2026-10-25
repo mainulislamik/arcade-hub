@@ -1,5 +1,5 @@
-// Arcadex Offline PWA Service Worker (Cache-First Core + Stale-While-Revalidate)
-const CACHE_NAME = 'arcadex-v1-offline-core';
+// Arcadex Offline PWA Service Worker (Network-First Navigation + Fast Assets Cache)
+const CACHE_NAME = 'arcadex-v2-mobile-responsive';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -33,10 +33,37 @@ self.addEventListener('fetch', (event) => {
   // Ignore chrome extensions or non-http
   if (!event.request.url.startsWith('http')) return;
 
+  const url = new URL(event.request.url);
+  const isHtmlNavigation = event.request.mode === 'navigate' || 
+    event.request.headers.get('accept')?.includes('text/html') ||
+    url.pathname === '/' ||
+    url.pathname === '/index.html' ||
+    url.pathname.startsWith('/game/');
+
+  // NETWORK-FIRST FOR HTML NAVIGATION TO PREVENT STALE CACHES
+  if (isHtmlNavigation) {
+    event.respondWith(
+      fetch(event.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+        }
+        return networkResponse;
+      }).catch(() => {
+        return caches.match(event.request).then((cached) => {
+          return cached || caches.match('/index.html');
+        });
+      })
+    );
+    return;
+  }
+
+  // CACHE-FIRST WITH BACKGROUND UPDATE FOR STATIC ASSETS
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
-        // Fetch in background to update cache for next time
         fetch(event.request).then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
             caches.open(CACHE_NAME).then((cache) => {
@@ -57,7 +84,6 @@ self.addEventListener('fetch', (event) => {
         });
         return networkResponse;
       }).catch(() => {
-        // Fallback for HTML pages when offline
         if (event.request.headers.get('accept')?.includes('text/html')) {
           return caches.match('/index.html');
         }
