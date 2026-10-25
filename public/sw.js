@@ -1,5 +1,5 @@
 // Arcadex Offline PWA Service Worker (Network-First Navigation + Fast Assets Cache)
-const CACHE_NAME = 'arcadex-v2-mobile-responsive';
+const CACHE_NAME = 'arcadex-v4-loader-fix';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

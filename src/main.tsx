@@ -13,7 +13,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register('/sw.js?v=20261025-2')
+      .register('/sw.js?v=20261025-4')
       .then((registration) => {
         // Check for updates on load
         registration.update().catch(() => {});
